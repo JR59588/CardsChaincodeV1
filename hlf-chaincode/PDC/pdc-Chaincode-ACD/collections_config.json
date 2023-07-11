@@ -1,16 +1,17 @@
 [
   {
-    "name": "PvOBMerchantSummary",
-    "policy": "OR('AggOrgMSP.member','APMSP.member','SAOrgMSP.member','CAcctMSP.member','EDIMSP.member')",
+    "name": "Main",
+    "policy": "OR('ACDMSP.member','AODMSP.member','AADMSP.member')",
     "requiredPeerCount": 2,
-    "maxPeerCount": 6,
+    "maxPeerCount": 4,
     "blockToLive": 0,
     "memberOnlyRead": true,
     "memberOnlyWrite": true
+    
   },
   {
-    "name": "PvCustomerCAcctInfo",
-    "policy": "OR('CAcctMSP.member')",
+    "name": "PDC1",
+    "policy": "OR('AODMSP.member')",
     "requiredPeerCount": 0,
     "maxPeerCount": 1,
     "blockToLive": 0,
@@ -18,8 +19,8 @@
     "memberOnlyWrite": true
   },
   {
-    "name": "PvMerchantAPInfo",
-    "policy": "OR('APMSP.member')",
+    "name": "PDC2",
+    "policy": "OR('AADMSP.member')",
     "requiredPeerCount": 0,
     "maxPeerCount": 1,
     "blockToLive": 0,
@@ -27,8 +28,8 @@
     "memberOnlyWrite": true
   },
   {
-    "name": "PvClearingInfo",
-    "policy": "OR('EDIMSP.member')",
+    "name": "PDC3",
+    "policy": "OR('AODMSP.member','AADMSP.member')",
     "requiredPeerCount": 0,
     "maxPeerCount": 1,
     "blockToLive": 0,
