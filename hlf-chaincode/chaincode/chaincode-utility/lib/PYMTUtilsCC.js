@@ -7,7 +7,7 @@
 "use strict";
 const PYMTUtils = require("./PYMTUtils");
 const { Contract } = require("fabric-contract-api");
-const HLFEVENT = require("./HLFEVENT");
+// const HLFEVENT = require("./HLFEVENT");
 const PYMTTX_MERCHANT_CC_SUFFIX = "PYMTTxMerchantCC";
 
 async function checkInvokeCCResponse(chaincodeResponse) {
@@ -17,8 +17,8 @@ async function checkInvokeCCResponse(chaincodeResponse) {
 
   console.log(
     "decodeddata = " +
-      // Buffer.from(chaincodeResponse.payload, "base64").toString()
-      Buffer.from(chaincodeResponse.payload).toString()
+    // Buffer.from(chaincodeResponse.payload, "base64").toString()
+    Buffer.from(chaincodeResponse.payload).toString()
   );
 
   if (!chaincodeResponse) {
@@ -92,11 +92,11 @@ class PYMTUtilsCC extends Contract {
     if (!accessValid) {
       throw new Error(
         "This transaction already exists for merchantId : " +
-          merchantId +
-          " customerId :" +
-          CustomerId +
-          "LoanReferenceNumber :" +
-          loanReferenceNumber
+        merchantId +
+        " customerId :" +
+        CustomerId +
+        "LoanReferenceNumber :" +
+        loanReferenceNumber
       );
     }
     // acl
@@ -183,11 +183,11 @@ class PYMTUtilsCC extends Contract {
     if (ccPayload == "true") {
       console.log("PYTMutilscc.js ccPayload = true : ", ccPayload);
       initiateTxObj.TxStatus = TXSTATUS_INITIATED;
-     
+
     } else {
       console.log("PYTMutilscc.js ccPayload = false : ", ccPayload);
       initiateTxObj.TxStatus = TXSTATUS_REJECTED;
-    
+
     }
 
     // === Save transaction to state ===
@@ -260,11 +260,11 @@ class PYMTUtilsCC extends Contract {
     if (!accessValid) {
       throw new Error(
         "This transaction already exists for merchantId : " +
-          MerchantId +
-          " customerId :" +
-          CustomerId +
-          "LoanReferenceNumber :" +
-          LoanReferenceNumber
+        MerchantId +
+        " customerId :" +
+        CustomerId +
+        "LoanReferenceNumber :" +
+        LoanReferenceNumber
       );
     }
     console.log("access valid : ", accessValid);
@@ -418,19 +418,19 @@ class PYMTUtilsCC extends Contract {
     // === Save transaction to state ===    let txID=ctx.stub.getTxID();
     // === Save transaction to state ===
     try {
-    
-    let txID = ctx.stub.getTxID();
-    console.log("Line 389", txID);
-    txIn.txID = txID;
-    let txTimestamp = ctx.stub.getTxTimestamp();
-    txIn.txTimestamp = txTimestamp.toString();
-    await ctx.stub.putState(key, Buffer.from(JSON.stringify(txIn)));
-    console.log("successfully putstate for key :", key);
-      
-  } catch (error) {
-    console.log(error);
-    throw error; 
-  }
+
+      let txID = ctx.stub.getTxID();
+      console.log("Line 389", txID);
+      txIn.txID = txID;
+      let txTimestamp = ctx.stub.getTxTimestamp();
+      txIn.txTimestamp = txTimestamp.toString();
+      await ctx.stub.putState(key, Buffer.from(JSON.stringify(txIn)));
+      console.log("successfully putstate for key :", key);
+
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   async readState(ctx, key) {
@@ -446,7 +446,7 @@ class PYMTUtilsCC extends Contract {
   async writeState(ctx, key, txIn) {
     try {
       let TxInfo = JSON.parse(txIn);
-      console.log("line no 427----PYMTutilsCC.js----TxInfo",TxInfo);
+      console.log("line no 427----PYMTutilsCC.js----TxInfo", TxInfo);
       await this.saveTxState(ctx, key, TxInfo);
     } catch (error) {
       throw Error(error);

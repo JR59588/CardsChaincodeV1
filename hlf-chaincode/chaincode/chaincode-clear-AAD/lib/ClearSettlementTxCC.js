@@ -8,21 +8,21 @@
 const PYMTUtils = require("./PYMTUtils");
 const { Contract } = require("fabric-contract-api");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
-class SubmitSettlementTxCC extends Contract {
-  async submitSettlementTx(ctx, merchantId, customerId, loanReferenceNumber) {
+class ClearSettlementTxCC extends Contract {
+  async clearSettlementTxCC(ctx, merchantId, customerId, loanReferenceNumber) {
     try {
-      console.log("------>>>In submitSettlementTx <<<<<<<-------");
+      console.log("------>>>In clearSettlementTxCC <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);
 
-      //ACL :  Can be called by SA Org only
-      //TODO : PSP org and acl org details has to be finalised......(discussion with nishanth)
-      let { PSP, PYMTUtilsCC } = await pymtutils.hlfconstants();
+      //ACL :  Can be called by AOD Org only
+      //TODO : AOD org and acl org details has to be finalised......(discussion with nishanth)
+      let { AOD, PYMTUtilsCC } = await pymtutils.hlfconstants();
 
-      const accessValid = await pymtutils.validateOrganization(ctx, PSP);
+      const accessValid = await pymtutils.validateOrganization(ctx, AOD);
 
       if (!accessValid) {
         throw new Error(
-          "Unauthorized to Perform the transaction for submitSettlementTx : "
+          "Unauthorized to Perform the transaction for clearSettlementTxCC : "
         );
       }
       // TODO : please check the parameters 
@@ -30,13 +30,14 @@ class SubmitSettlementTxCC extends Contract {
 
       let {
         // TODO : update the utils.js file (hlfconstants)  
-        TXSTATUS_INITIATED,
-        TXSTATUS_SUBMITTED,
-        TXSTATUS_NOT_SUBMITTED
+        TXSTATUS_BALANCED,
+        TXSTATUS_CLEARED,
+        TXSTATUS_NOT_CLEARED
 
       } = await pymtutils.hlfconstants();
       //TODO : change the function of the utils.js for channel name.(replace:getChannelIdentity )
       const channelName = await pymtutils.getChannelIdentity(ctx);
+      // TODO: Change the parameters based on requirement.
       let key = merchantId + "-" + customerId + "-" + loanReferenceNumber;
       console.log(" confirmTx.js:key", key);
 
@@ -52,20 +53,21 @@ class SubmitSettlementTxCC extends Contract {
       }
 
       //@to-do verify chaincode tx state is initiated only.
-      if (!(currentTxReadState.TxStatus == TXSTATUS_BALANCED)) {
+      // TODO verify chaincode tx state is as per requirement.
+      if (!(currentTxReadState.TxStatus == TXSTATUS_CLEARED)) {
         throw new Error(`Invalid Transaction state  for key  : ${key}`);
       }
 
-      const isSubmitted = await this.submitTxByACD(
+      const isCleared = await this.clearTxByAAD(
         ctx,
         currentTxReadState
       );
 
       var state;
-      if (isSubmitted) {
-        state = TXSTATUS_SUBMITTED;
+      if (isCleared) {
+        state = TXSTATUS_CLEARED;
       } else {
-        state = TXSTATUS_NOT_SUBMITTED;
+        state = TXSTATUS_NOT_CLEARED;
       }
       // putState the state to utilsCC
       currentTxReadState.TxStatus = state;
@@ -77,18 +79,18 @@ class SubmitSettlementTxCC extends Contract {
     }
   }
 
-  async submitTxByACD(ctx, txIn) {
-    var isSubmitted = true;
+  async clearTxByAAD(ctx, txIn) {
+    var isCleared = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
     const hasTxTransactionReferenceNumber = "TransactionReferenceNumber" in txIn;
     if (hasTxTransactionReferenceNumber) {
       if (txIn.TransactionReferenceNumber === "" || txIn.TransactionReferenceNumber.length == 0) {
-        isAccounted = false;
+        isCleared = false;
         console.log(
           "Validation by EDI...TransactionReferenceNumber not valid: ",
-          isAccounted
+          isCleared
         );
-        return isAccounted;
+        return isCleared;
       }
     } else {
       return false;
@@ -97,24 +99,24 @@ class SubmitSettlementTxCC extends Contract {
     const hasTxLoanTenure = "LoanTenure" in txIn;
     if (hasTxLoanTenure) {
       if (txIn.LoanTenure === "" || txIn.LoanTenure.length == 0) {
-        isAccounted = false;
-        console.log("Validation by EDI...LoanTenure not valid: ", isAccounted);
-        return isAccounted;
+        isCleared = false;
+        console.log("Validation by EDI...LoanTenure not valid: ", isCleared);
+        return isCleared;
       }
       let LoanTenureInt = parseInt(txIn.LoanTenure);
       if (isNaN(LoanTenureInt)) {
         return false;
       }
       if (LoanTenureInt > 36) {
-        isAccounted = false;
+        isCleared = false;
         console.log("LoanTenure (", txIn.LoanTenure, ") is not valid");
-        return isAccounted;
+        return isCleared;
       }
     } else {
       return false;
     }
-    return isAccounted;
+    return isCleared;
   }
 }
 
-module.exports = SubmitSettlementTxCC;
+module.exports = ClearSettlementTxCC;
