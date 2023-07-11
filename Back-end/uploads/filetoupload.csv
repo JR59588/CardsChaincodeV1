@@ -1,0 +1,2 @@
+merchantId,merchantName,CustomerName,CustomerID,TransactionCurrency,TransactionAmount,TransactionReferenceNumber,TransactionDate,LoanReferenceNumber,DateofLoanApproval,SubmittedBy,SubmissionNumberRef,ServiceDate,SubmissionDatetime,LoanAccountNumber,isContractSigned,Location,ProductType,LoanAmount,LoanTenure
+M101,Mname,Anne jah,C106,USD,500,TR101,1/4/2023,L99901,1/4/2023,M101,SN101,1/4/2023,1/4/2023,1234,TRUE,USA,PT12,500,2

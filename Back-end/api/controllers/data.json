@@ -1,0 +1,52 @@
+{
+  "Org1": {
+    "connectionPath": "./connection-org1.json",
+    "ccpPath": "ccpPathOrg1",
+    "walletOrg": "walletorg1",
+    "clientMSPId": "Org1MSP",
+    "userWallet": "appuserFororg1",
+    "admin": "admin"
+  },
+  "Org2": {
+    "connectionPath": "./connection-org2.json",
+    "walletOrg": "walletorg2",
+    "clientMSPId": "Org2MSP",
+    "userWallet": "appuserFor2Org2",
+    "admin": "admin"
+  },
+  "Agg": {
+    "connectionPath": "./connection-AggOrg.json",
+    "walletOrg": "wallet3AggOrg",
+    "clientMSPId": "AggOrgMSP",
+    "userWallet": "appuser3forOrg3",
+    "admin": "admin"
+  },
+  "SA": {
+    "connectionPath": "./connection-SAOrg.json",
+    "walletOrg": "wallet4SAOrg",
+    "clientMSPId": "SAOrgMSP",
+    "userWallet": "appUser4fororg4",
+    "admin": "admin"
+  },
+  "AP": {
+    "connectionPath": "./connection-AP.json",
+    "walletOrg": "wallet5AP",
+    "clientMSPId": "APMSP",
+    "userWallet": "appUser5fororg5",
+    "admin": "admin"
+  },
+  "CAcct": {
+    "connectionPath": "./connection-CAcct.json",
+    "walletOrg": "wallet6CAcct",
+    "clientMSPId": "CAcctMSP",
+    "userWallet": "appUser6ForCAcct",
+    "admin": "admin"
+  },
+  "EDI": {
+    "connectionPath": "./connection-EDI.json",
+    "walletOrg": "wallet_EDI",
+    "clientMSPId": "EDIMSP",
+    "userWallet": "appUser2EDI",
+    "admin": "admin"
+  }
+}

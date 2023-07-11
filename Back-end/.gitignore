@@ -1,0 +1,12 @@
+./node_modules
+package-lock.json
+wallet*/
+walletorg2
+walletorg3
+connection-org1.json
+connection-org2.json
+connection-*.json
+*.log
+logger.js
+combined.log
+node_modules
