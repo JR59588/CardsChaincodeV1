@@ -46,49 +46,44 @@ class PYMTUtilsCC extends Contract {
   //@required for V1
   async initiateTx(
     ctx,
-    merchantId,
-    CustomerId,
-    loanReferenceNumber,
-    merchantName,
-    CustomerName,
-    TransactionCurrency,
-    TransactionAmount,
-    TransactionReferenceNumber,
-    TransactionDate,
-    ProductType,
-    DateofLoanApproval,
-    LoanDisbursementDate,
-    LoanAmount,
-    LoanTenure,
-    LoanStatus,
-    LoanAccountNumber,
-    LoCapprovedamount,
-    LoCAvailableamount,
-    IsContractSigned,
-    Location,
-    POSEntryMode,
-    SubmittedBy,
-    SubmissionNumber,
-    ServiceDate,
-    SubmissionDate
+    processingCode,
+    transactionAmount,
+    transmissionDateAndTime,
+    systemTraceAuditNumber,
+    localTime,
+    localDate,
+    expirationDate,
+    merchantCategoryCode,
+    posEntryMode,
+    acquiringInstitutionIdentificationCode,
+    retrievalReferenceNumber,
+    cardAcceptorTerminalIdentification,
+    cardAcceptorIdentificationCode,
+    cardAcceptorNameAndLocation,
+    currencyCode,
+    personalIdentificationNumber,
+    additionalData,
+    posData
   ) {
     // acl
 
     // var OrgMSPId = ctx.clientIdentity.getMSPID();
     var pymtutils = new PYMTUtils(ctx);
     var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
-    var channelName = await pymtutils.getChannelForOrgWithAgg(ctx, "AggOrgMSP");
+    var channelName = await pymtutils.getChannelIdentity(ctx, "PSPOrgMSP");
 
     try {
+      // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
       await pymtutils.checkNull(merchantId, CustomerId, loanReferenceNumber);
     } catch (err) {
       console.log(err);
       throw err;
     }
     //20.2.23 changed to AggOrgMSP.
-    const accessValid = await pymtutils.validateOrganization(ctx, "AggOrgMSP");
+    const accessValid = await pymtutils.validateOrganization(ctx, "PSPOrgMSP");
     console.log("accessValid : ", accessValid);
 
+    // TODO: change the message as per the requirement by changing mid, cid, lrf.
     if (!accessValid) {
       throw new Error(
         "This transaction already exists for merchantId : " +
@@ -105,6 +100,7 @@ class PYMTUtilsCC extends Contract {
     // if isValidMerchantId(m101)
     console.log("before the key in utilscc");
     var iCCName;
+    // TODO: change tx key by changing mid, cid, lrf as per requirement.
     let key = await pymtutils.makeTxKey(
       OrgMSPID,
       merchantId,
@@ -119,34 +115,24 @@ class PYMTUtilsCC extends Contract {
     );
 
     let initiateTxObj = {
-      // submitter MSPId added by deepak
-      // this will contain the mspId of submitter organization
-      //SubmitterMSPID: clientId,
-      MerchantId: merchantId,
-      MerchantName: merchantName, // 10.2.23 merchant name is removed from front end. so this value should not be relied up-on
-      CustomerName: CustomerName,
-      CustomerID: CustomerId,
-      TransactionCurrency: TransactionCurrency,
-      TransactionAmount: TransactionAmount,
-      TransactionReferenceNumber: TransactionReferenceNumber,
-      TransactionDate: TransactionDate,
-      LoanReferenceNumber: loanReferenceNumber,
-      ProductType: ProductType,
-      DateofLoanApproval: DateofLoanApproval,
-      LoanDisbursementDate: LoanDisbursementDate,
-      LoanAmount: LoanAmount,
-      LoanTenure: LoanTenure,
-      LoanStatus: LoanStatus,
-      LoanAccountNumber: LoanAccountNumber,
-      LoCapprovedamount: LoCapprovedamount,
-      LoCAvailableamount: LoCAvailableamount,
-      IsContractSigned: IsContractSigned,
-      Location: Location,
-      POSEntryMode: POSEntryMode,
-      SubmittedBy: SubmittedBy,
-      SubmissionNumber: SubmissionNumber,
-      ServiceDate: ServiceDate,
-      SubmissionDate: SubmissionDate
+      processingCode: processingCode,
+      transactionAmount: transactionAmount,
+      transmissionDateAndTime: transmissionDateAndTime,
+      systemTraceAuditNumber: systemTraceAuditNumber,
+      localTime: localTime,
+      localDate: localDate,
+      expirationDate: expirationDate,
+      merchantCategoryCode: merchantCategoryCode,
+      posEntryMode: posEntryMode,
+      acquiringInstitutionIdentificationCode: acquiringInstitutionIdentificationCode,
+      retrievalReferenceNumber: retrievalReferenceNumber,
+      cardAcceptorTerminalIdentification: cardAcceptorTerminalIdentification,
+      cardAcceptorIdentificationCode: cardAcceptorIdentificationCode,
+      cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
+      currencyCode: currencyCode,
+      personalIdentificationNumber: personalIdentificationNumber,
+      additionalData: additionalData,
+      posData: posData,
     };
 
     let { initiateSettlementTxFN } = await pymtutils.hlfconstants();
@@ -215,48 +201,43 @@ class PYMTUtilsCC extends Contract {
   ///"TODO"  add settlement tx details /// should be add and invoked from this contract.........
   async requestTx(
     ctx,
-    MerchantId,
-    CustomerId,
-    LoanReferenceNumber,
-    MerchantName,
-    CustomerName,
-    TransactionCurrency,
-    TransactionAmount,
-    TransactionReferenceNumber,
-    TransactionDate,
-    ProductType,
-    DateofLoanApproval,
-    LoanDisbursementDate,
-    LoanAmount,
-    LoanTenure,
-    LoanStatus,
-    LoanAccountNumber,
-    LoCapprovedamount,
-    LoCAvailableamount,
-    IsMerchantContractSigned,
-    Location,
-    POSEntryMode,
-    SubmittedBy,
-    SubmissionNumber,
-    ServiceDate,
-    SubmissionDate
+    processingCode,
+    transactionAmount,
+    transmissionDateAndTime,
+    systemTraceAuditNumber,
+    localTime,
+    localDate,
+    expirationDate,
+    merchantCategoryCode,
+    posEntryMode,
+    acquiringInstitutionIdentificationCode,
+    retrievalReferenceNumber,
+    cardAcceptorTerminalIdentification,
+    cardAcceptorIdentificationCode,
+    cardAcceptorNameAndLocation,
+    currencyCode,
+    personalIdentificationNumber,
+    additionalData,
+    posData
   ) {
     // acl
 
     var OrgMSPId = ctx.clientIdentity.getMSPID();
     var pymtutils = new PYMTUtils(ctx);
     var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
-    var channelName = await pymtutils.getChannelForOrgWithoutAgg(ctx, "Org1");
+    var channelName = await pymtutils.getChannelIdentity(ctx, "Org1");
     console.log("channel name : ", channelName);
 
     try {
+      // TODO: change the parameters as per the requirement by changing mid, cid, lrf.
       await pymtutils.checkNull(MerchantId, CustomerId, LoanReferenceNumber);
     } catch (err) {
       console.log(err);
       throw err;
     }
-    // TODO: remove hardcoded Ord1MSP
+    // TODO: remove hardcoded Org1MSP
     const accessValid = await pymtutils.validateOrganization(ctx, "Org1MSP");
+    // TODO: change the message as per the requirement by changing mid, cid, lrf.
     if (!accessValid) {
       throw new Error(
         "This transaction already exists for merchantId : " +
@@ -270,6 +251,8 @@ class PYMTUtilsCC extends Contract {
     console.log("access valid : ", accessValid);
 
     console.log("before the key in utilscc");
+    // TODO: change the key as per the requirement by changing mid, cid, lrf.
+
     let key = await pymtutils.makeTxKey(
       OrgMSPID,
       MerchantId,
@@ -279,34 +262,24 @@ class PYMTUtilsCC extends Contract {
     console.log("after the key in utilscc");
 
     let settlementTx = {
-      MerchantId: MerchantId,
-      MerchantName: MerchantName, // 10.2.23 merchant name is removed from front end. so this value should not be relied up-on
-      CustomerName: CustomerName,
-      CustomerID: CustomerId,
-      TransactionCurrency: TransactionCurrency,
-      TransactionAmount: TransactionAmount,
-      TransactionReferenceNumber: TransactionReferenceNumber,
-      TransactionDate: TransactionDate,
-      LoanReferenceNumber: LoanReferenceNumber,
-      ProductType: ProductType,
-      DateofLoanApproval: DateofLoanApproval,
-      LoanDisbursementDate: LoanDisbursementDate,
-      LoanAmount: LoanAmount,
-      LoanTenure: LoanTenure,
-      LoanStatus: LoanStatus,
-      LoanAccountNumber: LoanAccountNumber,
-      LoCapprovedamount: LoCapprovedamount,
-      LoCAvailableamount: LoCAvailableamount,
-      IsMerchantContractSigned: IsMerchantContractSigned,
-      Location: Location,
-      POSEntryMode: POSEntryMode,
-      SubmittedBy: SubmittedBy,
-      SubmissionNumber: SubmissionNumber,
-      ServiceDate: ServiceDate,
-      SubmissionDate: SubmissionDate,
-      TxStatus: "TxRequested",
-      txID: "",
-      txTimestamp: "",
+      processingCode: processingCode,
+      transactionAmount: transactionAmount,
+      transmissionDateAndTime: transmissionDateAndTime,
+      systemTraceAuditNumber: systemTraceAuditNumber,
+      localTime: localTime,
+      localDate: localDate,
+      expirationDate: expirationDate,
+      merchantCategoryCode: merchantCategoryCode,
+      posEntryMode: posEntryMode,
+      acquiringInstitutionIdentificationCode: acquiringInstitutionIdentificationCode,
+      retrievalReferenceNumber: retrievalReferenceNumber,
+      cardAcceptorTerminalIdentification: cardAcceptorTerminalIdentification,
+      cardAcceptorIdentificationCode: cardAcceptorIdentificationCode,
+      cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
+      currencyCode: currencyCode,
+      personalIdentificationNumber: personalIdentificationNumber,
+      additionalData: additionalData,
+      posData: posData,
     };
 
     let { requestSettlementTxFN } = await pymtutils.hlfconstants();
@@ -316,6 +289,7 @@ class PYMTUtilsCC extends Contract {
     var iCCName;
     iCCName = "MC_" + PYMTTX_MERCHANT_CC_SUFFIX;
     console.log(" PYTMutilscc.js iCCName : ", iCCName);
+    // TODO: replace mid, mname, cid, lrf with the required fields as per the chaincode.
     const chaincodeResponse = await ctx.stub.invokeChaincode(
       iCCName,
       [

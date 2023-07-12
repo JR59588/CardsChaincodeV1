@@ -31,6 +31,7 @@ class PYMTUtils {
       TXSTATUS_ACCEPTED: "TxAccepted",
       TXSTATUS_REJECTED: "TxRejected",
       TXSTATUS_INITIATED: "TxInitiated",
+      TXSTATUS_REQUESTED: "TxRequested",
       TXSTATUS_SUBMITTED: "TxSubmitted",
       TXSTATUS_NOT_SUBMITTED: "TxNotSubmitted",
       TXSTATUS_AUTHORIZED: "TxAuthorized",
@@ -43,6 +44,9 @@ class PYMTUtils {
 
       PYMTUtilsCC: "PYMTUtilsCC",
       PYMTUtilsCCReadState: "readState",
+
+      initiateSettlementTxFN: "initiateSettlementTx",
+      requestSettlementTxFN: "requestSettlementTx",
 
       // PYMTTxMerchantCC: "PYMTTxMerchantCC",
       // PYMTTxPreSettlementCC: "PYMTTxPreSettlementCC",
@@ -58,9 +62,6 @@ class PYMTUtils {
       // APCCFuncName: "validation",
       // acceptSettlementTxFN: "acceptSettlementTx",
       // validateSettlementTxFN: "validateSettlementTx",
-      // initiateSettlementTxFN: "initiateSettlementTx",
-      // requestSettlementTxFN: "requestSettlementTx",
-      // TXSTATUS_REQUESTED: "TxRequested",
       // TXSTATUS_VALIDATED: "TxValidated",
       // TXSTATUS_NOT_VALIDATED: "TxNotValidated",
       // TXSTATUS_SUBMITED: "TxSubmited",
