@@ -1,0 +1,141 @@
+.placing {
+  background-color: white;
+  color: black;
+  width: 160px;
+  font-size: 15px;
+  font-weight: 500;
+  justify-content: center;
+  position: relative;
+  left: 23px;
+  top: -15px;
+}
+
+.placingAggregator {
+  background-color: white;
+  color: black;
+  width: 190px;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
+  left: 25px;
+  top: -15px;
+}
+
+.placingThreshold {
+  background-color: white;
+  color: black;
+  width: 250px;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
+  left: 25px;
+  top: -20px;
+}
+
+.placingDetails {
+  background-color: white;
+  color: black;
+  width: 250px;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
+  left: 25px;
+  top: -15px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputAlign {
+  position: relative;
+  left: 70px;
+}
+
+.bt1 {
+  width: 150px;
+}
+
+.bt2 {
+  margin-left: 20px;
+  width: 150px;
+}
+
+.btAlignA {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg {
+  background-color: #008555;
+}
+.divB {
+  position: relative;
+  top: -585px;
+  left: 600px;
+  width: 520px;
+}
+.divD {
+  height: 250px;
+  position: relative;
+  left: 50px;
+  top: -20px;
+  width: 520px;
+}
+label {
+  font-size: 17px;
+}
+
+/* modal design */
+.modalDemo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  width: 500px;
+  height: 350px;
+  background-color: white;
+  color: black;
+  padding: 20px;
+  border: 0px solid black;
+  border-radius: 10px;
+  /* box-shadow: 3px 6px 22px -1px rgb(204, 221, 224); */
+}
+.blur {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  position: fixed;
+  flex-direction: row;
+  top: 0;
+  left: 0;
+  width: 100%;
+  color: white;
+  height: 100vh;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.75);
+}
+.modalHeader {
+  width: auto;
+  height: 30px;
+}
+.modalBody {
+  overflow: scroll;
+  width: auto;
+  height: 180px;
+}
+.modalFooter {
+  width: auto;
+  height: 50px;
+}
+.cross {
+  float: right;
+  cursor: pointer;
+}
+.modalFooter button {
+  float: right;
+}

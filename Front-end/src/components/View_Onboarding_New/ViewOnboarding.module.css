@@ -1,0 +1,231 @@
+.col1, .col2,.col3,.col4{
+    border: 1px solid black !important;
+}
+.col1{
+    height: 370px;
+    padding: 20px;
+    width: 550px;;
+    border-radius: 5ch;
+}
+.col2{
+    height: 370px;
+    padding: 20px;
+    width: 550px;;
+    border-radius: 5ch;
+}
+.col3{
+    height: 130px;
+    padding: 20px;
+    width: 550px;;
+    border-radius: 5ch;
+}
+.col4{
+    height: 285px;
+    padding: 20px;
+    width: 550px;;
+    border-radius: 5ch;
+}
+.rowSpacing{
+    row-gap: 30px !important;
+    column-gap: 40px !important;
+}
+.rowSpacingStatic{
+    row-gap: 25px;
+    column-gap: 15px;
+}
+.placeInputsNames{
+    margin-top: -20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.floatingA{
+    background-color: white;
+    color: black;
+    width: 140px;
+    font-size: 15px;
+    font-weight: 500;
+    justify-content: center;
+    position: relative;
+    top: -34px;
+    left:15px;
+}
+.floatingB{
+    background-color: white;
+    color: black;
+    width: 240px;
+    font-size: 15px;
+    font-weight: 500;
+    justify-content: center;
+    position: relative;
+    left: 0px;
+    top: -34px;
+    left:15px;
+}
+.floatingC{
+    background-color: white;
+    color: black;
+    width: 180px;
+    font-size: 15px;
+    font-weight: 500;
+    justify-content: center;
+    position: relative;
+    left: 15px;
+    top: -34px;
+}
+.floatingD{
+    background-color: white;
+    color: black;
+    width: 250px;
+    font-size: 15px;
+    font-weight: 500;
+    justify-content: center;
+    position: relative;
+    left: 15px;
+    top: -34px;
+}
+.loaderSubmit{
+    width: 25px;
+    height: 25px;
+    border: 5px solid #008555;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    animation: rotationSubmit 1s linear infinite;
+    
+}
+@media screen and (max-width:700px) {
+    .floatingA{
+        background-color: white;
+        color: black;
+        width: 140px;
+        font-size: 15px;
+        font-weight: 500;
+        justify-content: center;
+        position: relative;
+        left: 10px;
+        top: -34px;
+    }
+    .floatingB{
+        background-color: white;
+        color: black;
+        width: 240px;
+        font-size: 15px;
+        font-weight: 500;
+        justify-content: center;
+        position: relative;
+        left: 10px;
+        top: -34px;
+    }
+    .floatingC{
+        background-color: white;
+        color: black;
+        width: 180px;
+        font-size: 15px;
+        font-weight: 500;
+        justify-content: center;
+        position: relative;
+        left: 10px;
+        top: -34px;
+    }
+    .floatingD{
+        background-color: white;
+        color: black;
+        width: 250px;
+        font-size: 15px;
+        font-weight: 500;
+        justify-content: center;
+        position: relative;
+        left: 10px;
+        top: -34px;
+    }
+    .placeInputsNames{
+        margin-top: -10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+@media screen and (max-width:400px) {
+    .col1{
+        height: 400px;
+        padding: 20px;
+        width: 550px;;
+        border-radius: 2ch;
+    }
+    .col2{
+        height: 410px;
+        padding: 20px;
+        width: 550px;;
+        border-radius: 2ch;
+    }
+    .col3{
+        height: 150px;
+        padding: 20px;
+        width: 550px;;
+        border-radius: 2ch;
+    }
+    .col4{
+        height: 340px;
+        padding: 20px;
+        width: 550px;;
+        border-radius: 2ch;
+    }
+    .rowSpacing{
+        row-gap: 20px !important;
+        column-gap: 40px !important;
+    }
+    .floatingA{
+        background-color: white;
+        color: black;
+        width: 140px;
+        font-size: 15px;
+        font-weight: 500;
+        justify-content: center;
+        position: relative;
+        left: 1px;
+        top: -34px;
+    }
+    .floatingB{
+        background-color: white;
+        color: black;
+        width: 240px;
+        font-size: 15px;
+        font-weight: 500;
+        justify-content: center;
+        position: relative;
+        left: 1px;
+        top: -34px;
+    }
+    .floatingC{
+        background-color: white;
+        color: black;
+        width: 180px;
+        font-size: 15px;
+        font-weight: 500;
+        justify-content: center;
+        position: relative;
+        left: 1px;
+        top: -34px;
+    }
+    .floatingD{
+        background-color: white;
+        color: black;
+        width: 250px;
+        font-size: 15px;
+        font-weight: 500;
+        justify-content: center;
+        position: relative;
+        left: 1px;
+        top: -34px;
+    }
+    .placeInputsNames{
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    p{
+        margin-top: 5px;
+    }
+}
+

@@ -1,0 +1,145 @@
+import React from 'react'
+import { NavLink } from 'react-router-dom'
+import '../App.css'
+import { useState } from 'react'
+import { useEffect } from 'react'
+import pdf from '../assets/Admin_User_guide.pdf'
+
+const Header = ({ roleId, setRoleId }) => {
+  return (
+    <nav
+      className="navbar navbar-expand-lg bg-body-tertiary "
+      style={{ height: '70px', backgroundColor: '#008555', color: 'white' }}
+    >
+      <div className="container-fluid" style={{ color: 'white' }}>
+        <a className="navbar-brand" href="#" style={{ color: 'white' }}>
+          HLF-CARDS Proof-of-Concept
+        </a>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarText"
+          aria-controls="navbarText"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarText">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <li className="nav-item">
+              <NavLink to="/About" className="ani">
+                {/* About{" "}
+                <span style={{ color: "white" }} className="gapLine">
+                  |
+                </span> */}
+              </NavLink>{' '}
+            </li>
+            <li className="nav-item">
+              {roleId === 'Agg' || roleId === 'Agg2' ? (
+                <>
+                  <NavLink to="/Aggregator" className="ani">
+                    New Onboarding{' '}
+                    <span className="gapLine" style={{ color: 'white' }}>
+                      |
+                    </span>
+                  </NavLink>
+                </>
+              ) : (
+                <>
+                  <div
+                    className="ani"
+                    style={{ cursor: 'not-allowed', color: 'lightgrey' }}
+                  >
+                    New Onboarding{' '}
+                    <span className="gapLine" style={{ color: 'white' }}>
+                      |
+                    </span>
+                  </div>
+                </>
+              )}
+            </li>
+            <li className="nav-item">
+              <NavLink to="/View-Onboarding-Static" className="ani">
+                View Onboarding{' '}
+                <span className="gapLine" style={{ color: 'white' }}>
+                  |
+                </span>
+              </NavLink>
+            </li>
+
+            <li className="nav-item">
+              {roleId === 'Agg' || roleId === 'Agg2' ? (
+                <>
+                  <NavLink to="/Merchant" className="ani">
+                    Sales/Return Request{' '}
+                    <span className="gapLine" style={{ color: 'white' }}>
+                      |
+                    </span>
+                  </NavLink>
+                </>
+              ) : (
+                <>
+                  <div
+                    className="ani"
+                    style={{ cursor: 'not-allowed', color: 'lightgrey' }}
+                  >
+                    Sales/Return Request{' '}
+                    <span className="gapLine" style={{ color: 'white' }}>
+                      |
+                    </span>
+                  </div>
+                </>
+              )}
+            </li>
+            {/* <li className="nav-item">
+              <NavLink to="/ViewTx" className="ani">
+                View Sales/Return Requests{' '}
+              </NavLink>{' '}
+            </li> */}
+          </ul>
+          <div className="d-flex">
+            <div style={{ display: 'flex' }}>
+              <label
+                htmlFor="dropdown"
+                style={{ color: 'white', lineHeight: '35px' }}
+                className="dropLable"
+              >
+                Role*: &nbsp;
+              </label>
+              <select
+                style={{
+                  width: '210px',
+                  backgroundColor: '#008555',
+                  height: '36px',
+                  color: 'white',
+                }}
+                className="form-select"
+                id="dropdown"
+                required
+                value={roleId}
+                onChange={(event) => setRoleId(event.target.value)}
+              >
+                <option value="AP" id="AP" className="dropdown-item">
+                  Select Role
+                </option>
+                <option value="Agg" id="Agg" className="dropdown-item">
+                  Customer Department
+                </option>
+                <option value="Agg3" id="Agg3" className="dropdown-item">
+                  Operations Department
+                </option>
+                <option value="Agg2" id="Agg3" className="dropdown-item">
+                  Accounts Department
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+export default Header
