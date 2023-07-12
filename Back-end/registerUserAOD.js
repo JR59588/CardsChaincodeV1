@@ -12,10 +12,9 @@ const path = require("path");
 
 const db = require("./api/controllers/data.json");
 
-const connectionPath = db.CAcct.connectionPath;
+const connectionPath = db.AOD.connectionPath;
 
 const ccpPath = path.resolve(connectionPath);
-
 
 
 
@@ -31,7 +30,7 @@ async function main() {
 
     // Create a new CA client for interacting with the CA.
 
-    const caURL = ccp.certificateAuthorities["ca_CAcct"].url;
+    const caURL = ccp.certificateAuthorities["ca_AOD"].url;
 
     const ca = new FabricCAServices(caURL);
 
@@ -42,7 +41,7 @@ async function main() {
     // Create a new file system based wallet for managing identities.
 
    // const walletPath = path.join(process.cwd(), "wallet");
-    const walletPath = path.join(process.cwd(), db.CAcct.walletOrg);
+    const walletPath = path.join(process.cwd(), db.AOD.walletOrg);
 
     const wallet = await Wallets.newFileSystemWallet(walletPath);
 
@@ -50,23 +49,23 @@ async function main() {
 
     // Check to see if we've already enrolled the user.
 
-    const userIdentity = await wallet.get(db.CAcct.userWallet);
+    const userIdentity = await wallet.get(db.AOD.userWallet);
 
     if (userIdentity) {
       console.log(
-        `An identity for the user ${db.CAcct.userWallet} already exists in the wallet`
+        `An identity for the user ${db.AOD.userWallet} already exists in the wallet`
       );
 
       return;
     }
 
-    // Check to see if we've already enrolled the db.CAcct.admin user.
+    // Check to see if we've already enrolled the db.AOD.admin user.
 
-    const adminIdentity = await wallet.get(db.CAcct.admin);
+    const adminIdentity = await wallet.get(db.AOD.admin);
 
     if (!adminIdentity) {
       console.log(
-        `An identity for the admin user ${db.CAcct.admin} does not exist in the wallet`
+        `An identity for the admin user ${db.AOD.admin} does not exist in the wallet`
       );
 
       console.log("Run the enrollAdmin.js application before retrying");
@@ -80,15 +79,14 @@ async function main() {
       .getProviderRegistry()
       .getProvider(adminIdentity.type);
 
-    const adminUser = await provider.getUserContext(adminIdentity, db.CAcct.admin);
+    const adminUser = await provider.getUserContext(adminIdentity, db.AOD.admin);
 
     // Register the user, enroll the user, and import the new identity into the wallet.
 
     const secret = await ca.register(
       {
-       
-
-        enrollmentID: db.CAcct.userWallet,
+        
+        enrollmentID: db.AOD.userWallet,
 
         role: "client",
       },
@@ -96,7 +94,7 @@ async function main() {
     );
 
     const enrollment = await ca.enroll({
-      enrollmentID: db.CAcct.userWallet,
+      enrollmentID: db.AOD.userWallet,
 
       enrollmentSecret: secret,
     });
@@ -108,18 +106,18 @@ async function main() {
         privateKey: enrollment.key.toBytes(),
       },
 
-      mspId: db.CAcct.clientMSPId,
+      mspId: db.AOD.clientMSPId,
 
       type: "X.509",
     };
 
-    await wallet.put(db.CAcct.userWallet, x509Identity);
+    await wallet.put(db.AOD.userWallet, x509Identity);
 
     console.log(
-      `Successfully registered and enrolled db.CAcct.admin user ${db.CAcct.userWallet} and imported it into the wallet`
+      `Successfully registered and enrolled db.AOD.admin user ${db.AOD.userWallet} and imported it into the wallet`
     );
   } catch (error) {
-    console.error(`Failed to register user ${db.CAcct.userWallet}: ${error}`);
+    console.error(`Failed to register user ${db.AOD.userWallet}: ${error}`);
 
     process.exit(1);
   }
