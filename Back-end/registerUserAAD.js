@@ -12,9 +12,10 @@ const path = require("path");
 
 const db = require("./api/controllers/data.json");
 
-const connectionPath = db.SA.connectionPath;
+const connectionPath = db.AAD.connectionPath;
 
 const ccpPath = path.resolve(connectionPath);
+
 
 
 
@@ -30,7 +31,7 @@ async function main() {
 
     // Create a new CA client for interacting with the CA.
 
-    const caURL = ccp.certificateAuthorities["ca_SAOrg"].url;
+    const caURL = ccp.certificateAuthorities["ca_AAD"].url;
 
     const ca = new FabricCAServices(caURL);
 
@@ -41,7 +42,7 @@ async function main() {
     // Create a new file system based wallet for managing identities.
 
    // const walletPath = path.join(process.cwd(), "wallet");
-    const walletPath = path.join(process.cwd(), db.SA.walletOrg);
+    const walletPath = path.join(process.cwd(), db.AAD.walletOrg);
 
     const wallet = await Wallets.newFileSystemWallet(walletPath);
 
@@ -49,23 +50,23 @@ async function main() {
 
     // Check to see if we've already enrolled the user.
 
-    const userIdentity = await wallet.get(db.SA.userWallet);
+    const userIdentity = await wallet.get(db.AAD.userWallet);
 
     if (userIdentity) {
       console.log(
-        `An identity for the user ${db.SA.userWallet} already exists in the wallet`
+        `An identity for the user ${db.AAD.userWallet} already exists in the wallet`
       );
 
       return;
     }
 
-    // Check to see if we've already enrolled the db.SA.admin user.
+    // Check to see if we've already enrolled the db.AAD.admin user.
 
-    const adminIdentity = await wallet.get(db.SA.admin);
+    const adminIdentity = await wallet.get(db.AAD.admin);
 
     if (!adminIdentity) {
       console.log(
-        `An identity for the admin user ${db.SA.admin} does not exist in the wallet`
+        `An identity for the admin user ${db.AAD.admin} does not exist in the wallet`
       );
 
       console.log("Run the enrollAdmin.js application before retrying");
@@ -79,14 +80,14 @@ async function main() {
       .getProviderRegistry()
       .getProvider(adminIdentity.type);
 
-    const adminUser = await provider.getUserContext(adminIdentity, db.SA.admin);
+    const adminUser = await provider.getUserContext(adminIdentity, db.AAD.admin);
 
     // Register the user, enroll the user, and import the new identity into the wallet.
 
     const secret = await ca.register(
       {
-        
-        enrollmentID: db.SA.userWallet,
+       
+        enrollmentID: db.AAD.userWallet,
 
         role: "client",
       },
@@ -94,7 +95,7 @@ async function main() {
     );
 
     const enrollment = await ca.enroll({
-      enrollmentID: db.SA.userWallet,
+      enrollmentID: db.AAD.userWallet,
 
       enrollmentSecret: secret,
     });
@@ -106,18 +107,18 @@ async function main() {
         privateKey: enrollment.key.toBytes(),
       },
 
-      mspId: db.SA.clientMSPId,
+      mspId: db.AAD.clientMSPId,
 
       type: "X.509",
     };
 
-    await wallet.put(db.SA.userWallet, x509Identity);
+    await wallet.put(db.AAD.userWallet, x509Identity);
 
     console.log(
-      `Successfully registered and enrolled db.SA.admin user ${db.SA.userWallet} and imported it into the wallet`
+      `Successfully registered and enrolled db.AAD.admin user ${db.AAD.userWallet} and imported it into the wallet`
     );
   } catch (error) {
-    console.error(`Failed to register user ${db.SA.userWallet}: ${error}`);
+    console.error(`Failed to register user ${db.AAD.userWallet}: ${error}`);
 
     process.exit(1);
   }

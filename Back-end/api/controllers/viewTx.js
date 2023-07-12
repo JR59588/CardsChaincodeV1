@@ -43,84 +43,6 @@ const verifyToken = (req, res) => {
 };
 
 
-exports.retrievePvMerchantMetaData = async function (req, res) {
-  console.log("line 53 ");
-  const channelName = "channel1";
-  const contractName = "onboardingMerchantC";
-  try {
-    let org = req.params.roleId;
-    if (!data[org]) {
-      res.status(400).send("Error!. Invalid role name");
-    }
-    let ccpPath = path.resolve(data[org].connectionPath);
-    let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
-    // Create a new file system based wallet for managing identities.
-    const walletPath = path.join(process.cwd(), data[org].walletOrg);
-    const wallet = await Wallets.newFileSystemWallet(walletPath);
-    console.log(`Wallet path: ${walletPath}`);
-
-    // Check to see if we've already enrolled the user.
-    const identity = await wallet.get(data[org].userWallet);
-    if (!identity) {
-      console.log(
-        "An identity for the user" +
-        data[org].userWallet +
-        "does not exist in the wallet"
-      );
-      console.log("Run the registerUser.js application before retrying");
-      return;
-    }
-
-    // Create a new gateway for connecting to our peer node.
-    const gateway = new Gateway();
-    await gateway.connect(ccp, {
-      wallet,
-      identity: data[org].userWallet,
-      discovery: { enabled: true, asLocalhost: true },
-    });
-
-    // Get the network (channel) our contract is deployed to.
-    const network = await gateway.getNetwork(channelName);
-    // Get the contract from the network.
-    const contract = network.getContract(contractName);
-
-    // Submit the specified transaction.
-    //ctx is
-    //const ClientMSPID = await ctx.clientIdentity.getMSPID();
-    const merchantID = req.params.merchantID;
-    // const CustomerID = req.body.CustomerID;
-    // const LoanReferenceNumber = req.body.LoanReferenceNumber;
-    if (!merchantID) {
-      return res.status(400).json({
-        success: false,
-        message: "Request cannot be processed.Please provide valid inputs",
-      });
-    }
-    // if (ClientMSPID !== APMSPID) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Sorry,you are not authorized to view this data.Please contact the Network Administrator.",
-    //   });
-    // }
-    const result = await contract.evaluateTransaction(
-      "retrievePvMerchantMetaData",
-      merchantID
-    );
-    console.log(
-      `Transaction has been evaluated, result is: ${result.toString()}`
-    );
-    res.status(200).json({ response: JSON.parse(result.toString()) });
-    // Disconnect from the gateway.
-    await gateway.disconnect();
-  } catch (error) {
-    console.error(`Failed to submit transaction: ${error}`);
-
-    return res.status(401).json({
-      success: false,
-      message: "Error" + error,
-    });
-  }
-};
 
 
 exports.GetTxByRange = async function (req, res) {
@@ -184,9 +106,12 @@ exports.GetTxByRange = async function (req, res) {
 
 
 exports.retrieveOBMerchantData = async function (req, res) {
-  console.log("line 183 ");
+
+  console.log("retrieveOBMerchantData ");
+
   const channelName = "channel1";
   const contractName = "onboardingMerchantC";
+
   try {
     let org = req.params.roleId;
     if (!data[org]) {
@@ -228,20 +153,14 @@ exports.retrieveOBMerchantData = async function (req, res) {
     //ctx is
     //const ClientMSPID = await ctx.clientIdentity.getMSPID();
     const merchantID = req.params.merchantID;
-    // const CustomerID = req.body.CustomerID;
-    // const LoanReferenceNumber = req.body.LoanReferenceNumber;
+    
     if (!merchantID) {
       return res.status(400).json({
         success: false,
         message: "Request cannot be processed.Please provide valid inputs",
       });
     }
-    // if (ClientMSPID !== APMSPID) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Sorry,you are not authorized to view this data.Please contact the Network Administrator.",
-    //   });
-    // }
+   
     const result = await contract.evaluateTransaction(
       "retrieveOBMerchantData",
       merchantID
@@ -262,19 +181,26 @@ exports.retrieveOBMerchantData = async function (req, res) {
   }
 };
 
+exports.retrievePvAADMetaData = async function (req, res) {
 
-exports.retrievePvCustomerMetaData = async function (req, res) {
-  console.log("line 56 ");
+  console.log("retrievePvAADMetaData");
+
+  const channelName = "channel1";
+  const contractName = "onboardingMerchantC";
   try {
     let org = req.params.roleId;
     if (!data[org]) {
       res.status(400).send("Error!. Invalid role name");
     }
     let ccpPath = path.resolve(data[org].connectionPath);
+
     let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+
     // Create a new file system based wallet for managing identities.
     const walletPath = path.join(process.cwd(), data[org].walletOrg);
+
     const wallet = await Wallets.newFileSystemWallet(walletPath);
+
     console.log(`Wallet path: ${walletPath}`);
 
     // Check to see if we've already enrolled the user.
@@ -299,33 +225,30 @@ exports.retrievePvCustomerMetaData = async function (req, res) {
 
     // Get the network (channel) our contract is deployed to.
     const network = await gateway.getNetwork(channelName);
-
     // Get the contract from the network.
     const contract = network.getContract(contractName);
-
-    // Submit the specified transaction.
-    //const merchantID = req.body.merchantID;
-    const customerID = req.params.customerID;
-    // const LoanReferenceNumber = req.body.LoanReferenceNumber;
-    if (!customerID) {
+    const merchantID = req.params.merchantID;
+    
+    if (!merchantID) {
       return res.status(400).json({
         success: false,
         message: "Request cannot be processed.Please provide valid inputs",
       });
     }
+   
     const result = await contract.evaluateTransaction(
-      "retrievePvCustomerMetaData",
-      customerID
+      "retrievePvAADMetaData",
+      merchantID
     );
     console.log(
       `Transaction has been evaluated, result is: ${result.toString()}`
     );
-    res.status(200).json({ response: result.toString() });
-
+    res.status(200).json({ response: JSON.parse(result.toString()) });
     // Disconnect from the gateway.
     await gateway.disconnect();
   } catch (error) {
     console.error(`Failed to submit transaction: ${error}`);
+
     return res.status(401).json({
       success: false,
       message: "Error" + error,
@@ -333,9 +256,10 @@ exports.retrievePvCustomerMetaData = async function (req, res) {
   }
 };
 
+exports.retrievePvACDMetaData = async function (req, res) {
 
-exports.retrieveEDIPvMerchantMetaData = async function (req, res) {
-  console.log("line 53 ");
+  console.log("retrievePvACDMetaData ");
+
   const channelName = "channel1";
   const contractName = "onboardingMerchantC";
   try {
@@ -374,10 +298,10 @@ exports.retrieveEDIPvMerchantMetaData = async function (req, res) {
     const network = await gateway.getNetwork(channelName);
     // Get the contract from the network.
     const contract = network.getContract(contractName);
-
-
     const merchantID = req.params.merchantID;
-    console.log("line number 366 merchantID", merchantID);
+
+    console.log(" merchantID", merchantID);
+
     if (!merchantID) {
       return res.status(400).json({
         success: false,
@@ -386,7 +310,7 @@ exports.retrieveEDIPvMerchantMetaData = async function (req, res) {
     }
 
     const result = await contract.evaluateTransaction(
-      "retrievePvEDIMerchantMetaData",
+      "retrievePvACDMetaData",
       merchantID
     );
     console.log(
@@ -399,6 +323,74 @@ exports.retrieveEDIPvMerchantMetaData = async function (req, res) {
   } catch (error) {
     console.error(`Failed to submit transaction: ${error}`);
 
+    return res.status(401).json({
+      success: false,
+      message: "Error" + error,
+    });
+  }
+};
+
+exports.retrievePvAODMetaData = async function (req, res) {
+
+  console.log("retrievePvAODMetaData");
+  try {
+    let org = req.params.roleId;
+    if (!data[org]) {
+      res.status(400).send("Error!. Invalid role name");
+    }
+    let ccpPath = path.resolve(data[org].connectionPath);
+    let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+    // Create a new file system based wallet for managing identities.
+    const walletPath = path.join(process.cwd(), data[org].walletOrg);
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
+    console.log(`Wallet path: ${walletPath}`);
+
+    // Check to see if we've already enrolled the user.
+    const identity = await wallet.get(data[org].userWallet);
+    if (!identity) {
+      console.log(
+        "An identity for the user" +
+        data[org].userWallet +
+        "does not exist in the wallet"
+      );
+      console.log("Run the registerUser.js application before retrying");
+      return;
+    }
+
+    // Create a new gateway for connecting to our peer node.
+    const gateway = new Gateway();
+    await gateway.connect(ccp, {
+      wallet,
+      identity: data[org].userWallet,
+      discovery: { enabled: true, asLocalhost: true },
+    });
+
+    // Get the network (channel) our contract is deployed to.
+    const network = await gateway.getNetwork(channelName);
+
+    // Get the contract from the network.
+    const contract = network.getContract(contractName);
+    const merchantID = req.body.merchantID;
+    
+    if (!merchantID) {
+      return res.status(400).json({
+        success: false,
+        message: "Request cannot be processed.Please provide valid inputs",
+      });
+    }
+    const result = await contract.evaluateTransaction(
+      "retrievePvAODMetaData",
+      merchantID
+    );
+    console.log(
+      `Transaction has been evaluated, result is: ${result.toString()}`
+    );
+    res.status(200).json({ response: result.toString() });
+
+    // Disconnect from the gateway.
+    await gateway.disconnect();
+  } catch (error) {
+    console.error(`Failed to submit transaction: ${error}`);
     return res.status(401).json({
       success: false,
       message: "Error" + error,
@@ -465,144 +457,121 @@ exports.lookUpMerchantMetaData = async function (req, res) {
 
     //console.log("---line 438 COMMON DATA---");
     let defaultValueOBMerchant = {
-      "bnplProductTypes": UNAUTHORIZED,
-      "clrOrgID": UNAUTHORIZED,
-      "isContractSigned": UNAUTHORIZED,
-      "merchantDescription": UNAUTHORIZED,
       "merchantID": UNAUTHORIZED,
       "merchantName": UNAUTHORIZED,
-      "merchantType": UNAUTHORIZED,
-      "locationsAllowed": UNAUTHORIZED,
-      "promoCode": UNAUTHORIZED,
+      "merchantDescription": UNAUTHORIZED,
+      "merchantCategoryCode": UNAUTHORIZED,
+      "transactionGeographiesAllowed": UNAUTHORIZED,
+      "kycStatus": UNAUTHORIZED,
+      "isContractSigned": UNAUTHORIZED,
     }
-    let defaultValueAPPDC = {
-      "bnplProductTypes": UNAUTHORIZED,
-      "clrOrgID": UNAUTHORIZED,
-      "clrOrgName": UNAUTHORIZED,
-      "isContractSigned": UNAUTHORIZED,
-      "merchantDescription": UNAUTHORIZED,
+    let defaultValueAODPDC = {
       "merchantID": UNAUTHORIZED,
-      "merchantName": UNAUTHORIZED,
-      "merchantType": UNAUTHORIZED,
+      "product": UNAUTHORIZED,
+      "numberOfPOSTerminalsRequired": UNAUTHORIZED,
+      "POSID": UNAUTHORIZED,
+    }
+
+    let defaultValueACDPDC = {
+      "merchantID": UNAUTHORIZED,
+      "merchantBankCode": UNAUTHORIZED,
+      "merchantAccountNumber": UNAUTHORIZED,
+      "securityDeposits": UNAUTHORIZED
+    }
+    
+    let defaultValueAADPDC = {
+      "merchantID": UNAUTHORIZED,
+      "txcNegotiatedMDR": UNAUTHORIZED,
       "txcMaxTxPerDay": UNAUTHORIZED,
       "txcMinTxAmount": UNAUTHORIZED,
       "txcMaxTxAmount": UNAUTHORIZED,
       "txcTxCurrency": UNAUTHORIZED,
-      "aggName": UNAUTHORIZED,
-      "aggID": UNAUTHORIZED
+      "promoCode": UNAUTHORIZED,
     }
 
-    let defaultValueCAcctPDC = {
-      "currentOutstandingAmount": UNAUTHORIZED,
-      "customerID": UNAUTHORIZED,
-      "customerName": UNAUTHORIZED,
-      "isDefaulter": UNAUTHORIZED,
-      "loanAccountNumber": UNAUTHORIZED,
-      "loanExpiryDate": UNAUTHORIZED,
-      "maxLoanAmount": UNAUTHORIZED,
-      "merchantID": UNAUTHORIZED,
-      "totalDisbursedAmount": UNAUTHORIZED,
-      "txcNegotiatedMDR": UNAUTHORIZED,
-    }
-    let defaultValueEDIPDC = {
-      "balanceAmount": UNAUTHORIZED,
-      "clearedAmount": UNAUTHORIZED,
-      "creditCost": UNAUTHORIZED,
-      "customerID": UNAUTHORIZED,
-      "customerName": UNAUTHORIZED,
-      "funding": UNAUTHORIZED,
-      "issuerProcessor": UNAUTHORIZED,
-      "loanAccountNumber": UNAUTHORIZED,
-      "merchantBankCode": UNAUTHORIZED,
-      "merchantFees": UNAUTHORIZED,
-      "merchantID": UNAUTHORIZED,
-      "networkFees": UNAUTHORIZED,
-      "refNegotiatedMDR": UNAUTHORIZED,
-      "txID": UNAUTHORIZED,
-      "merchantAccountNumber": UNAUTHORIZED,
-      //03-03-23 added clrorgname
-      "clrOrgName": UNAUTHORIZED,
-    }
     let retrieveOBMerchantDataResult;
     try {
       retrieveOBMerchantDataResult = await contract.evaluateTransaction(
         "retrieveOBMerchantData",
         merchantID
       );
-      console.log("line 443---retrieveOBMerchantDataResult", JSON.parse(retrieveOBMerchantDataResult));
+      console.log("---retrieveOBMerchantDataResult---", JSON.parse(retrieveOBMerchantDataResult));
       //  console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
     }
     catch (error) {
       retrieveOBMerchantDataResult = { error: error, pdcUnauthorized: "retrieveOBMerchantData" }
     }
-    console.log("line 449---retrieveOBMerchantDataResult", retrieveOBMerchantDataResult);
+    console.log("---retrieveOBMerchantDataResult---", retrieveOBMerchantDataResult);
 
-    console.log("---line 451 AP DATA---");
-    let retrievePvMerchantMetaDataResult;
+    console.log("---retrievePvAODMetaData DATA---");
+
+    let retrievePvAODMetaDataResult;
     try {
-      retrievePvMerchantMetaDataResult = await contract.evaluateTransaction(
-        "retrievePvMerchantMetaData",
+      retrievePvAODMetaDataResult = await contract.evaluateTransaction(
+        "retrievePvAODMetaData",
         merchantID
       );
       // console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
-      console.log("line 458---retrievePvMerchantMetaDataResult", JSON.parse(retrievePvMerchantMetaDataResult));
+      console.log("---retrievePvAODMetaDataResult---", JSON.parse(retrievePvAODMetaDataResult));
     } catch (error) {
-      retrievePvMerchantMetaDataResult = { error: error, pdcUnauthorized: "retrievePvMerchantMetaData" }
+      retrievePvAODMetaDataResult = { error: error, pdcUnauthorized: "retrievePvAODMetaData" }
     }
-    console.log("line 462---retrievePvMerchantMetaDataResult", retrievePvMerchantMetaDataResult);
+    console.log("---retrievePvAODMetaDataResult---", retrievePvAODMetaDataResult);
 
-    console.log("---line 465 CACCT DATA---");
-    let retrievePvCustomerMetaDataResult;
+    console.log("---retrievePvAADMetaData DATA---");
+
+    let retrievePvAADMetaDataResult;
     try {
-      retrievePvCustomerMetaDataResult = await contract.evaluateTransaction(
-        "retrievePvCustomerMetaData",
+      retrievePvAADMetaDataResult = await contract.evaluateTransaction(
+        "retrievePvAADMetaData",
         "C" + merchantID
         // merchantID
       );
       //  console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
-      console.log("line 471---retrievePvCustomerMetaData", JSON.parse(retrievePvCustomerMetaDataResult));
+      console.log("---retrievePvAADMetaData---", JSON.parse(retrievePvAADMetaDataResult));
     } catch (error) {
-      retrievePvCustomerMetaDataResult = { error: error, pdcUnauthorized: "retrievePvCustomerMetaData" }
+      retrievePvAADMetaDataResult = { error: error, pdcUnauthorized: "retrievePvAADMetaData" }
     }
-    console.log("line 475---retrievePvCustomerMetaData", retrievePvCustomerMetaDataResult);
+    console.log("---retrievePvAADMetaData---", retrievePvAADMetaDataResult);
 
-    console.log("---line 477 EDI DATA---");
-    let retrieveEDIPvMerchantMetaDataResult;
+    console.log("---retrievePvACDMetaData DATA---");
+
+    let retrievePvACDMetaDataResult;
     try {
-      retrieveEDIPvMerchantMetaDataResult = await contract.evaluateTransaction(
-        "retrievePvEDIMerchantMetaData",
+      retrievePvACDMetaDataResult = await contract.evaluateTransaction(
+        "retrievePvACDMetaData",
         merchantID
       );
 
-      console.log("line 484---retrieveEDIPvMerchantMetaDataResult", JSON.parse(retrieveEDIPvMerchantMetaDataResult));
+      console.log("---retrievePvACDMetaDataResult---", JSON.parse(retrievePvACDMetaDataResult));
     } catch (error) {
-      retrieveEDIPvMerchantMetaDataResult = { error: error, pdcUnauthorized: "retrievePvEDIMerchantMetaData" }
+      retrievePvACDMetaDataResult = { error: error, pdcUnauthorized: "retrievePvACDMetaData" }
     }
-    console.log("line 488---retrieveEDIPvMerchantMetaDataResult", retrieveEDIPvMerchantMetaDataResult);
+    console.log("---retrievePvACDMetaDataResult---", retrievePvACDMetaDataResult);
 
 
     retrieveOBMerchantDataResult = retrieveOBMerchantDataResult.error ? defaultValueOBMerchant : JSON.parse(retrieveOBMerchantDataResult)
-    retrievePvMerchantMetaDataResult = retrievePvMerchantMetaDataResult.error ? defaultValueAPPDC : JSON.parse(retrievePvMerchantMetaDataResult)
-    retrievePvCustomerMetaDataResult = retrievePvCustomerMetaDataResult.error ? defaultValueCAcctPDC : JSON.parse(retrievePvCustomerMetaDataResult)
-    retrieveEDIPvMerchantMetaDataResult = retrieveEDIPvMerchantMetaDataResult.error ? defaultValueEDIPDC : JSON.parse(retrieveEDIPvMerchantMetaDataResult)
+    retrievePvAODMetaDataResult = retrievePvAODMetaDataResult.error ? defaultValueAODPDC : JSON.parse(retrievePvAODMetaDataResult)
+    retrievePvAADMetaDataResult = retrievePvAADMetaDataResult.error ? defaultValueACDPDC : JSON.parse(retrievePvAADMetaDataResult)
+    retrievePvACDMetaDataResult = retrievePvACDMetaDataResult.error ? defaultValueAADPDC : JSON.parse(retrievePvACDMetaDataResult)
 
     console.log("retrieveOBMerchantDataResult : ", retrieveOBMerchantDataResult);
-    console.log("retrievePvMerchantMetaDataResult : ", retrievePvMerchantMetaDataResult);
-    console.log("retrievePvCustomerMetaDataResult : ", retrievePvCustomerMetaDataResult);
-    console.log("retrieveEDIPvMerchantMetaDataResult : ", retrieveEDIPvMerchantMetaDataResult);
+    console.log("retrievePvAODMetaDataResult : ", retrievePvAODMetaDataResult);
+    console.log("retrievePvAADMetaDataResult : ", retrievePvAADMetaDataResult);
+    console.log("retrievePvACDMetaDataResult : ", retrievePvACDMetaDataResult);
 
-    const mergeObjects1 = mergeObjects(retrieveOBMerchantDataResult, retrievePvMerchantMetaDataResult)
-    const mergeObjects2 = mergeObjects(mergeObjects1, retrievePvCustomerMetaDataResult)
-    const mergeObjects3 = mergeObjects(mergeObjects2, retrieveEDIPvMerchantMetaDataResult)
+    const mergeObjects1 = mergeObjects(retrieveOBMerchantDataResult, retrievePvAODMetaDataResult)
+    const mergeObjects2 = mergeObjects(mergeObjects1, retrievePvAADMetaDataResult)
+    const mergeObjects3 = mergeObjects(mergeObjects2, retrievePvACDMetaDataResult)
 
     console.log("mergeObjects1", mergeObjects1);
     console.log("mergeObjects2", mergeObjects2);
     console.log("mergeObjects3", mergeObjects3);
 
     console.log("retrieveOBMerchantDataResult", retrieveOBMerchantDataResult);
-    console.log("retrievePvMerchantMetaDataResult", retrievePvMerchantMetaDataResult);
-    console.log("retrievePvCustomerMetaDataResult", retrievePvCustomerMetaDataResult);
-    console.log("retrieveEDIPvMerchantMetaDataResult", retrieveEDIPvMerchantMetaDataResult);
+    console.log("retrievePvAODMetaDataResult", retrievePvAODMetaDataResult);
+    console.log("retrievePvAADMetaDataResult", retrievePvAADMetaDataResult);
+    console.log("retrievePvACDMetaDataResult", retrievePvACDMetaDataResult);
 
     return res.status(200).json
       ({
