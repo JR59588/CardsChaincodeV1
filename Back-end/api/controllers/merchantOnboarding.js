@@ -416,5 +416,387 @@ exports.saveOBMerchantSummary = async function (req, res) {
 };
 
 
+exports.verifySubmitTx = async function (req, res) {
+  const channelName = "channel1";
+  const contractName = "SubmitSettlementTxCC";
+  const ccFunctionName = "submitSettlementTx"
+ 
+  try {
+    let org = req.body.roleId;
+    console.log("req.body", req.body);
+    if (!data[org] ) {
+      res.status(400).send("Error!. Invalid role name");
+    }
+   // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
+    const merchantId = req.body.merchantId;
+    const customerId = req.body.customerId;
+    const loanReferenceNumber = req.body.loanReferenceNumber;
+    if (!merchantId)  {
+      res.status(400).send("Merchant ID field is empty. Please provide Merchant ID");
+    }
+    if (!customerId)  {
+      res.status(400).send("customerId field is empty. Please provide customerId");
+    }
+    if (!loanReferenceNumber)  {
+      res.status(400).send("loanReferenceNumber field is empty. Please provide loanReferenceNumber");
+    }
+  
+    console.log("Verifying for " ,org );
+    let ccpPath = path.resolve(data[org].connectionPath);
+    let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+    const walletPath = path.join(process.cwd(), data[org].walletOrg);
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
+    console.log(`Wallet path: ${walletPath}`);
+
+    // Check to see if we've already enrolled the user.
+    const identity = await wallet.get(data[org].userWallet);
+    console.log("identity",identity);
+    if (!identity) {
+      console.log(
+        "An identity for the user" +
+          data[org].userWallet +
+          "does not exist in the wallet"
+      );
+      console.log("Run the registerUser.js application before retrying");
+      return;
+    }
+
+    // Create a new gateway for connecting to our peer node.
+    const gateway = new Gateway();
+   // console.log("gateway",gateway);
+    await gateway.connect(ccp, {
+      wallet,
+      identity: data[org].userWallet,
+      discovery: { enabled: true, asLocalhost: true },
+    });
+
+    // Get the network (channel) our contract is deployed to.
+    const network = await gateway.getNetwork(channelName);
+    //console.log("network",network);
+    // Get the contract from the network.
+    const contract = network.getContract(contractName);
+   // console.log("contract",contract);
+   
+  let result;
+    try {
+         // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
+      result= await contract.submitTransaction(
+      ccFunctionName,
+      merchantId,
+      customerId,
+      loanReferenceNumber
+    );
+    console.log("Transaction has been submitted for verifySubmitTx by PSP ",result);
+    } catch (error) {
+      console.error(`Failed to call submit transaction while submitting Settelment transcation : ${error}`);
+      throw error;
+    }
+
+    console.log("Transaction has been submitted for verifySubmitTx by PSP ",result);
+   // Disconnect from the gateway.
+    await gateway.disconnect();
+   
+    
+    return res.status(200).json({
+      success: true,
+      message: "Transaction has been submitted",
+    });
+  } catch (error) {
+    console.error(`Failed to submit transaction: ${error}`);
+    return res.status(400).json({
+      success: false,
+      message: "Error" + error,
+    });
+  }
+};
+
+
+exports.verifyAuthoriseTx = async function (req, res) {
+  const channelName = "channel1";
+  const contractName = "AuthorizeSettlementTxCC";
+  const ccFunctionName = "authorizeSettlementTx"
+ 
+  try {
+    let org = req.body.roleId;
+    console.log("req.body----" , req.body);
+    if (!data[org] ) {
+      res.status(400).send("Error!. Invalid role name");
+    }
+     // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
+    const merchantId = req.body.merchantId;
+    const customerId = req.body.customerId;
+    const loanReferenceNumber = req.body.loanReferenceNumber;
+    if (!merchantId)  {
+      res.status(400).send("Merchant ID field is empty. Please provide Merchant ID");
+    }
+   
+    if (!customerId)  {
+      res.status(400).send("customerId field is empty. Please provide customerId");
+    }
+    if (!loanReferenceNumber)  {
+      res.status(400).send("loanReferenceNumber field is empty. Please provide loanReferenceNumber");
+    }
+   
+    console.log("Verifying for " ,org );
+    let ccpPath = path.resolve(data[org].connectionPath);
+    let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+    const walletPath = path.join(process.cwd(), data[org].walletOrg);
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
+    console.log(`Wallet path: ${walletPath}`);
+
+    // Check to see if we've already enrolled the user.
+    const identity = await wallet.get(data[org].userWallet);
+    console.log("identity",identity);
+    if (!identity) {
+      console.log(
+        "An identity for the user" +
+          data[org].userWallet +
+          "does not exist in the wallet"
+      );
+      console.log("Run the registerUser.js application before retrying");
+      return;
+    }
+
+    // Create a new gateway for connecting to our peer node.
+    const gateway = new Gateway();
+   // console.log("gateway",gateway);
+    await gateway.connect(ccp, {
+      wallet,
+      identity: data[org].userWallet,
+      discovery: { enabled: true, asLocalhost: true },
+    });
+
+    // Get the network (channel) our contract is deployed to.
+    const network = await gateway.getNetwork(channelName);
+    //console.log("network",network);
+    // Get the contract from the network.
+    const contract = network.getContract(contractName);
+   // console.log("contract",contract);
+   
+  let result;
+    try {
+        // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
+      result= await contract.submitTransaction(
+      ccFunctionName,
+      merchantId,
+      customerId,
+      loanReferenceNumber
+    );
+    console.log("Transaction has been submitted for verifyAuthoriseTx by ACD ",result);
+    } catch (error) {
+      console.error(`Failed to submit transaction while submitting transcation for accept for ACD: ${error}`);
+      throw error;
+    }
+
+    //console.log("Transaction has been submitted for verifyAuthoriseTx by SA ",result);
+   // Disconnect from the gateway.
+    await gateway.disconnect();
+    console.log("line139");
+    
+   
+    res.status(200).json({
+      success: true,
+      message: "Transaction has been submitted",
+    });
+  } catch (error) {
+    console.error(`Failed to submit transaction: ${error}`);
+    return res.status(400).json({
+      success: false,
+      message: "Error" + error,
+    });
+  }
+};
+
+
+exports.verifyBalanceTx = async function (req, res) {
+  const channelName = "channel1";
+  const contractName = "BalanceSettlementTxCC";
+  const ccFunctionName = "balanceSettlementTx"
+ 
+  try {
+    let org = req.body.roleId;
+    if (!data[org] ) {
+      res.status(400).send("Error!. Invalid role name");
+    }
+      // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
+
+    const merchantId = req.body.merchantId;
+    const customerId = req.body.customerId;
+    const loanReferenceNumber = req.body.loanReferenceNumber;
+    if (!merchantId)  {
+      res.status(400).send("Merchant ID field is empty. Please provide Merchant ID");
+    }
+
+    if (!customerId)  {
+      res.status(400).send("customerId field is empty. Please provide customerId");
+    }
+    if (!loanReferenceNumber)  {
+      res.status(400).send("loanReferenceNumber field is empty. Please provide loanReferenceNumber");
+    }
+   
+    console.log("Verifying balance for " ,org );
+    let ccpPath = path.resolve(data[org].connectionPath);
+    let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+    const walletPath = path.join(process.cwd(), data[org].walletOrg);
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
+    console.log(`Wallet path: ${walletPath}`);
+
+    // Check to see if we've already enrolled the user.
+    const identity = await wallet.get(data[org].userWallet);
+    console.log("identity",identity);
+    if (!identity) {
+      console.log(
+        "An identity for the user" +
+          data[org].userWallet +
+          "does not exist in the wallet"
+      );
+      console.log("Run the registerUser.js application before retrying");
+      return;
+    }
+
+    // Create a new gateway for connecting to our peer node.
+    const gateway = new Gateway();
+   // console.log("gateway",gateway);
+    await gateway.connect(ccp, {
+      wallet,
+      identity: data[org].userWallet,
+      discovery: { enabled: true, asLocalhost: true },
+    });
+
+    // Get the network (channel) our contract is deployed to.
+    const network = await gateway.getNetwork(channelName);
+    //console.log("network",network);
+    // Get the contract from the network.
+    const contract = network.getContract(contractName);
+   // console.log("contract",contract);
+   
+  let result;
+    try {
+        // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
+
+      result= await contract.submitTransaction(
+      ccFunctionName,
+      merchantId,
+      customerId,
+      loanReferenceNumber
+    );
+    console.log("Transaction has been submitted for verifyBalanceTx by AAD ",result);
+    } catch (error) {
+      console.error(`Failed to call submit transaction while submitting transcation BalanceTx : ${error}`);
+      throw error;
+    }
+
+    console.log("Transaction has been submitted for verifyBalanceTx  ",result);
+   // Disconnect from the gateway.
+    await gateway.disconnect();
+    // await module.exports.balanceTxByAgg(req, res);
+   
+    return res.status(200).json({
+      success: true,
+      message: "Transaction has been submitted",
+    });
+  } catch (error) {
+    console.error(`Failed to submit transaction: ${error}`);
+    return res.status(400).json({
+      success: false,
+      message: "Error" + error,
+    });
+  }
+};
+
+
+exports.verifyClearTx = async function (req, res) {
+  const channelName = "channel1";
+  const contractName = "ClearSettlementTxCC";
+  const ccFunctionName = "clearSettlementTx"
+ 
+  try {
+    let org = req.body.roleId;
+    if (!data[org] ) {
+      res.status(400).send("Error!. Invalid role name");
+    }
+    // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
+    const merchantId = req.body.merchantId;
+    const customerId = req.body.customerId;
+    const loanReferenceNumber = req.body.loanReferenceNumber;
+    if (!merchantId)  {
+      res.status(400).send("Merchant ID field is empty. Please provide Merchant ID");
+    }
+    
+    if (!customerId)  {
+      res.status(400).send("customerId field is empty. Please provide customerId");
+    }
+    if (!loanReferenceNumber)  {
+      res.status(400).send("loanReferenceNumber field is empty. Please provide loanReferenceNumber");
+    }
+    
+    console.log("Verifying for " ,org );
+    let ccpPath = path.resolve(data[org].connectionPath);
+    let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+    const walletPath = path.join(process.cwd(), data[org].walletOrg);
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
+    console.log(`Wallet path: ${walletPath}`);
+
+    // Check to see if we've already enrolled the user.
+    const identity = await wallet.get(data[org].userWallet);
+    console.log("identity",identity);
+    if (!identity) {
+      console.log(
+        "An identity for the user" +
+          data[org].userWallet +
+          "does not exist in the wallet"
+      );
+      console.log("Run the registerUser.js application before retrying");
+      return;
+    }
+
+    // Create a new gateway for connecting to our peer node.
+    const gateway = new Gateway();
+   // console.log("gateway",gateway);
+    await gateway.connect(ccp, {
+      wallet,
+      identity: data[org].userWallet,
+      discovery: { enabled: true, asLocalhost: true },
+    });
+
+    // Get the network (channel) our contract is deployed to.
+    const network = await gateway.getNetwork(channelName);
+    //console.log("network",network);
+    // Get the contract from the network.
+    const contract = network.getContract(contractName);
+   // console.log("contract",contract);
+   
+  let result;
+    try {
+      // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
+      result= await contract.submitTransaction(
+      ccFunctionName,
+      merchantId,
+      customerId,
+      loanReferenceNumber
+    );
+    console.log("Transaction has been submitted for verifyclearTx by AOD ",result);
+    } catch (error) {
+      console.error(`Failed to submit transaction while submitting transcation for Verify for AOD: ${error}`);
+      throw error;
+    }
+
+    console.log("Transaction has been submitted for verifyclearTx by AOD ",result);
+   // Disconnect from the gateway.
+    await gateway.disconnect();
+    console.log("line139");
+   
+    return res.status(200).json({
+      success: true,
+      message: "Transaction has been submitted",
+    });
+  } catch (error) {
+    console.error(`Failed to submit transaction: ${error}`);
+    return res.status(400).json({
+      success: false,
+      message: "Error" + error,
+    });
+  }
+};
 
           

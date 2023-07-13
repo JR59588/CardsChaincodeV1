@@ -34,5 +34,12 @@
     "clientMSPId": "AADMSP",
     "userWallet": "appUserForAAD",
     "admin": "admin"
+  },
+  "PSP": {
+    "connectionPath": "./connection-PSP.json",
+    "walletOrg": "wallet5PSP",
+    "clientMSPId": "PSPMSP",
+    "userWallet": "appUserForPSP",
+    "admin": "admin"
   }
 }

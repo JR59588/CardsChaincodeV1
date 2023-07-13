@@ -9,7 +9,7 @@ const PYMTUtils = require("./PYMTUtils");
 const { Contract } = require("fabric-contract-api");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class BalanceSettlementTxCC extends Contract {
-  async balanceSettlementTxCC(ctx, merchantId, customerId, loanReferenceNumber) {
+  async balanceSettlementTx(ctx, merchantId, customerId, loanReferenceNumber) {
     try {
       console.log("------>>>In balanceSettlementTxCC <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);

@@ -93,11 +93,6 @@ exports.requestSettlementTx = async function (req, res) {
 
     let stxObj = makeTxObj(req, res);
 
-    //console.log("line no 110---------",JSON.stringify(req.body));
-    // console.log(req.params)
-
-    // IsMerchantContractSigned: isMerchantContractSigned,
-
     console.log(
       "trying to add data in requestsetllmentTx for merchantId",
       stxObj.merchantId,
@@ -108,31 +103,24 @@ exports.requestSettlementTx = async function (req, res) {
     console.log("controller line no 108" ,JSON.stringify(stxObj));
     await contract.submitTransaction(
       ccFunctionName,
-      stxObj.merchantId,
-      stxObj.CustomerID,
-      stxObj.LoanReferenceNumber,
-      stxObj.merchantName,
-      stxObj.CustomerName,
-      stxObj.TransactionCurrency,
-      stxObj.TransactionAmount,
-      stxObj.TransactionReferenceNumber,
-      stxObj.TransactionDate,
-      stxObj.ProductType,
-      stxObj.DateofLoanApproval,
-      stxObj.LoanDisbursementDate,
-      stxObj.LoanAmount,
-      stxObj.LoanTenure,
-      stxObj.LoanStatus,
-      stxObj.LoanAccountNumber,
-      stxObj.LoCapprovedamount,
-      stxObj.LoCAvailableamount,
-      stxObj.isContractSigned,
-      stxObj.Location,
-      stxObj.POSEntryMode,
-      stxObj.SubmittedBy,
-      stxObj.SubmissionNumber,
-      stxObj.ServiceDate,
-      stxObj.SubmissionDate
+      stxObj.processingCode,
+      stxObj.transactionAmount,
+      stxObj.transmissionDateAndTime,
+      stxObj.systemTraceAuditNumber,
+      stxObj.localTime,
+      stxObj.localDate,
+      stxObj.expirationDate,
+      stxObj.merchantCategoryCode,
+      stxObj.posEntryMode,
+      stxObj.acquiringInstitutionIdentificationCode,
+      stxObj.retrievalReferenceNumber,
+      stxObj.cardAcceptorTerminalIdentification,
+      stxObj.cardAcceptorIdentificationCode,
+      stxObj.cardAcceptorNameAndLocation,
+      stxObj.currencyCode,
+      stxObj.personalIdentificationNumber,
+      stxObj.additionalData,
+      stxObj.posData
     );
     console.log("inside requestsetllmentTx ,Transaction has been submitted");
 
@@ -155,8 +143,9 @@ exports.requestSettlementTx = async function (req, res) {
 function getChannelName(mode, MSPId) {
   //14.02.23 todo: this logic has to be completed
   var chName ;
-  if (mode == "Aggregator") {
-    if (MSPId == "Org1MSP") {
+  // TODO: change MSPID according to the requirement
+  if (mode == "PSP") {
+    if (MSPId == "PSPMSP") {
       chName = "channel1";
     }
   } else {
@@ -169,7 +158,7 @@ function getChannelName(mode, MSPId) {
 
 function getFunctionName(mode, MSPId) {
   var fnName ;
-  if (mode == "Aggregator") {
+  if (mode == "PSP") {
     
       fnName = "initiateTx";
     }
@@ -185,35 +174,26 @@ function getFunctionName(mode, MSPId) {
 }
 
 function makeTxObj(req, res) {
+  //TODO: change the property values of the object according to the requirements
   let localTxObj = {
-    merchantId: req.body.merchantId,
-    merchantName: req.body.merchantName,
-    CustomerName: req.body.CustomerName,
-    CustomerID: req.body.CustomerID,
-    TransactionCurrency: req.body.TransactionCurrency,
-    TransactionAmount: req.body.TransactionAmount,
-    TransactionReferenceNumber: req.body.TransactionReferenceNumber,
-    TransactionDate: req.body.TransactionDate,
-    LoanReferenceNumber: req.body.LoanReferenceNumber,
-    DateofLoanApproval: req.body.DateofLoanApproval,
-    SubmittedBy: req.body.SubmittedBy,
-    SubmissionNumber: req.body.SubmissionNumberRef,
-    ServiceDate: req.body.ServiceDate,
-    SubmissionDate: req.body.SubmissionDateTime,
-    LoanAccountNumber: req.body.LoanAccountNumber,
-    isContractSigned: req.body.isContractSigned
-      ? req.body.isContractSigned
-      : true,
-    Location: req.body.Location,
-    POSEntryMode: req.body.POSEntryMode,
-
-    ProductType: req.body.ProductType || "",
-    LoanAmount: req.body.LoanAmount || "",
-    LoanTenure: req.body.LoanTenure || "",
-    LoanDisbursementDate: req.body.LoanDisbursementDate || "",
-    LoanStatus: req.body.LoanStatus || "Pending",
-    LoCapprovedamount: req.body.LoCapprovedamount || "",
-    LoCAvailableamount: req.body.LoCAvailableamount || "",
+    processingCode: req.body.processingCode,
+    transactionAmount: req.body.transactionAmount,
+    transmissionDateAndTime: req.body.transmissionDateAndTime,
+    systemTraceAuditNumber: req.body.systemTraceAuditNumber,
+    localTime: req.body.localTime,
+    localDate: req.body.localDate,
+    expirationDate: req.body.expirationDate,
+    merchantCategoryCode: req.body.merchantCategoryCode,
+    posEntryMode: req.body.posEntryMode,
+    acquiringInstitutionIdentificationCode: req.body.acquiringInstitutionIdentificationCode,
+    retrievalReferenceNumber: req.body.retrievalReferenceNumber,
+    cardAcceptorTerminalIdentification: req.body.cardAcceptorTerminalIdentification,
+    cardAcceptorIdentificationCode: req.body.cardAcceptorIdentificationCode,
+    cardAcceptorNameAndLocation: req.body.cardAcceptorNameAndLocation,
+    currencyCode: req.body.currencyCode,
+    personalIdentificationNumber: req.body.personalIdentificationNumber,
+    additionalData: req.body.additionalData,
+    posData: req.body.posData,
 
   };
   return localTxObj;
