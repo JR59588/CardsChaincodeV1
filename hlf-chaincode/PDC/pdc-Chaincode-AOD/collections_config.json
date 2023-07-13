@@ -7,7 +7,6 @@
     "blockToLive": 0,
     "memberOnlyRead": true,
     "memberOnlyWrite": true
-    
   },
   {
     "name": "PDC1",

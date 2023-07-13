@@ -81,8 +81,8 @@ class MerchantOnboardingPDC extends Contract {
       );
     }
     console.log("merchantAsBytes");
-
-    await verifyClientOrgMatchesPeerOrg(ctx);
+//TODO: if require then uncomment below check
+    //await verifyClientOrgMatchesPeerOrg(ctx);
 
     console.log("merchant inputs :", merchantInput);
 
