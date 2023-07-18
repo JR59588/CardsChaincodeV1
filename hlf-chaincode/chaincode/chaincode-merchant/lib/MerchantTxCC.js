@@ -280,7 +280,7 @@ class MerchantTxCC extends Contract {
     } else {
       return false;
     }
-
+    return isVerified;
   }
 
   async doVerifyinitiateSettlementTx(ctx, tx) {

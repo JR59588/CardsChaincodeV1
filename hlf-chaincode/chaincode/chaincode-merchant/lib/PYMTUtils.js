@@ -29,6 +29,7 @@ class PYMTUtils {
 
 
       TXSTATUS_ACCEPTED: "TxAccepted",
+      TXSTATUS_REQUESTED: "TxRequested",
       TXSTATUS_REJECTED: "TxRejected",
       TXSTATUS_INITIATED: "TxInitiated",
       TXSTATUS_SUBMITTED: "TxSubmitted",
