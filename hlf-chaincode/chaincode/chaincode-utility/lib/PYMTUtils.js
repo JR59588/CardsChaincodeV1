@@ -17,21 +17,21 @@ class PYMTUtils {
 
 
       // SA_ORG_MSPID: "SAOrgMSP",
-      // MRT1_ORG_NAME: "Org1MSP",
+       MRT1_ORG_NAME: "Org1MSP",
       // AP_ORG_NAME: "APMSP",
       // AGG_ORG_NAME: "AggOrgMSP",
       // CACCT_ORG_NAME: "CAcctMSP",
       // EDI_ORG_NAME: "EDIMSP",
-      PSP_ORG_MSPID: "PSPOrgMSP",
-      AOD_ORG_MSPID: "AODOrgMSP",
-      ACD_ORG_MSPID: "ACDOrgMSP",
-      AAD_ORG_MSPID: "AADOrgMSP",
+      PSP_ORG_MSPID: "PSPMSP",
+      AOD_ORG_MSPID: "AODMSP",
+      ACD_ORG_MSPID: "ACDMSP",
+      AAD_ORG_MSPID: "AADMSP",
 
 
       TXSTATUS_ACCEPTED: "TxAccepted",
+      TXSTATUS_REQUESTED: "TxRequested",
       TXSTATUS_REJECTED: "TxRejected",
       TXSTATUS_INITIATED: "TxInitiated",
-      TXSTATUS_REQUESTED: "TxRequested",
       TXSTATUS_SUBMITTED: "TxSubmitted",
       TXSTATUS_NOT_SUBMITTED: "TxNotSubmitted",
       TXSTATUS_AUTHORIZED: "TxAuthorized",
@@ -41,12 +41,11 @@ class PYMTUtils {
       TXSTATUS_CLEARED: "TxCleared",
       TXSTATUS_NOT_CLEARED: "TxNotCleared",
       submitSettlementTxFN: "submitSettlementTx",
+      requestSettlementTxFN: "requestSettlementTx",
 
       PYMTUtilsCC: "PYMTUtilsCC",
       PYMTUtilsCCReadState: "readState",
-
-      initiateSettlementTxFN: "initiateSettlementTx",
-      requestSettlementTxFN: "requestSettlementTx",
+      PYMTUtilsCCWriteState: "writeState",
 
       // PYMTTxMerchantCC: "PYMTTxMerchantCC",
       // PYMTTxPreSettlementCC: "PYMTTxPreSettlementCC",
@@ -54,14 +53,17 @@ class PYMTUtils {
       // PYMTTxPreSettlementCC: "PYMTTxPreSettlementCC",
       // processSettlementTxFN: "processSettlementTX",
 
-      // readSettlementTxFN: "readState",
-      // PYMTUtilsCCWriteState: "writeState",
-      // IsMerchantContractSigned: "IsMerchantContractSigned",
+       readSettlementTxFN: "readState",
+       
+       IsMerchantContractSigned: "IsMerchantContractSigned",
       // APChaincodeName: "APvalidationcc",
       // SACCFuncName: "validation",
       // APCCFuncName: "validation",
       // acceptSettlementTxFN: "acceptSettlementTx",
       // validateSettlementTxFN: "validateSettlementTx",
+       initiateSettlementTxFN: "initiateSettlementTx",
+      // requestSettlementTxFN: "requestSettlementTx",
+      // TXSTATUS_REQUESTED: "TxRequested",
       // TXSTATUS_VALIDATED: "TxValidated",
       // TXSTATUS_NOT_VALIDATED: "TxNotValidated",
       // TXSTATUS_SUBMITED: "TxSubmited",

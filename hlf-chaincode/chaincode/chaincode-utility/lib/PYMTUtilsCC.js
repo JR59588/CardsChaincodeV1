@@ -7,7 +7,7 @@
 "use strict";
 const PYMTUtils = require("./PYMTUtils");
 const { Contract } = require("fabric-contract-api");
-// const HLFEVENT = require("./HLFEVENT");
+ const HLFEVENT = require("./HLFEVENT");
 const PYMTTX_MERCHANT_CC_SUFFIX = "PYMTTxMerchantCC";
 
 async function checkInvokeCCResponse(chaincodeResponse) {
@@ -46,6 +46,11 @@ class PYMTUtilsCC extends Contract {
   //@required for V1
   async initiateTx(
     ctx,
+    merchantId,
+    CustomerId,
+    loanReferenceNumber,
+    merchantName,
+    primaryAccountNumber,
     processingCode,
     transactionAmount,
     transmissionDateAndTime,
@@ -115,6 +120,11 @@ class PYMTUtilsCC extends Contract {
     );
 
     let initiateTxObj = {
+      MerchantId: merchantId,
+      CustomerID: CustomerId,
+      LoanReferenceNumber: loanReferenceNumber,
+      merchantName:  merchantName,
+      primaryAccountNumber: primaryAccountNumber,
       processingCode: processingCode,
       transactionAmount: transactionAmount,
       transmissionDateAndTime: transmissionDateAndTime,
@@ -201,6 +211,11 @@ class PYMTUtilsCC extends Contract {
   ///"TODO"  add settlement tx details /// should be add and invoked from this contract.........
   async requestTx(
     ctx,
+    MerchantId,
+    CustomerId,
+    LoanReferenceNumber,
+    MerchantName,
+    primaryAccountNumber,
     processingCode,
     transactionAmount,
     transmissionDateAndTime,
@@ -262,6 +277,11 @@ class PYMTUtilsCC extends Contract {
     console.log("after the key in utilscc");
 
     let settlementTx = {
+      MerchantId: MerchantId,
+      CustomerId: CustomerId,
+      LoanReferenceNumber: LoanReferenceNumber,
+      MerchantName:MerchantName,
+      primaryAccountNumber: primaryAccountNumber,
       processingCode: processingCode,
       transactionAmount: transactionAmount,
       transmissionDateAndTime: transmissionDateAndTime,

@@ -16,9 +16,9 @@ class SubmitSettlementTxCC extends Contract {
 
       //ACL :  Can be called by SA Org only
       //TODO : PSP org and acl org details has to be finalised......(discussion with nishanth)
-      let { PSP, PYMTUtilsCC } = await pymtutils.hlfconstants();
+      let { PSP_ORG_MSPID, PYMTUtilsCC } = await pymtutils.hlfconstants();
 
-      const accessValid = await pymtutils.validateOrganization(ctx, PSP);
+      const accessValid = await pymtutils.validateOrganization(ctx, PSP_ORG_MSPID);
 
       if (!accessValid) {
         throw new Error(
@@ -30,7 +30,7 @@ class SubmitSettlementTxCC extends Contract {
 
       let {
         // TODO : update the utils.js file (hlfconstants)  
-        TXSTATUS_INITIATED,
+        TXSTATUS_REQUESTED,
         TXSTATUS_SUBMITTED,
         TXSTATUS_NOT_SUBMITTED
 
@@ -52,7 +52,7 @@ class SubmitSettlementTxCC extends Contract {
       }
 
       //@to-do verify chaincode tx state is initiated only.
-      if (!(currentTxReadState.TxStatus == TXSTATUS_BALANCED)) {
+      if (!(currentTxReadState.TxStatus == TXSTATUS_REQUESTED)) {
         throw new Error(`Invalid Transaction state  for key  : ${key}`);
       }
 
@@ -80,40 +80,21 @@ class SubmitSettlementTxCC extends Contract {
   async submitTxByACD(ctx, txIn) {
     var isSubmitted = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
-    const hasTxTransactionReferenceNumber = "TransactionReferenceNumber" in txIn;
-    if (hasTxTransactionReferenceNumber) {
-      if (txIn.TransactionReferenceNumber === "" || txIn.TransactionReferenceNumber.length == 0) {
-        isAccounted = false;
+    const hasTxprimaryAccountNumber = "primaryAccountNumber" in txIn;
+    if (hasTxprimaryAccountNumber) {
+      if (txIn.primaryAccountNumber === "" || txIn.primaryAccountNumber.length == 0) {
+        isSubmitted = false;
         console.log(
-          "Validation by EDI...TransactionReferenceNumber not valid: ",
-          isAccounted
+          "Validation primaryAccountNumber not valid: ",
+          isSubmitted
         );
-        return isAccounted;
+        return isSubmitted;
       }
     } else {
       return false;
     }
-
-    const hasTxLoanTenure = "LoanTenure" in txIn;
-    if (hasTxLoanTenure) {
-      if (txIn.LoanTenure === "" || txIn.LoanTenure.length == 0) {
-        isAccounted = false;
-        console.log("Validation by EDI...LoanTenure not valid: ", isAccounted);
-        return isAccounted;
-      }
-      let LoanTenureInt = parseInt(txIn.LoanTenure);
-      if (isNaN(LoanTenureInt)) {
-        return false;
-      }
-      if (LoanTenureInt > 36) {
-        isAccounted = false;
-        console.log("LoanTenure (", txIn.LoanTenure, ") is not valid");
-        return isAccounted;
-      }
-    } else {
-      return false;
-    }
-    return isAccounted;
+    
+    return isSubmitted;
   }
 }
 
