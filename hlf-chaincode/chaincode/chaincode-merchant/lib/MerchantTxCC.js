@@ -14,7 +14,6 @@ class MerchantTxCC extends Contract {
   async requestSettlementTx(
     ctx,
     MerchantId,
-    MerchantName,
     CustomerId,
     LoanReferenceNumber,
     txObjJSON
@@ -59,7 +58,7 @@ class MerchantTxCC extends Contract {
     console.log(" merchantsettlementcc.js:key", key);
     // else return error
 
-    let channelName = await pymtutils.getChannelForOrgWithoutAgg(ctx, "Org1");
+    let channelName = await pymtutils.getChannelIdentity(ctx, "Org1");
 
     // ==== Create tx object and marshal to JSON ====
 
@@ -192,7 +191,7 @@ class MerchantTxCC extends Contract {
     //let { PYMTUtilsCC } = await pymtutils.hlfconstants();
     console.log("read this line and next line is in problem line num 51 ");
     let { TXSTATUS_INITIATED } = await pymtutils.hlfconstants();
-    let { PYMTUtilsCC, AGG_ORG_NAME } = await pymtutils.hlfconstants();
+    let { PYMTUtilsCC, PSP_ORG_NAME } = await pymtutils.hlfconstants();
     // TODO: must check that txStatus is txRequested, if not then do nothing
 
     try {
@@ -205,7 +204,7 @@ class MerchantTxCC extends Contract {
     // TODO: remove hardcoded Org3MSP must check if it is merchantOrg only
     // const accessValid = await validateOrganization(ctx, "Org3MSP");
 
-    const accessValid = await pymtutils.validateOrganization(ctx, "AggOrgMSP");
+    const accessValid = await pymtutils.validateOrganization(ctx, "PSPOrgMSP");
 
     if (!accessValid) {
       throw new Error(
@@ -228,8 +227,8 @@ class MerchantTxCC extends Contract {
     console.log("line no 48 settlementcc.js:key", key);
     //// getTxStatus is in cc cross chaincode invocation for gettx status...
 
-    let channelName = await pymtutils.getChannelForOrgWithAgg(ctx, "AggOrgMSP");
-   // let size = parseInt(loanReferenceNumber);
+    let channelName = await pymtutils.getChannelIdentity(ctx, "PSPOrgMSP");
+    // let size = parseInt(loanReferenceNumber);
     // if (typeof size !== "number") {
     //   throw new Error("Loan Reference Number must be a numeric string");
     // }
@@ -257,61 +256,58 @@ class MerchantTxCC extends Contract {
     //TODO: remove hardcoded Org3MSP must check if it is merchantOrg only
     let verified = false;
     //14.02.23 Corrected check for AGG_ORG_NAME
-    if (OrgMSPID == AGG_ORG_NAME) {
+    if (OrgMSPID == PSP_ORG_NAME) {
 
       verified = await this.doVerifyinitiateSettlementTx(ctx, tx);
-      
+
     }
     console.log("After verifying merchantchecks: " + verified);
     return verified;
   }
-  
+
 
   async doVerifyRequestSettlementTx(ctx, tx) {
     var isVerify = true;
-    if (!tx.TransactionAmount || tx.TransactionAmount.length === 0) {
+    if (!tx.primaryAccountNumber || tx.primaryAccountNumber.length === 0) {
       isVerify = false;
+      console.log("Primary Account Number should not be empty");
 
     }
-    if (tx.TransactionAmount <= 0) {
+
+    if (tx.primaryAccountNumber != 16) {
       isVerify = false;
-      console.log("txAmount cannot be zero");
-    } else if (tx.TransactionAmount > 50000) {
-      isVerify = false;
-      console.log("Transaction amount cannot be > 50000.");
+      console.log("Primary Account Number should have 16 characters");
     }
 
 
-    if (!tx.LoanAccountNumber || tx.LoanAccountNumber.length === 0) {
-      isVerify = false;
-      console.log("LoanAccountNumber not valid");
-    } else {
-      isVerify = true;
-    }
+    // if (!tx.LoanAccountNumber || tx.LoanAccountNumber.length === 0) {
+    //   isVerify = false;
+    //   console.log("LoanAccountNumber not valid");
+    // } else {
+    //   isVerify = true;
+    // }
     return isVerify;
   }
 
   async doVerifyinitiateSettlementTx(ctx, tx) {
-    // var isVerify = false;
-    var isVerify=true;
-    if (!tx.TransactionAmount || tx.TransactionAmount.length === 0) {
+    var isVerify = true;
+    if (!tx.primaryAccountNumber || tx.primaryAccountNumber.length === 0) {
       isVerify = false;
 
     }
-    if (tx.TransactionAmount <= 0) {
+
+    if (tx.primaryAccountNumber != 16) {
       isVerify = false;
-      console.log("txAmount cannot be zero");
-    } else if (tx.TransactionAmount > 50000) {
-      isVerify = false;
+      console.log("Primary Account Number should have 16 characters");
     }
 
     //13.02.23 changed validation to be on DateofLoanApproval
-    if (!tx.DateofLoanApproval || tx.DateofLoanApproval.length === 0) {
-      isVerify = false;
-      console.log("DateofLoanApproval not provided");
-    } else {
-      isVerify = true;
-    }
+    // if (!tx.DateofLoanApproval || tx.DateofLoanApproval.length === 0) {
+    //   isVerify = false;
+    //   console.log("DateofLoanApproval not provided");
+    // } else {
+    //   isVerify = true;
+    // }
     return isVerify;
   }
 

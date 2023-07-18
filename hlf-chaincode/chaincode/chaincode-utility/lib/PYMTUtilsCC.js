@@ -46,6 +46,11 @@ class PYMTUtilsCC extends Contract {
   //@required for V1
   async initiateTx(
     ctx,
+    merchantId,
+    CustomerId,
+    loanReferenceNumber,
+    merchantName,
+    primaryAccountNumber,
     processingCode,
     transactionAmount,
     transmissionDateAndTime,
@@ -115,6 +120,10 @@ class PYMTUtilsCC extends Contract {
     );
 
     let initiateTxObj = {
+      MerchantId: merchantId,
+      CustomerID: CustomerId,
+      LoanReferenceNumber: loanReferenceNumber,
+      primaryAccountNumber: primaryAccountNumber,
       processingCode: processingCode,
       transactionAmount: transactionAmount,
       transmissionDateAndTime: transmissionDateAndTime,
@@ -201,6 +210,10 @@ class PYMTUtilsCC extends Contract {
   ///"TODO"  add settlement tx details /// should be add and invoked from this contract.........
   async requestTx(
     ctx,
+    MerchantId,
+    CustomerId,
+    LoanReferenceNumber,
+    primaryAccountNumber,
     processingCode,
     transactionAmount,
     transmissionDateAndTime,
@@ -262,6 +275,10 @@ class PYMTUtilsCC extends Contract {
     console.log("after the key in utilscc");
 
     let settlementTx = {
+      MerchantId: MerchantId,
+      CustomerId: CustomerId,
+      LoanReferenceNumber: LoanReferenceNumber,
+      primaryAccountNumber: primaryAccountNumber,
       processingCode: processingCode,
       transactionAmount: transactionAmount,
       transmissionDateAndTime: transmissionDateAndTime,
