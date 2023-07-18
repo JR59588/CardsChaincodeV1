@@ -17,7 +17,7 @@ class PYMTUtils {
 
 
       // SA_ORG_MSPID: "SAOrgMSP",
-      // MRT1_ORG_NAME: "Org1MSP",
+       MRT1_ORG_NAME: "Org1MSP",
       // AP_ORG_NAME: "APMSP",
       // AGG_ORG_NAME: "AggOrgMSP",
       // CACCT_ORG_NAME: "CAcctMSP",
@@ -40,6 +40,7 @@ class PYMTUtils {
       TXSTATUS_CLEARED: "TxCleared",
       TXSTATUS_NOT_CLEARED: "TxNotCleared",
       submitSettlementTxFN: "submitSettlementTx",
+      requestSettlementTxFN: "requestSettlementTx",
 
       PYMTUtilsCC: "PYMTUtilsCC",
       PYMTUtilsCCReadState: "readState",

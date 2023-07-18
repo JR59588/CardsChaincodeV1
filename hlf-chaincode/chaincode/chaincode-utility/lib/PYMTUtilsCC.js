@@ -7,7 +7,7 @@
 "use strict";
 const PYMTUtils = require("./PYMTUtils");
 const { Contract } = require("fabric-contract-api");
-// const HLFEVENT = require("./HLFEVENT");
+ const HLFEVENT = require("./HLFEVENT");
 const PYMTTX_MERCHANT_CC_SUFFIX = "PYMTTxMerchantCC";
 
 async function checkInvokeCCResponse(chaincodeResponse) {

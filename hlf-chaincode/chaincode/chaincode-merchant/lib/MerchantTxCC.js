@@ -14,6 +14,7 @@ class MerchantTxCC extends Contract {
   async requestSettlementTx(
     ctx,
     MerchantId,
+    MerchantName,
     CustomerId,
     LoanReferenceNumber,
     txObjJSON
@@ -58,7 +59,7 @@ class MerchantTxCC extends Contract {
     console.log(" merchantsettlementcc.js:key", key);
     // else return error
 
-    let channelName = await pymtutils.getChannelIdentity(ctx, "Org1");
+    let channelName = await pymtutils.getChannelIdentity(ctx, "Org1MSP");
 
     // ==== Create tx object and marshal to JSON ====
 
@@ -70,7 +71,6 @@ class MerchantTxCC extends Contract {
     let verified = false;
     if (OrgMSPID == MRT1_ORG_NAME) {
       verified = await this.doVerifyRequestSettlementTx(ctx, tx);
-
 
       console.log("After verifying merchantchecks: " + verified);
 
@@ -265,28 +265,22 @@ class MerchantTxCC extends Contract {
     return verified;
   }
 
-
   async doVerifyRequestSettlementTx(ctx, tx) {
-    var isVerify = true;
-    if (!tx.primaryAccountNumber || tx.primaryAccountNumber.length === 0) {
-      isVerify = false;
-      console.log("Primary Account Number should not be empty");
-
+    var isVerified = true;
+    const hasTxprimaryAccountNumber = "primaryAccountNumber" in tx;
+    if (hasTxprimaryAccountNumber) {
+      if (tx.TransactionReferenceNumber === "" || tx.TransactionReferenceNumber.length == 0) {
+        isVerified = false;
+        console.log(
+          "Validation primaryAccountNumber not valid: ",
+          isVerified
+        );
+        return isVerified;
+      }
+    } else {
+      return false;
     }
 
-    if (tx.primaryAccountNumber != 16) {
-      isVerify = false;
-      console.log("Primary Account Number should have 16 characters");
-    }
-
-
-    // if (!tx.LoanAccountNumber || tx.LoanAccountNumber.length === 0) {
-    //   isVerify = false;
-    //   console.log("LoanAccountNumber not valid");
-    // } else {
-    //   isVerify = true;
-    // }
-    return isVerify;
   }
 
   async doVerifyinitiateSettlementTx(ctx, tx) {
@@ -296,10 +290,10 @@ class MerchantTxCC extends Contract {
 
     }
 
-    if (tx.primaryAccountNumber != 16) {
-      isVerify = false;
-      console.log("Primary Account Number should have 16 characters");
-    }
+    // if (tx.primaryAccountNumber != 16) {
+    //   isVerify = false;
+    //   console.log("Primary Account Number should have 16 characters");
+    // }
 
     //13.02.23 changed validation to be on DateofLoanApproval
     // if (!tx.DateofLoanApproval || tx.DateofLoanApproval.length === 0) {
