@@ -7,7 +7,7 @@
 'use strict';
 
 // const assetTransfer = require('./lib/assetTransfer');
-const AccountSettlementTxCC = require('./lib/AccountSettlementTxCC');
+const SubmitSettlementTxCC = require('./lib/SubmitSettlementTxCC');
 // BNPL
-module.exports.AccountSettlementTxCC = AccountSettlementTxCC;
-module.exports.contracts = [AccountSettlementTxCC];
+module.exports.SubmitSettlementTxCC = SubmitSettlementTxCC;
+module.exports.contracts = [SubmitSettlementTxCC];

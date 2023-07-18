@@ -22,10 +22,10 @@ class PYMTUtils {
       // AGG_ORG_NAME: "AggOrgMSP",
       // CACCT_ORG_NAME: "CAcctMSP",
       // EDI_ORG_NAME: "EDIMSP",
-      PSP_ORG_MSPID: "PSPOrgMSP",
-      AOD_ORG_MSPID: "AODOrgMSP",
-      ACD_ORG_MSPID: "ACDOrgMSP",
-      AAD_ORG_MSPID: "AADOrgMSP",
+      PSP_ORG_MSPID: "PSPMSP",
+      AOD_ORG_MSPID: "AODMSP",
+      ACD_ORG_MSPID: "ACDMSP",
+      AAD_ORG_MSPID: "AADMSP",
 
 
       TXSTATUS_ACCEPTED: "TxAccepted",
@@ -45,6 +45,7 @@ class PYMTUtils {
 
       PYMTUtilsCC: "PYMTUtilsCC",
       PYMTUtilsCCReadState: "readState",
+      PYMTUtilsCCWriteState: "writeState",
 
       // PYMTTxMerchantCC: "PYMTTxMerchantCC",
       // PYMTTxPreSettlementCC: "PYMTTxPreSettlementCC",
@@ -52,15 +53,15 @@ class PYMTUtils {
       // PYMTTxPreSettlementCC: "PYMTTxPreSettlementCC",
       // processSettlementTxFN: "processSettlementTX",
 
-      // readSettlementTxFN: "readState",
-      // PYMTUtilsCCWriteState: "writeState",
-      // IsMerchantContractSigned: "IsMerchantContractSigned",
+       readSettlementTxFN: "readState",
+       
+       IsMerchantContractSigned: "IsMerchantContractSigned",
       // APChaincodeName: "APvalidationcc",
       // SACCFuncName: "validation",
       // APCCFuncName: "validation",
       // acceptSettlementTxFN: "acceptSettlementTx",
       // validateSettlementTxFN: "validateSettlementTx",
-      // initiateSettlementTxFN: "initiateSettlementTx",
+       initiateSettlementTxFN: "initiateSettlementTx",
       // requestSettlementTxFN: "requestSettlementTx",
       // TXSTATUS_REQUESTED: "TxRequested",
       // TXSTATUS_VALIDATED: "TxValidated",
