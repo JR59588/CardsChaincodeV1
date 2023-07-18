@@ -269,7 +269,7 @@ class MerchantTxCC extends Contract {
     var isVerified = true;
     const hasTxprimaryAccountNumber = "primaryAccountNumber" in tx;
     if (hasTxprimaryAccountNumber) {
-      if (tx.TransactionReferenceNumber === "" || tx.TransactionReferenceNumber.length == 0) {
+      if (tx.primaryAccountNumber === "" || tx.primaryAccountNumber.length == 0) {
         isVerified = false;
         console.log(
           "Validation primaryAccountNumber not valid: ",
