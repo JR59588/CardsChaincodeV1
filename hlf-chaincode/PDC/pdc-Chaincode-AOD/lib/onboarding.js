@@ -236,7 +236,8 @@ class MerchantOnboardingPDC extends Contract {
     }
     //retrievePvAODMetaData
 
-    async savePvAADMetaData(ctx) {
+    async savePvAADAODMetaData(ctx) {
+
       const transientMap = await ctx.stub.getTransient();
   
       const pv_IndividualCollectionName= "PDC3"
@@ -256,31 +257,6 @@ class MerchantOnboardingPDC extends Contract {
         );
       }
   
-      if (!merchantInput.txcNegotiatedMDR && merchantInput.txcNegotiatedMDR === "") {
-        throw new Error(
-          "Transcation Negotiated MDR is required, it must be a non-empty string"
-        );
-      }
-  
-      if (!merchantInput.txcMaxTxAmount && merchantInput.txcMaxTxAmount === "") {
-        throw new Error(
-          "Transcation Maximum Amount is required, it must be a non-empty string"
-        );
-      }
-  
-  
-      if (!merchantInput.txcMinTxAmount && merchantInput.txcMinTxAmount === "") {
-        throw new Error(
-          "Transaction Minimum Amount field is required, it must be a non-empty string"
-        );
-      }
-  
-      if (!merchantInput.txcTxCurrency && merchantInput.txcTxCurrency === "") {
-        throw new Error(
-          "Transaction Currency field is required, it must be a non-empty string"
-        );
-      }
-     
       // Check if merchant already exists
       const merchantAsBytes = await ctx.stub.getPrivateData(
         pv_IndividualCollectionName,
@@ -294,38 +270,38 @@ class MerchantOnboardingPDC extends Contract {
       console.log("merchantAsBytes");
   
      //TODO: if require then uncomment below check
-    //await verifyClientOrgMatchesPeerOrg(ctx);
-
-      console.log("verifyClientOrgMatchesPeerOrgForAAD");
+      //await verifyClientOrgMatchesPeerOrg(ctx);
+  
+      console.log("verifyClientOrgMatchesPeerOrgForAOD");
   
       console.log("merchant inputs :", merchantInput);
   
       const merchant = {
-        merchantID: merchantInput.merchantID,
-        txcNegotiatedMDR: merchantInput.txcNegotiatedMDR,
-        promoCode: merchantInput.promoCode,
         txcMaxTxPerDay: merchantInput.txcMaxTxPerDay,
         txcMinTxAmount: merchantInput.txcMinTxAmount,
         txcMaxTxAmount: merchantInput.txcMaxTxAmount,
         txcTxCurrency: merchantInput.txcTxCurrency,
-  
+        txcNegotiatedMDR: merchantInput.txcNegotiatedMDR,
+        promoCode: merchantInput.promoCode ,
       };
+  
       console.log(
         `CreateAsset Put: collection ${pv_IndividualCollectionName}, ID ${merchantInput.merchantID} , merchant ${merchant}`
       );
+  
       try {
         await ctx.stub.putPrivateData(
           pv_IndividualCollectionName,
           merchantInput.merchantID,
           Buffer.from(stringify(merchant))
         );
-      } catch (error) {
+      } 
+      catch (error) {
         throw Error("Failed to put merchant into private data collecton.");
       }
-    } 
-    //savePvAADMetaData
-
-    async retrievePvAADMetaData(ctx, merchantID) {
+    }
+    //savePvAODMetaData
+    async retrievePvAADAODMetaData(ctx, merchantID) {
 
       const pv_IndividualCollectionName= "PDC3"
 
@@ -343,7 +319,7 @@ class MerchantOnboardingPDC extends Contract {
          );
        }
       return merchant;
-     }
-  //retrievePvAADMetaData
+    }
+    //retrievePvAADMetaData
 }
 module.exports = MerchantOnboardingPDC;

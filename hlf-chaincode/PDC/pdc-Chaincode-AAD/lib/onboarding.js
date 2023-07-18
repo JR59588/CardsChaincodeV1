@@ -50,7 +50,7 @@ class MerchantOnboardingPDC extends Contract {
   async savePvAADMetaData(ctx) {
     const transientMap = await ctx.stub.getTransient();
 
-    const pv_IndividualCollectionName= "PDC3"
+    const pv_IndividualCollectionName= "PDC2"
 
     // Asset properties are private, therefore they get passed in transient field, instead of func args
     const transientAssetJSON = transientMap.get("merchant_properties");
@@ -113,14 +113,10 @@ class MerchantOnboardingPDC extends Contract {
 
     const merchant = {
       merchantID: merchantInput.merchantID,
-      txcNegotiatedMDR: merchantInput.txcNegotiatedMDR,
-      promoCode: merchantInput.promoCode,
-      txcMaxTxPerDay: merchantInput.txcMaxTxPerDay,
-      txcMinTxAmount: merchantInput.txcMinTxAmount,
-      txcMaxTxAmount: merchantInput.txcMaxTxAmount,
-      txcTxCurrency: merchantInput.txcTxCurrency,
-
-    };
+      merchantBankCode: merchantInput.merchantBankCode ,
+      merchantAccountNumber: merchantInput.merchantAccountNumber,
+      securityDeposits: merchantInput.securityDeposits,
+     };
     console.log(
       `CreateAsset Put: collection ${pv_IndividualCollectionName}, ID ${merchantInput.merchantID} , merchant ${merchant}`
     );
@@ -228,7 +224,7 @@ class MerchantOnboardingPDC extends Contract {
 
   async retrievePvAADMetaData(ctx, merchantID) {
 
-      const pv_IndividualCollectionName= "PDC3"
+      const pv_IndividualCollectionName= "PDC2"
 
        const merchantJSON = await ctx.stub.getPrivateData(
          pv_IndividualCollectionName,
@@ -247,11 +243,11 @@ class MerchantOnboardingPDC extends Contract {
      }
   //retrievePvAADMetaData
 
-  async savePvAODMetaData(ctx) {
+  async savePvAADAODMetaData(ctx) {
 
     const transientMap = await ctx.stub.getTransient();
 
-    const pv_IndividualCollectionName= "PDC1"
+    const pv_IndividualCollectionName= "PDC3"
 
     // Asset properties are private, therefore they get passed in transient field, instead of func args
     const transientAssetJSON = transientMap.get("merchant_properties");
@@ -268,24 +264,6 @@ class MerchantOnboardingPDC extends Contract {
       );
     }
 
-    if (!merchantInput.txcMaxTxPerDay && merchantInput.txcMaxTxPerDay === "") {
-      throw new Error(
-        "Number of transactions allowed per day field is required, it must be a non-empty string"
-      );
-    }
-
-    if (!merchantInput.POSID && merchantInput.POSID === "") {
-      throw new Error(
-        "POS ID field is required, it must be a non-empty string"
-      );
-    }
-
-    if (!merchantInput.numberOfPOSTerminalsRequired && merchantInput.numberOfPOSTerminalsRequired === "") {
-      throw new Error(
-        "Number Of POS Terminals Required field is required, it must be a non-empty string"
-      );
-    }
-   
     // Check if merchant already exists
     const merchantAsBytes = await ctx.stub.getPrivateData(
       pv_IndividualCollectionName,
@@ -301,15 +279,17 @@ class MerchantOnboardingPDC extends Contract {
    //TODO: if require then uncomment below check
     //await verifyClientOrgMatchesPeerOrg(ctx);
 
-    console.log("verifyClientOrgMatchesPeerOrgForAOD");
+    console.log("verifyClientOrgMatchesPeerOrgForAADAOD");
 
     console.log("merchant inputs :", merchantInput);
 
     const merchant = {
-      merchantID: merchantInput.merchantID,
-      product: merchantInput.product,
-      numberOfPOSTerminalsRequired: merchantInput.numberOfPOSTerminalsRequired,
-      POSID: merchantInput.POSID,
+      txcMaxTxPerDay: merchantInput.txcMaxTxPerDay,
+      txcMinTxAmount: merchantInput.txcMinTxAmount,
+      txcMaxTxAmount: merchantInput.txcMaxTxAmount,
+      txcTxCurrency: merchantInput.txcTxCurrency,
+      txcNegotiatedMDR: merchantInput.txcNegotiatedMDR,
+      promoCode: merchantInput.promoCode ,
     };
 
     console.log(
@@ -348,9 +328,9 @@ class MerchantOnboardingPDC extends Contract {
   }
   //retrieveOBMerchantData
 
-    async retrievePvAODMetaData(ctx, merchantID) {
+    async retrievePvAADAODMetaData(ctx, merchantID) {
 
-      const pv_IndividualCollectionName= "PDC1"
+      const pv_IndividualCollectionName= "PDC3"
 
        const merchantJSON = await ctx.stub.getPrivateData(
          pv_IndividualCollectionName,
@@ -367,6 +347,6 @@ class MerchantOnboardingPDC extends Contract {
        }
       return merchant;
     }
-    //retrievePvAODMetaData
+    //retrievePvAADAODMetaData
 }
 module.exports = MerchantOnboardingPDC;

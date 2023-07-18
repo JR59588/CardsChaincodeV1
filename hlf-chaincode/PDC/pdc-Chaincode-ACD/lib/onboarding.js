@@ -29,7 +29,7 @@ class MerchantOnboardingPDC extends Contract {
 
     const transientMap = await ctx.stub.getTransient();
 
-    const pv_IndividualCollectionName= "PDC2"
+    const pv_IndividualCollectionName= "PDC4"
 
     // Asset properties are private, therefore they get passed in transient field, instead of func args
     const transientAssetJSON = transientMap.get("merchant_properties");
@@ -64,11 +64,12 @@ class MerchantOnboardingPDC extends Contract {
       );
     }
 
-    if (!merchantInput.isContractSigned && merchantInput.isContractSigned === "No") {
+    if (merchantInput.isContractSigned === "No" || !merchantInput.isContractSigned) {
       throw new Error(
-        "Is Contract Signed field is No please provide valide input."
-      );
+        "Is Contract Signed field is No, please provide valid input."
+        );
     }
+    
    
     // Check if merchant already exists
     const merchantAsBytes = await ctx.stub.getPrivateData(
@@ -88,10 +89,10 @@ class MerchantOnboardingPDC extends Contract {
 
     const merchant = {
       merchantID: merchantInput.merchantID,
-      merchantBankCode: merchantInput.merchantBankCode ,
-      merchantAccountNumber: merchantInput.merchantAccountNumber,
+      promoCode: merchantInput.promoCode ,
+      kycStatus: merchantInput.kycStatus,
       securityDeposits: merchantInput.securityDeposits,
-
+      isContractSigned: merchantInput.isContractSigned
     };
     console.log(
       `CreateAsset Put: collection ${pv_IndividualCollectionName}, ID ${merchantInput.merchantID} , merchant ${merchant}`
@@ -202,7 +203,7 @@ class MerchantOnboardingPDC extends Contract {
 
   async retrievePvACDMetaData(ctx, merchantID) {
 
-      const pv_IndividualCollectionName= "PDC2"
+      const pv_IndividualCollectionName= "PDC4"
 
        const merchantJSON = await ctx.stub.getPrivateData(
          pv_IndividualCollectionName,
