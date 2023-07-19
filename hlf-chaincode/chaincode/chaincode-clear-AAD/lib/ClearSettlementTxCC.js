@@ -16,9 +16,9 @@ class ClearSettlementTxCC extends Contract {
 
       //ACL :  Can be called by AOD Org only
       //TODO : AOD org and acl org details has to be finalised......(discussion with nishanth)
-      let { AOD, PYMTUtilsCC } = await pymtutils.hlfconstants();
+      let { AOD_ORG_MSPID, PYMTUtilsCC } = await pymtutils.hlfconstants();
 
-      const accessValid = await pymtutils.validateOrganization(ctx, AOD);
+      const accessValid = await pymtutils.validateOrganization(ctx, AOD_ORG_MSPID);
 
       if (!accessValid) {
         throw new Error(
@@ -54,7 +54,7 @@ class ClearSettlementTxCC extends Contract {
 
       //@to-do verify chaincode tx state is initiated only.
       // TODO verify chaincode tx state is as per requirement.
-      if (!(currentTxReadState.TxStatus == TXSTATUS_CLEARED)) {
+      if (!(currentTxReadState.TxStatus == TXSTATUS_BALANCED)) {
         throw new Error(`Invalid Transaction state  for key  : ${key}`);
       }
 
@@ -82,34 +82,14 @@ class ClearSettlementTxCC extends Contract {
   async clearTxByAAD(ctx, txIn) {
     var isCleared = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
-    const hasTxTransactionReferenceNumber = "TransactionReferenceNumber" in txIn;
-    if (hasTxTransactionReferenceNumber) {
-      if (txIn.TransactionReferenceNumber === "" || txIn.TransactionReferenceNumber.length == 0) {
+    const hasTxacquiringInstitutionIdentificationCode = "acquiringInstitutionIdentificationCode" in txIn;
+    if (hasTxacquiringInstitutionIdentificationCode) {
+      if (txIn.acquiringInstitutionIdentificationCode === "" || txIn.acquiringInstitutionIdentificationCode.length == 0) {
         isCleared = false;
         console.log(
-          "Validation by EDI...TransactionReferenceNumber not valid: ",
+          "Validation by AAD ...acquiringInstitutionIdentificationCode not valid: ",
           isCleared
         );
-        return isCleared;
-      }
-    } else {
-      return false;
-    }
-
-    const hasTxLoanTenure = "LoanTenure" in txIn;
-    if (hasTxLoanTenure) {
-      if (txIn.LoanTenure === "" || txIn.LoanTenure.length == 0) {
-        isCleared = false;
-        console.log("Validation by EDI...LoanTenure not valid: ", isCleared);
-        return isCleared;
-      }
-      let LoanTenureInt = parseInt(txIn.LoanTenure);
-      if (isNaN(LoanTenureInt)) {
-        return false;
-      }
-      if (LoanTenureInt > 36) {
-        isCleared = false;
-        console.log("LoanTenure (", txIn.LoanTenure, ") is not valid");
         return isCleared;
       }
     } else {
