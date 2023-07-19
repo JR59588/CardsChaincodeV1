@@ -256,79 +256,6 @@ exports.retrievePvAADMetaData = async function (req, res) {
   }
 };
 
-exports.retrievePvACDMetaData = async function (req, res) {
-
-  console.log("retrievePvACDMetaData ");
-
-  const channelName = "channel1";
-  const contractName = "onboardingMerchantC";
-  try {
-    let org = req.params.roleId;
-    if (!data[org]) {
-      res.status(400).send("Error!. Invalid role name");
-    }
-    let ccpPath = path.resolve(data[org].connectionPath);
-    let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
-    // Create a new file system based wallet for managing identities.
-    const walletPath = path.join(process.cwd(), data[org].walletOrg);
-    const wallet = await Wallets.newFileSystemWallet(walletPath);
-    console.log(`Wallet path: ${walletPath}`);
-
-    // Check to see if we've already enrolled the user.
-    const identity = await wallet.get(data[org].userWallet);
-    if (!identity) {
-      console.log(
-        "An identity for the user" +
-        data[org].userWallet +
-        "does not exist in the wallet"
-      );
-      console.log("Run the registerUser.js application before retrying");
-      return;
-    }
-
-    // Create a new gateway for connecting to our peer node.
-    const gateway = new Gateway();
-    await gateway.connect(ccp, {
-      wallet,
-      identity: data[org].userWallet,
-      discovery: { enabled: true, asLocalhost: true },
-    });
-
-    // Get the network (channel) our contract is deployed to.
-    const network = await gateway.getNetwork(channelName);
-    // Get the contract from the network.
-    const contract = network.getContract(contractName);
-    const merchantID = req.params.merchantID;
-
-    console.log(" merchantID", merchantID);
-
-    if (!merchantID) {
-      return res.status(400).json({
-        success: false,
-        message: "Request cannot be processed.Please provide valid inputs",
-      });
-    }
-
-    const result = await contract.evaluateTransaction(
-      "retrievePvACDMetaData",
-      merchantID
-    );
-    console.log(
-      `Transaction has been evaluated, result is: ${result.toString()}`
-    );
-    res.status(200).json({ response: JSON.parse(result.toString()) });
-    return result;
-    // Disconnect from the gateway.
-    await gateway.disconnect();
-  } catch (error) {
-    console.error(`Failed to submit transaction: ${error}`);
-
-    return res.status(401).json({
-      success: false,
-      message: "Error" + error,
-    });
-  }
-};
 
 exports.retrievePvAODMetaData = async function (req, res) {
 
@@ -398,9 +325,76 @@ exports.retrievePvAODMetaData = async function (req, res) {
   }
 };
 
+exports.retrievePvAADAODMetaData = async function (req, res) {
+
+  console.log("retrievePvAADAODMetaData");
+  try {
+    let org = req.params.roleId;
+    if (!data[org]) {
+      res.status(400).send("Error!. Invalid role name");
+    }
+    let ccpPath = path.resolve(data[org].connectionPath);
+    let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+    // Create a new file system based wallet for managing identities.
+    const walletPath = path.join(process.cwd(), data[org].walletOrg);
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
+    console.log(`Wallet path: ${walletPath}`);
+
+    // Check to see if we've already enrolled the user.
+    const identity = await wallet.get(data[org].userWallet);
+    if (!identity) {
+      console.log(
+        "An identity for the user" +
+        data[org].userWallet +
+        "does not exist in the wallet"
+      );
+      console.log("Run the registerUser.js application before retrying");
+      return;
+    }
+
+    // Create a new gateway for connecting to our peer node.
+    const gateway = new Gateway();
+    await gateway.connect(ccp, {
+      wallet,
+      identity: data[org].userWallet,
+      discovery: { enabled: true, asLocalhost: true },
+    });
+
+    // Get the network (channel) our contract is deployed to.
+    const network = await gateway.getNetwork(channelName);
+
+    // Get the contract from the network.
+    const contract = network.getContract(contractName);
+    const merchantID = req.body.merchantID;
+    
+    if (!merchantID) {
+      return res.status(400).json({
+        success: false,
+        message: "Request cannot be processed.Please provide valid inputs",
+      });
+    }
+    const result = await contract.evaluateTransaction(
+      "retrievePvAADAODMetaData",
+      merchantID
+    );
+    console.log(
+      `Transaction has been evaluated, result is: ${result.toString()}`
+    );
+    res.status(200).json({ response: result.toString() });
+
+    // Disconnect from the gateway.
+    await gateway.disconnect();
+  } catch (error) {
+    console.error(`Failed to submit transaction: ${error}`);
+    return res.status(401).json({
+      success: false,
+      message: "Error" + error,
+    });
+  }
+};
 
 exports.lookUpMerchantMetaData = async function (req, res) {
-  console.log("line 387 ");
+  console.log("lookUpMerchantMetaData ");
 
   const channelName = "channel1";
   const contractName = "onboardingMerchantC";
@@ -413,7 +407,7 @@ exports.lookUpMerchantMetaData = async function (req, res) {
 
     const merchantID = req.params.merchantID;
 
-    console.log("line number 400 merchantID", merchantID);
+    console.log(" merchantID", merchantID);
 
     if (!merchantID) {
       return res.status(400).json({
@@ -455,7 +449,7 @@ exports.lookUpMerchantMetaData = async function (req, res) {
     // Get the contract from the network.
     const contract = network.getContract(contractName);
 
-    //console.log("---line 438 COMMON DATA---");
+    //console.log("---COMMON DATA---");
     let defaultValueOBMerchant = {
       "merchantID": UNAUTHORIZED,
       "merchantName": UNAUTHORIZED,
@@ -466,27 +460,24 @@ exports.lookUpMerchantMetaData = async function (req, res) {
       "isContractSigned": UNAUTHORIZED,
     }
     let defaultValueAODPDC = {
-      "merchantID": UNAUTHORIZED,
       "product": UNAUTHORIZED,
       "numberOfPOSTerminalsRequired": UNAUTHORIZED,
       "POSID": UNAUTHORIZED,
     }
 
-    let defaultValueACDPDC = {
-      "merchantID": UNAUTHORIZED,
-      "merchantBankCode": UNAUTHORIZED,
-      "merchantAccountNumber": UNAUTHORIZED,
-      "securityDeposits": UNAUTHORIZED
-    }
-    
-    let defaultValueAADPDC = {
-      "merchantID": UNAUTHORIZED,
+    let defaultValueAADAODPDC = {
       "txcNegotiatedMDR": UNAUTHORIZED,
       "txcMaxTxPerDay": UNAUTHORIZED,
       "txcMinTxAmount": UNAUTHORIZED,
       "txcMaxTxAmount": UNAUTHORIZED,
       "txcTxCurrency": UNAUTHORIZED,
       "promoCode": UNAUTHORIZED,
+    }
+    
+    let defaultValueAADPDC = {
+      "merchantBankCode": UNAUTHORIZED,
+      "merchantAccountNumber": UNAUTHORIZED,
+      "securityDeposits": UNAUTHORIZED,
     }
 
     let retrieveOBMerchantDataResult;
@@ -524,7 +515,7 @@ exports.lookUpMerchantMetaData = async function (req, res) {
     try {
       retrievePvAADMetaDataResult = await contract.evaluateTransaction(
         "retrievePvAADMetaData",
-        "C" + merchantID
+         merchantID
         // merchantID
       );
       //  console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
@@ -534,35 +525,35 @@ exports.lookUpMerchantMetaData = async function (req, res) {
     }
     console.log("---retrievePvAADMetaData---", retrievePvAADMetaDataResult);
 
-    console.log("---retrievePvACDMetaData DATA---");
+    console.log("---retrievePvAADAODMetaData DATA---");
 
-    let retrievePvACDMetaDataResult;
+    let retrievePvAADAODMetaDataResult;
     try {
-      retrievePvACDMetaDataResult = await contract.evaluateTransaction(
-        "retrievePvACDMetaData",
+      retrievePvAADAODMetaDataResult = await contract.evaluateTransaction(
+        "retrievePvAADAODMetaData",
         merchantID
       );
 
-      console.log("---retrievePvACDMetaDataResult---", JSON.parse(retrievePvACDMetaDataResult));
+      console.log("---retrievePvAADAODMetaDataResult---", JSON.parse(retrievePvAADAODMetaDataResult));
     } catch (error) {
-      retrievePvACDMetaDataResult = { error: error, pdcUnauthorized: "retrievePvACDMetaData" }
+      retrievePvAADAODMetaDataResult = { error: error, pdcUnauthorized: "retrievePvAADAODMetaData" }
     }
-    console.log("---retrievePvACDMetaDataResult---", retrievePvACDMetaDataResult);
+    console.log("---retrievePvAADAODMetaDataResult---", retrievePvAADAODMetaDataResult);
 
 
     retrieveOBMerchantDataResult = retrieveOBMerchantDataResult.error ? defaultValueOBMerchant : JSON.parse(retrieveOBMerchantDataResult)
     retrievePvAODMetaDataResult = retrievePvAODMetaDataResult.error ? defaultValueAODPDC : JSON.parse(retrievePvAODMetaDataResult)
-    retrievePvAADMetaDataResult = retrievePvAADMetaDataResult.error ? defaultValueACDPDC : JSON.parse(retrievePvAADMetaDataResult)
-    retrievePvACDMetaDataResult = retrievePvACDMetaDataResult.error ? defaultValueAADPDC : JSON.parse(retrievePvACDMetaDataResult)
+    retrievePvAADMetaDataResult = retrievePvAADMetaDataResult.error ? defaultValueAADPDC : JSON.parse(retrievePvAADMetaDataResult)
+    retrievePvAADAODMetaDataResult = retrievePvAADAODMetaDataResult.error ? defaultValueAADAODPDC : JSON.parse(retrievePvAADAODMetaDataResult)
 
     console.log("retrieveOBMerchantDataResult : ", retrieveOBMerchantDataResult);
     console.log("retrievePvAODMetaDataResult : ", retrievePvAODMetaDataResult);
     console.log("retrievePvAADMetaDataResult : ", retrievePvAADMetaDataResult);
-    console.log("retrievePvACDMetaDataResult : ", retrievePvACDMetaDataResult);
+    console.log("retrievePvAADAODMetaDataResult : ", retrievePvAADAODMetaDataResult);
 
     const mergeObjects1 = mergeObjects(retrieveOBMerchantDataResult, retrievePvAODMetaDataResult)
     const mergeObjects2 = mergeObjects(mergeObjects1, retrievePvAADMetaDataResult)
-    const mergeObjects3 = mergeObjects(mergeObjects2, retrievePvACDMetaDataResult)
+    const mergeObjects3 = mergeObjects(mergeObjects2, retrievePvAADAODMetaDataResult)
 
     console.log("mergeObjects1", mergeObjects1);
     console.log("mergeObjects2", mergeObjects2);
@@ -571,7 +562,7 @@ exports.lookUpMerchantMetaData = async function (req, res) {
     console.log("retrieveOBMerchantDataResult", retrieveOBMerchantDataResult);
     console.log("retrievePvAODMetaDataResult", retrievePvAODMetaDataResult);
     console.log("retrievePvAADMetaDataResult", retrievePvAADMetaDataResult);
-    console.log("retrievePvACDMetaDataResult", retrievePvACDMetaDataResult);
+    console.log("retrievePvAADAODMetaDataResult", retrievePvAADAODMetaDataResult);
 
     return res.status(200).json
       ({
@@ -587,7 +578,6 @@ exports.lookUpMerchantMetaData = async function (req, res) {
     });
   }
 };
-
 
 function mergeObjects(obj1, obj2) {
   // Create a new object to hold the merged properties  

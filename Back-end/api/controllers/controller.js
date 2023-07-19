@@ -100,7 +100,7 @@ exports.requestSettlementTx = async function (req, res) {
       contract
 
     );
-    console.log("controller line no 108" ,JSON.stringify(stxObj));
+    console.log("controller " ,JSON.stringify(stxObj));
     await contract.submitTransaction(
       ccFunctionName,
       stxObj.processingCode,

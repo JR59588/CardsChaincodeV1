@@ -25,6 +25,7 @@ var storage = multer.diskStorage({
     }
 })
 const IP = "";
+mongoose.set('strictQuery', false);
 
 //create multer instance
 const upload = multer({ storage: storage });
