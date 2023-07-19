@@ -34,15 +34,6 @@
     "blockToLive": 0,
     "memberOnlyRead": true,
     "memberOnlyWrite": true
-  },
-  {
-    "name": "PDC4",
-    "policy": "OR('ACDMSP.member')",
-    "requiredPeerCount": 0,
-    "maxPeerCount": 1,
-    "blockToLive": 0,
-    "memberOnlyRead": true,
-    "memberOnlyWrite": true
   }
   
 ]

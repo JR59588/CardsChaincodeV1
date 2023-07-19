@@ -103,7 +103,6 @@ class MerchantOnboardingPDC extends Contract {
     console.log("merchant inputs :", merchantInput);
 
     const merchant = {
-      merchantID: merchantInput.merchantID,
       product: merchantInput.product,
       numberOfPOSTerminalsRequired: merchantInput.numberOfPOSTerminalsRequired,
       POSID: merchantInput.POSID,
@@ -149,10 +148,34 @@ class MerchantOnboardingPDC extends Contract {
         "merchantID field is required, it must be a non-empty string"
       );
     }
+
+    if (!merchantInput.promoCode && merchantInput.promoCode === "") {
+      throw new Error(
+        "promoCode field is required, it must be a non-empty string"
+      );
+    }
+
+    if (!merchantInput.kycStatus && merchantInput.kycStatus === "") {
+      throw new Error(
+        "KYC Status field is required, it must be a non-empty string"
+      );
+    }
+
+    if (!merchantInput.securityDeposits && merchantInput.securityDeposits === "") {
+      throw new Error(
+        "Security Deposits field is required, it must be a non-empty string"
+      );
+    }
+
+    if (merchantInput.isContractSigned === "No" || !merchantInput.isContractSigned) {
+      throw new Error(
+        "Is Contract Signed field is No, please provide valid input."
+        );
+    }
       
-    const merchantAsBytes = await ctx.stub.getPrivateData(
-    pv_CollectionName,
-    merchantInput.merchantID
+      const merchantAsBytes = await ctx.stub.getPrivateData(
+      pv_CollectionName,
+      merchantInput.merchantID
     );
 
     console.log("merchantAsBytes", merchantAsBytes);
@@ -162,7 +185,7 @@ class MerchantOnboardingPDC extends Contract {
         `This merchant (${merchantInput.merchantID}) already exists`
       );
     }
-    
+   
     console.log("merchant inputs :", merchantInput);
 
     const merchant = {
@@ -174,7 +197,7 @@ class MerchantOnboardingPDC extends Contract {
       isContractSigned: merchantInput.isContractSigned,
       kycStatus: merchantInput.kycStatus,
 
-    };
+       };
 
     console.log("merchant", merchant);
    
@@ -300,7 +323,8 @@ class MerchantOnboardingPDC extends Contract {
         throw Error("Failed to put merchant into private data collecton.");
       }
     }
-    //savePvAODMetaData
+    //savePvAADAODMetaData
+    
     async retrievePvAADAODMetaData(ctx, merchantID) {
 
       const pv_IndividualCollectionName= "PDC3"

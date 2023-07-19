@@ -112,13 +112,12 @@ class MerchantOnboardingPDC extends Contract {
     console.log("merchant inputs :", merchantInput);
 
     const merchant = {
-      merchantID: merchantInput.merchantID,
       merchantBankCode: merchantInput.merchantBankCode ,
       merchantAccountNumber: merchantInput.merchantAccountNumber,
       securityDeposits: merchantInput.securityDeposits,
      };
     console.log(
-      `CreateAsset Put: collection ${pv_IndividualCollectionName}, ID ${merchantInput.merchantID} , merchant ${merchant}`
+      `CreateAsset Put: collection ${pv_IndividualCollectionName}, ID ${merchantInput.merchantID} ,merchant ${merchant}`
     );
     try {
       await ctx.stub.putPrivateData(
@@ -155,6 +154,30 @@ class MerchantOnboardingPDC extends Contract {
         "merchantID field is required, it must be a non-empty string"
       );
     }
+
+    if (!merchantInput.promoCode && merchantInput.promoCode === "") {
+      throw new Error(
+        "promoCode field is required, it must be a non-empty string"
+      );
+    }
+
+    if (!merchantInput.kycStatus && merchantInput.kycStatus === "") {
+      throw new Error(
+        "KYC Status field is required, it must be a non-empty string"
+      );
+    }
+
+    if (!merchantInput.securityDeposits && merchantInput.securityDeposits === "") {
+      throw new Error(
+        "Security Deposits field is required, it must be a non-empty string"
+      );
+    }
+
+    if (merchantInput.isContractSigned === "No" || !merchantInput.isContractSigned) {
+      throw new Error(
+        "Is Contract Signed field is No, please provide valid input."
+        );
+    }
       
       const merchantAsBytes = await ctx.stub.getPrivateData(
       pv_CollectionName,
@@ -168,7 +191,7 @@ class MerchantOnboardingPDC extends Contract {
         `This merchant (${merchantInput.merchantID}) already exists`
       );
     }
-
+   
     console.log("merchant inputs :", merchantInput);
 
     const merchant = {
@@ -180,7 +203,7 @@ class MerchantOnboardingPDC extends Contract {
       isContractSigned: merchantInput.isContractSigned,
       kycStatus: merchantInput.kycStatus,
 
-    };
+       };
 
     console.log("merchant", merchant);
    
@@ -199,7 +222,6 @@ class MerchantOnboardingPDC extends Contract {
       console.log("Failed to put merchant into private data collecton", error);
       throw Error("Failed to put merchant into private data collecton.");
     }
-
   } 
   //End of saveOBMerchantSummary
 
@@ -307,7 +329,7 @@ class MerchantOnboardingPDC extends Contract {
       throw Error("Failed to put merchant into private data collecton.");
     }
   }
-  //savePvAODMetaData
+  //savePvAADAODMetaData
 
    async retrieveOBMerchantData(ctx, merchantID) {
 

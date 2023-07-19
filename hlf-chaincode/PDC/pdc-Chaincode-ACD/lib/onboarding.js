@@ -25,20 +25,23 @@ async function verifyClientOrgMatchesPeerOrg(ctx) {
 
 class MerchantOnboardingPDC extends Contract {
 
-  async savePvACDMetaData(ctx) {
+ async saveOBMerchantSummary(ctx) {
 
     const transientMap = await ctx.stub.getTransient();
 
-    const pv_IndividualCollectionName= "PDC4"
+    console.log("transientMap", transientMap);
 
-    // Asset properties are private, therefore they get passed in transient field, instead of func args
     const transientAssetJSON = transientMap.get("merchant_properties");
 
     if (!transientAssetJSON) {
-      throw new Error("The merchant was not found in the transient map input.");
+      throw new Error(
+        "The merchant info was not found in the transient map input."
+      );
     }
 
     let merchantInput = JSON.parse(transientAssetJSON);
+ 
+    console.log("merchantInput", merchantInput);
 
     if (!merchantInput.merchantID && merchantInput.merchantID === "") {
       throw new Error(
@@ -68,71 +71,6 @@ class MerchantOnboardingPDC extends Contract {
       throw new Error(
         "Is Contract Signed field is No, please provide valid input."
         );
-    }
-    
-   
-    // Check if merchant already exists
-    const merchantAsBytes = await ctx.stub.getPrivateData(
-      pv_IndividualCollectionName,
-      merchantInput.merchantID
-    );
-    if (merchantAsBytes != "") {
-      throw new Error(
-        `This merchant (${merchantInput.merchantID}) already exists`
-      );
-    }
-    console.log("merchantAsBytes");
-//TODO: if require then uncomment below check
-    //await verifyClientOrgMatchesPeerOrg(ctx);
-
-    console.log("merchant inputs :", merchantInput);
-
-    const merchant = {
-      merchantID: merchantInput.merchantID,
-      promoCode: merchantInput.promoCode ,
-      kycStatus: merchantInput.kycStatus,
-      securityDeposits: merchantInput.securityDeposits,
-      isContractSigned: merchantInput.isContractSigned
-    };
-    console.log(
-      `CreateAsset Put: collection ${pv_IndividualCollectionName}, ID ${merchantInput.merchantID} , merchant ${merchant}`
-    );
-    
-    try {
-      await ctx.stub.putPrivateData(
-        pv_IndividualCollectionName,
-        merchantInput.merchantID,
-        Buffer.from(stringify(merchant))
-      );
-    } 
-    catch (error) {
-      throw Error("Failed to put merchant into private data collecton.");
-    }
-  }
-  //savePvACDMetaData
-
-  async saveOBMerchantSummary(ctx) {
-
-    const transientMap = await ctx.stub.getTransient();
-
-    console.log("transientMap", transientMap);
-
-    const transientAssetJSON = transientMap.get("merchant_properties");
-
-    if (!transientAssetJSON) {
-      throw new Error(
-        "The merchant info was not found in the transient map input."
-      );
-    }
-
-    let merchantInput = JSON.parse(transientAssetJSON);
- 
-    console.log("merchantInput", merchantInput);
-
-    if (!merchantInput.merchantID && merchantInput.merchantID === "") {
-      throw new Error(
-        "merchantID field is required, it must be a non-empty string"
-      );
     }
       
       const merchantAsBytes = await ctx.stub.getPrivateData(
@@ -200,27 +138,6 @@ class MerchantOnboardingPDC extends Contract {
     }
   // retrieveOBMerchantData
 
-
-  async retrievePvACDMetaData(ctx, merchantID) {
-
-      const pv_IndividualCollectionName= "PDC4"
-
-       const merchantJSON = await ctx.stub.getPrivateData(
-         pv_IndividualCollectionName,
-         merchantID
-       );
-
-       const merchant = merchantJSON.toString();
-   
-       //No Asset found, return empty response
-       if (!merchant) {
-         throw new Error(
-           `${merchantID} does not exist in collection ${pv_IndividualCollectionName}.`
-         );
-       }
-        return merchant;
-  } 
-  //retrievePvACDMetaData
 
 }
 module.exports = MerchantOnboardingPDC;
