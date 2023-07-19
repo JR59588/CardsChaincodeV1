@@ -7,11 +7,11 @@ const merchantController = require("../controllers/merchantOnboarding");
 
 module.exports = function (app) {
 
-  // app
+  app
 
-  //   .route("/api/v1/merchantTx")
+    .route("/api/v1/merchantTx")
 
-  //   .post(controller.requestSettlementTx); //merchant App
+    .post(controller.requestSettlementTx); //merchant App
 
   // app
   //   .route("/api/v1/GetTxByRange/:roleId")
@@ -66,34 +66,34 @@ module.exports = function (app) {
 
     .post(merchantController.savePvACDMetaData);
 
-    app
-    
-  .route("/api/v1/savePvAODMetaData")
+  app
 
-  .post(merchantController.savePvAODMetaData);
+    .route("/api/v1/savePvAODMetaData")
 
-  // app
-    
-  // .route("/api/v1/verifySubmitTx")
+    .post(merchantController.savePvAODMetaData);
 
-  // .post(merchantController.verifySubmitTx);
+  app
 
-  // app
-    
-  // .route("/api/v1/verifyBalanceTx")
+    .route("/api/v1/verifySubmitTx")
 
-  // .post(merchantController.verifyBalanceTx);
+    .post(merchantController.verifySubmitTx);
 
-  // app
-    
-  // .route("/api/v1/verifyAccountTx")                              
+  app
 
-  // .post(merchantController.verifyAccountTx);
+    .route("/api/v1/verifyBalanceTx")
 
-  // app
-    
-  // .route("/api/v1/verifyClearTx")
+    .post(merchantController.verifyBalanceTx);
 
-  // .post(merchantController.verifyClearTx);
+  app
+
+    .route("/api/v1/verifyAuthorizeTx")
+
+    .post(merchantController.verifyAuthorizeTx);
+
+  app
+
+    .route("/api/v1/verifyClearTx")
+
+    .post(merchantController.verifyClearTx);
 
 };
