@@ -5,10 +5,8 @@ import { Routes } from 'react-router-dom'
 import Aggregator from './components/Aggregator'
 import FileComponent from './components/Merchant-Submit-Deails/FileComponent'
 import Header from './components/Header'
-import Home from './components/Home'
 import Merchant from './components/Merchant'
 import { Route } from 'react-router-dom'
-// import TestTabel from './components/TestTabel'
 import Dashboard from './components/Dashboard'
 import ViewOnboardingStatic from './components/ViewOnboardingStatic/ViewOnboardingStatic'
 import Onboard from './components/Onboarding/Onboard'
@@ -44,12 +42,10 @@ function App() {
           element={<Onboard roleId={roleId} IP={IP} />}
         />
 
-        <Route path="/Home" element={<Home />} />
         <Route
           path="/FileComponent"
           element={<FileComponent roleId={roleId} IP={IP} />}
         />
-        {/* <Route path="/table" element={<TestTabel />} /> */}
 
         <Route
           path="/View-Onboarding-Static"
