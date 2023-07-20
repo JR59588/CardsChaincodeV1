@@ -36,22 +36,20 @@ const Onboard = (props) => {
     merchantDescription: '',
     merchantType: '',
     bnplProductTypes: '',
-    merchantAccountType: '',
     txcNegotiatedMDR: '',
+    promoCode: '',
     txcMaxTxPerDay: '',
     txcTxCurrency: '',
     txcMaxTxAmount: '',
     txcMinTxAmount: '',
-    locationsAllowed: '',
-    aggName: '',
-    aggID: '',
-    clrOrgName: 'Internal',
-    clrOrgID: 'CLORG-101',
+    transactionGeographiesAllowed: '',
+    accountNumber: '',
+    bankCode: '',
     isContractSigned: '',
+    kycStatus: '',
     customerID: '',
-    merchantBankCode: '',
-    promoCode: '',
-    merchantAccountNumber: '',
+    securityDeposits: '',
+    numberOfPOSTerminalsRequired: '',
     loanExpiryDate: '',
     maxLoanAmount: '',
     currentOutstandingAmount: '',
@@ -383,8 +381,8 @@ const Onboard = (props) => {
                     className="form-control"
                     placeholder="Location A, Location B"
                     aria-label="Last name"
-                    name="locationsAllowed"
-                    value={onboardingFormData.locationsAllowed}
+                    name="transactionGeographiesAllowed"
+                    value={onboardingFormData.transactionGeographiesAllowed}
                     onChange={onChangeHandel}
                   />
                 </div>
@@ -406,8 +404,8 @@ const Onboard = (props) => {
                     className="form-control"
                     placeholder="Account  Number"
                     aria-label="Last name"
-                    name="aggName"
-                    value={onboardingFormData.aggName}
+                    name="accountNumber"
+                    value={onboardingFormData.accountNumber}
                     onChange={onChangeHandel}
                   />
                 </div>
@@ -424,8 +422,8 @@ const Onboard = (props) => {
                     className="form-control"
                     placeholder="Bank code"
                     aria-label="Last name"
-                    name="aggID"
-                    value={onboardingFormData.aggID}
+                    name="bankCode"
+                    value={onboardingFormData.bankCode}
                     onChange={onChangeHandel}
                   />
                   {/* <span
@@ -460,9 +458,9 @@ const Onboard = (props) => {
                     className="form-control"
                     placeholder="Terminals Number"
                     aria-label="Last name"
-                    name="merchantAccountNumber"
+                    name="numberOfPOSTerminalsRequired"
                     onChange={onChangeHandel}
-                    value={onboardingFormData.merchantAccountNumber}
+                    value={onboardingFormData.numberOfPOSTerminalsRequired}
                   />
                   <span
                     class={styles.tool}
@@ -488,9 +486,9 @@ const Onboard = (props) => {
                     className="form-control"
                     placeholder="number of Deposits"
                     aria-label="Last name"
-                    name="merchantBankCode"
+                    name="securityDeposits"
                     onChange={onChangeHandel}
-                    value={onboardingFormData.merchantBankCode}
+                    value={onboardingFormData.securityDeposits}
                   />
                   <span
                     class={styles.tool}
@@ -538,14 +536,14 @@ const Onboard = (props) => {
                 <div className="col mt-2">
                   <input
                     type="radio"
-                    name="isContractSigned"
+                    name="kycStatus"
                     value="YES"
                     onChange={onChangeHandel}
                   />
                   &nbsp;Completed
                   <input
                     type="radio"
-                    name="isContractSigned"
+                    name="kycStatus"
                     value="NO"
                     style={{ marginLeft: '10px' }}
                     onChange={onChangeHandel}
