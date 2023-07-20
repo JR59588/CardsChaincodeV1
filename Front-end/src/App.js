@@ -11,11 +11,11 @@ import Dashboard from './components/Dashboard'
 import ViewOnboardingStatic from './components/ViewOnboardingStatic/ViewOnboardingStatic'
 import Onboard from './components/Onboarding/Onboard'
 import SubmitTx from './components/Submit_Tx/SubmitTx'
-const IP = ''
+const IP = 'localhost'
 
 function App() {
   //storing the roleId...
-  const [roleId, setRoleId] = useState('Agg')
+  const [roleId, setRoleId] = useState('Org1')
 
   const getRoleFromFile = (roleState) => {
     console.log('app', roleState)
@@ -41,7 +41,10 @@ function App() {
           path="/Aggregator"
           element={<Onboard roleId={roleId} IP={IP} />}
         />
-
+        <Route
+          path="/Onboard"
+          element={<Onboard roleId={roleId} IP={IP} />}
+        />
         <Route
           path="/FileComponent"
           element={<FileComponent roleId={roleId} IP={IP} />}

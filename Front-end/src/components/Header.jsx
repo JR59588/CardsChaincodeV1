@@ -37,15 +37,15 @@ const Header = ({ roleId, setRoleId }) => {
               </NavLink>{' '}
             </li>
             <li className="nav-item">
-              {roleId === 'Agg' || roleId === 'Agg2' ? (
-                <>
+              {/* {roleId === 'Agg' || roleId === 'Agg2' ? (
+                <> */}
                   <NavLink to="/Aggregator" className="ani">
                     New Onboarding{' '}
                     <span className="gapLine" style={{ color: 'white' }}>
                       |
                     </span>
                   </NavLink>
-                </>
+                {/* </>
               ) : (
                 <>
                   <div
@@ -58,7 +58,8 @@ const Header = ({ roleId, setRoleId }) => {
                     </span>
                   </div>
                 </>
-              )}
+              ) 
+              }*/}
             </li>
             <li className="nav-item">
               <NavLink to="/View-Onboarding-Static" className="ani">
@@ -70,15 +71,15 @@ const Header = ({ roleId, setRoleId }) => {
             </li>
 
             <li className="nav-item">
-              {roleId === 'Agg' || roleId === 'Agg2' ? (
-                <>
+              {/* {roleId === 'Agg' || roleId === 'Agg2' ? (
+                <> */}
                   <NavLink to="/Merchant" className="ani">
                     Sales/Return Request{' '}
                     <span className="gapLine" style={{ color: 'white' }}>
                       |
                     </span>
                   </NavLink>
-                </>
+                {/* </>
               ) : (
                 <>
                   <div
@@ -91,7 +92,7 @@ const Header = ({ roleId, setRoleId }) => {
                     </span>
                   </div>
                 </>
-              )}
+              )} */}
             </li>
             {/* <li className="nav-item">
               <NavLink to="/ViewTx" className="ani">
@@ -124,14 +125,23 @@ const Header = ({ roleId, setRoleId }) => {
                 <option value="AP" id="AP" className="dropdown-item">
                   Select Role
                 </option>
-                <option value="Agg" id="Agg" className="dropdown-item">
-                  Customer Department
+                <option value="Org1" id="Org1" className="dropdown-item">
+                  Merchant Org 1
                 </option>
-                <option value="Agg3" id="Agg3" className="dropdown-item">
-                  Operations Department
+                <option value="Org2" id="Org2" className="dropdown-item">
+                  Merchant Org 2
                 </option>
-                <option value="Agg2" id="Agg3" className="dropdown-item">
-                  Accounts Department
+                <option value="PSP" id="PSP" className="dropdown-item">
+                  Payment Service Provider
+                </option>
+                <option value="ACD" id="ACD" className="dropdown-item">
+                  Acquirer Customer Department
+                </option>
+                <option value="AAD" id="AAD" className="dropdown-item">
+                  Acquirer Accounts Department
+                </option>
+                <option value="AOD" id="AOD" className="dropdown-item">
+                  Acquirer Operations Department
                 </option>
               </select>
             </div>

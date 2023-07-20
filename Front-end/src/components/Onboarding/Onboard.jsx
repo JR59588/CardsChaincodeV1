@@ -34,8 +34,8 @@ const Onboard = (props) => {
     merchantName: '',
     merchantID: '',
     merchantDescription: '',
-    merchantType: '',
-    bnplProductTypes: '',
+    merchantCategoryCode: '',
+    product: '',
     txcNegotiatedMDR: '',
     promoCode: '',
     txcMaxTxPerDay: '',
@@ -43,8 +43,8 @@ const Onboard = (props) => {
     txcMaxTxAmount: '',
     txcMinTxAmount: '',
     transactionGeographiesAllowed: '',
-    accountNumber: '',
-    bankCode: '',
+    merchantAccountNumber: '',
+    merchantBankCode: '',
     isContractSigned: '',
     kycStatus: '',
     customerID: '',
@@ -56,6 +56,7 @@ const Onboard = (props) => {
     totalDisbursedAmount: '',
     isDefaulter: '',
     customerName: '',
+    POSID: '',
     roleId: props.roleId,
   })
 
@@ -205,10 +206,10 @@ const Onboard = (props) => {
                 <div className="col">
                   <select
                     style={{ height: '40px', fontSize: '14px' }}
-                    name="merchantType"
+                    name="merchantCategoryCode"
                     className="form-select"
                     onChange={onChangeHandel}
-                    value={onboardingFormData.merchantType}
+                    value={onboardingFormData.merchantCategoryCode}
                   >
                     <option value="">Select Merchant Category Code</option>
                     <option value="E-Commerce">E-Commerce</option>
@@ -228,9 +229,9 @@ const Onboard = (props) => {
                 <div className="col">
                   <select
                     style={{ height: '40px', fontSize: '14px' }}
-                    name="bnplProductTypes"
+                    name="product"
                     onChange={onChangeHandel}
-                    value={onboardingFormData.bnplProductTypes}
+                    value={onboardingFormData.product}
                     id=""
                     className="form-select"
                   >
@@ -404,8 +405,8 @@ const Onboard = (props) => {
                     className="form-control"
                     placeholder="Account  Number"
                     aria-label="Last name"
-                    name="accountNumber"
-                    value={onboardingFormData.accountNumber}
+                    name="merchantAccountNumber"
+                    value={onboardingFormData.merchantAccountNumber}
                     onChange={onChangeHandel}
                   />
                 </div>
@@ -422,8 +423,8 @@ const Onboard = (props) => {
                     className="form-control"
                     placeholder="Bank code"
                     aria-label="Last name"
-                    name="bankCode"
-                    value={onboardingFormData.bankCode}
+                    name="merchantBankCode"
+                    value={onboardingFormData.merchantBankCode}
                     onChange={onChangeHandel}
                   />
                   {/* <span
@@ -472,6 +473,27 @@ const Onboard = (props) => {
                       <BsInfoCircle />{' '}
                     </span>
                   </span>
+                </div>
+              </div>
+              <div className="row">
+                <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                  {/* Merchant's Bank Details: */}
+                </span>
+                <div className="col">
+                  <label htmlFor="name" className="col-form-label">
+                    POS ID:
+                  </label>
+                </div>
+                <div className={`col ${styles.placingMsgHover}`}>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="POS ID"
+                    aria-label="POS ID"
+                    name="POSID"
+                    onChange={onChangeHandel}
+                    value={onboardingFormData.POSID}
+                  />
                 </div>
               </div>
               <div className="row">

@@ -5,6 +5,8 @@ import FileComponent from "./Merchant-Submit-Deails/FileComponent";
 import SubmitForm from "./Merchant-Submit-Deails/SubmitForm";
 import Footer from "./Footer";
 import SubmitTx from "./Submit_Tx/SubmitTx";
+import ISO8583Component from "./Merchant-Submit-Deails/ISO8583Component";
+import ISO8583Decoded from "./Merchant-Submit-Deails/ISO8583Decoded";
 
 const Merchant = ({ roleId, IP,getRoleFromFile }) => {
   //storing the radio value and rendering & by default it will display the radio1
@@ -69,6 +71,46 @@ const Merchant = ({ roleId, IP,getRoleFromFile }) => {
           </span>
           <h6 className="headItem">(Aggregator Mode)</h6>
           </div>
+          <div className="col">
+            <br />
+          <input
+              className="form-check-input"
+              type={"radio"}
+              value="radio3"
+              checked={formFile === "radio3"}
+              name="radioBtn"
+              id="radio3"
+              onChange={handelOnchange}
+              onClick={onCilckFileCOmponent}
+            /><span
+            htmlFor="file"
+            className="form-check-label"
+            style={{ marginLeft: "10px", fontSize: "16px" }}
+          >
+            Submit ISO 8583 message
+          </span>
+          {/* <h6 className="headItem">(Aggregator Mode)</h6> */}
+          </div>
+          <div className="col">
+            <br />
+          <input
+              className="form-check-input"
+              type={"radio"}
+              value="radio4"
+              checked={formFile === "radio4"}
+              name="radioBtn"
+              id="radio4"
+              onChange={handelOnchange}
+              onClick={onCilckFileCOmponent}
+            /><span
+            htmlFor="file"
+            className="form-check-label"
+            style={{ marginLeft: "10px", fontSize: "16px" }}
+          >
+            Submit Decoded ISO 8583 message
+          </span>
+          {/* <h6 className="headItem">(Aggregator Mode)</h6> */}
+          </div>
         </div>
       </div>
       <div style={{ marginLeft: "230px", marginTop: "20px" }}>
@@ -95,6 +137,12 @@ const Merchant = ({ roleId, IP,getRoleFromFile }) => {
       {/* File Input*/}
       {formFile === "radio2" && (
         <FileComponent roleId={roleId} IP={IP} />
+      )}
+      {formFile === "radio3" && (
+        <ISO8583Component roleId={roleId} IP={IP} />
+      )}
+      {formFile === "radio4" && (
+        <ISO8583Decoded roleId={roleId} IP={IP} />
       )}
       <Footer />
     </div>
