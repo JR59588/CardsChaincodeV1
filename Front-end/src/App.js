@@ -11,6 +11,7 @@ import Dashboard from './components/Dashboard'
 import ViewOnboardingStatic from './components/ViewOnboardingStatic/ViewOnboardingStatic'
 import Onboard from './components/Onboarding/Onboard'
 import SubmitTx from './components/Submit_Tx/SubmitTx'
+import NewViewOnboardingStatic from './components/ViewOnboardingStatic/NewViewOnboardingStatic'
 const IP = 'localhost'
 
 function App() {
@@ -52,7 +53,7 @@ function App() {
 
         <Route
           path="/View-Onboarding-Static"
-          element={<ViewOnboardingStatic roleId={roleId} IP={IP} />}
+          element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}
         />
         <Route path="*" element={<h1>Not found....</h1>} />
 
