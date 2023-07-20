@@ -80,12 +80,12 @@ class SubmitSettlementTxCC extends Contract {
   async submitTxByACD(ctx, txIn) {
     var isSubmitted = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
-    const hasTxprimaryAccountNumber = "primaryAccountNumber" in txIn;
-    if (hasTxprimaryAccountNumber) {
-      if (txIn.primaryAccountNumber === "" || txIn.primaryAccountNumber.length == 0) {
+    const hasTxprocessingCode = "processingCode" in txIn;
+    if (hasTxprocessingCode) {
+      if (txIn.processingCode === "" || txIn.processingCode.length == 0) {
         isSubmitted = false;
         console.log(
-          "Validation primaryAccountNumber not valid: ",
+          "Validation at ACD: processingCode not valid: ",
           isSubmitted
         );
         return isSubmitted;
@@ -93,7 +93,7 @@ class SubmitSettlementTxCC extends Contract {
     } else {
       return false;
     }
-    
+
     return isSubmitted;
   }
 }

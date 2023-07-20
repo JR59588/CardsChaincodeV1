@@ -16,9 +16,9 @@ class AuthorizeSettlementTxCC extends Contract {
 
       //ACL :  Can be called by ACD Org only
       //TODO : ACD org and acl org details has to be finalised......(discussion with nishanth)
-      let { ACD, PYMTUtilsCC } = await pymtutils.hlfconstants();
+      let { ACD_ORG_MSPID, PYMTUtilsCC } = await pymtutils.hlfconstants();
 
-      const accessValid = await pymtutils.validateOrganization(ctx, ACD);
+      const accessValid = await pymtutils.validateOrganization(ctx, ACD_ORG_MSPID);
 
       if (!accessValid) {
         throw new Error(
@@ -80,36 +80,16 @@ class AuthorizeSettlementTxCC extends Contract {
   }
 
   async authorizeTxByAOD(ctx, txIn) {
-    var isSubmitted = true;
+    var isAuthorized = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
-    const hasTxTransactionReferenceNumber = "TransactionReferenceNumber" in txIn;
-    if (hasTxTransactionReferenceNumber) {
-      if (txIn.TransactionReferenceNumber === "" || txIn.TransactionReferenceNumber.length == 0) {
+    const hasTxsystemTraceAuditNumber = "systemTraceAuditNumber" in txIn;
+    if (hasTxsystemTraceAuditNumber) {
+      if (txIn.systemTraceAuditNumber === "" || txIn.systemTraceAuditNumber.length == 0) {
         isAuthorized = false;
         console.log(
-          "Validation by EDI...TransactionReferenceNumber not valid: ",
+          "Validation by AOD... systemTraceAuditNumber not valid: ",
           isAuthorized
         );
-        return isAuthorized;
-      }
-    } else {
-      return false;
-    }
-
-    const hasTxLoanTenure = "LoanTenure" in txIn;
-    if (hasTxLoanTenure) {
-      if (txIn.LoanTenure === "" || txIn.LoanTenure.length == 0) {
-        isAuthorized = false;
-        console.log("Validation by EDI...LoanTenure not valid: ", isAuthorized);
-        return isAuthorized;
-      }
-      let LoanTenureInt = parseInt(txIn.LoanTenure);
-      if (isNaN(LoanTenureInt)) {
-        return false;
-      }
-      if (LoanTenureInt > 36) {
-        isAuthorized = false;
-        console.log("LoanTenure (", txIn.LoanTenure, ") is not valid");
         return isAuthorized;
       }
     } else {

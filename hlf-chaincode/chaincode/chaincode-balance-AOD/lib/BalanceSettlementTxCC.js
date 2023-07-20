@@ -16,9 +16,9 @@ class BalanceSettlementTxCC extends Contract {
 
       //ACL :  Can be called by AAD Org only
       //TODO : AAD org and acl org details has to be finalised......(discussion with nishanth)
-      let { AAD, PYMTUtilsCC } = await pymtutils.hlfconstants();
+      let { AAD_ORG_MSPID, PYMTUtilsCC } = await pymtutils.hlfconstants();
 
-      const accessValid = await pymtutils.validateOrganization(ctx, AAD);
+      const accessValid = await pymtutils.validateOrganization(ctx, AAD_ORG_MSPID);
 
       if (!accessValid) {
         throw new Error(
@@ -54,7 +54,7 @@ class BalanceSettlementTxCC extends Contract {
 
       //@to-do verify chaincode tx state is initiated only.
       // TODO verify chaincode tx state is as per requirement.
-      if (!(currentTxReadState.TxStatus == TXSTATUS_BALANCED)) {
+      if (!(currentTxReadState.TxStatus == TXSTATUS_AUTHORIZED)) {
         throw new Error(`Invalid Transaction state  for key  : ${key}`);
       }
 
@@ -82,34 +82,14 @@ class BalanceSettlementTxCC extends Contract {
   async balanceTxByAOD(ctx, txIn) {
     var isBalanced = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
-    const hasTxTransactionReferenceNumber = "TransactionReferenceNumber" in txIn;
-    if (hasTxTransactionReferenceNumber) {
-      if (txIn.TransactionReferenceNumber === "" || txIn.TransactionReferenceNumber.length == 0) {
+    const hasTxposEntryMode = "TransactionReferenceNumber" in txIn;
+    if (hasTxposEntryMode) {
+      if (txIn.posEntryMode === "" || txIn.posEntryMode.length == 0) {
         isBalanced = false;
         console.log(
-          "Validation by EDI...TransactionReferenceNumber not valid: ",
+          "Validation by AOD... posEntryMode not valid: ",
           isBalanced
         );
-        return isBalanced;
-      }
-    } else {
-      return false;
-    }
-
-    const hasTxLoanTenure = "LoanTenure" in txIn;
-    if (hasTxLoanTenure) {
-      if (txIn.LoanTenure === "" || txIn.LoanTenure.length == 0) {
-        isBalanced = false;
-        console.log("Validation by EDI...LoanTenure not valid: ", isBalanced);
-        return isBalanced;
-      }
-      let LoanTenureInt = parseInt(txIn.LoanTenure);
-      if (isNaN(LoanTenureInt)) {
-        return false;
-      }
-      if (LoanTenureInt > 36) {
-        isBalanced = false;
-        console.log("LoanTenure (", txIn.LoanTenure, ") is not valid");
         return isBalanced;
       }
     } else {

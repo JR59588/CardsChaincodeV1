@@ -56,26 +56,26 @@ exports.requestSettlementTx = async function (req, res) {
     if (!identity) {
       console.log(
         "An identity for the user" +
-          data[org].userWallet +
-          "does not exist in the wallet"
+        data[org].userWallet +
+        "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
       return;
     }
 
     // Create a new gateway for connecting to our peer node.
-   
-      const gateway = new Gateway();
-      await gateway.connect(ccp, {
-        wallet,
-        identity: data[org].userWallet,
-        discovery: { enabled: true, asLocalhost: true },
-      });
-    
+
+    const gateway = new Gateway();
+    await gateway.connect(ccp, {
+      wallet,
+      identity: data[org].userWallet,
+      discovery: { enabled: true, asLocalhost: true },
+    });
+
     //await gateway.connect(ccp, { wallet, identity: walletUser, discovery: { enabled: true, asLocalhost: true } });
 
     // Get the network (channel) our contract is deployed to.
-    let mode = req.body.mode || "Direct" ;
+    let mode = req.body.mode || "Direct";
     let clientMSPId = data[org].clientMSPId;
     let channelName = getChannelName(mode, clientMSPId);
     console.log("Using channel name : ", channelName);
@@ -100,9 +100,14 @@ exports.requestSettlementTx = async function (req, res) {
       contract
 
     );
-    console.log("controller " ,JSON.stringify(stxObj));
+    console.log("controller line no 108", JSON.stringify(stxObj));
     await contract.submitTransaction(
       ccFunctionName,
+      stxObj.MerchantId,
+      stxObj.CustomerId,
+      stxObj.LoanReferenceNumber,
+      stxObj.MerchantName,
+      stxObj.primaryAccountNumber,
       stxObj.processingCode,
       stxObj.transactionAmount,
       stxObj.transmissionDateAndTime,
@@ -142,7 +147,7 @@ exports.requestSettlementTx = async function (req, res) {
 
 function getChannelName(mode, MSPId) {
   //14.02.23 todo: this logic has to be completed
-  var chName ;
+  var chName;
   // TODO: change MSPID according to the requirement
   if (mode == "PSP") {
     if (MSPId == "PSPMSP") {
@@ -157,25 +162,30 @@ function getChannelName(mode, MSPId) {
 
 
 function getFunctionName(mode, MSPId) {
-  var fnName ;
+  var fnName;
   if (mode == "PSP") {
-    
-      fnName = "initiateTx";
-    }
-   
-   //direct mode requestTx
-  else {
-    fnName = "requestTx";
-    
+
+    fnName = "initiateTx";
   }
 
-  console.log("WARNING : Function name : " , fnName  );
+  //direct mode requestTx
+  else {
+    fnName = "requestTx";
+
+  }
+
+  console.log("WARNING : Function name : ", fnName);
   return fnName;
 }
 
 function makeTxObj(req, res) {
   //TODO: change the property values of the object according to the requirements
   let localTxObj = {
+    MerchantId: req.body.MerchantId,
+    CustomerId: req.body.CustomerId,
+    LoanReferenceNumber: req.body.LoanReferenceNumber,
+    MerchantName: req.body.MerchantName,
+    primaryAccountNumber: req.body.primaryAccountNumber,
     processingCode: req.body.processingCode,
     transactionAmount: req.body.transactionAmount,
     transmissionDateAndTime: req.body.transmissionDateAndTime,
