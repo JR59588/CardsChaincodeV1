@@ -1,18 +1,18 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
-import '../App.css'
-import { useState } from 'react'
-import { useEffect } from 'react'
-import pdf from '../assets/Admin_User_guide.pdf'
+import React from "react";
+import { NavLink } from "react-router-dom";
+import "../App.css";
+import { useState } from "react";
+import { useEffect } from "react";
+import pdf from "../assets/Admin_User_guide.pdf";
 
 const Header = ({ roleId, setRoleId }) => {
   return (
     <nav
       className="navbar navbar-expand-lg bg-body-tertiary "
-      style={{ height: '70px', backgroundColor: '#008555', color: 'white' }}
+      style={{ height: "70px", backgroundColor: "#008555", color: "white" }}
     >
-      <div className="container-fluid" style={{ color: 'white' }}>
-        <a className="navbar-brand" href="#" style={{ color: 'white' }}>
+      <div className="container-fluid" style={{ color: "white" }}>
+        <a className="navbar-brand" href="#" style={{ color: "white" }}>
           HLF-CARDS Proof-of-Concept
         </a>
         <button
@@ -34,18 +34,18 @@ const Header = ({ roleId, setRoleId }) => {
                 <span style={{ color: "white" }} className="gapLine">
                   |
                 </span> */}
-              </NavLink>{' '}
+              </NavLink>{" "}
             </li>
             <li className="nav-item">
               {/* {roleId === 'Agg' || roleId === 'Agg2' ? (
                 <> */}
-                  <NavLink to="/Aggregator" className="ani">
-                    New Onboarding{' '}
-                    <span className="gapLine" style={{ color: 'white' }}>
-                      |
-                    </span>
-                  </NavLink>
-                {/* </>
+              <NavLink to="/Aggregator" className="ani">
+                New Onboarding{" "}
+                <span className="gapLine" style={{ color: "white" }}>
+                  |
+                </span>
+              </NavLink>
+              {/* </>
               ) : (
                 <>
                   <div
@@ -63,8 +63,8 @@ const Header = ({ roleId, setRoleId }) => {
             </li>
             <li className="nav-item">
               <NavLink to="/View-Onboarding-Static" className="ani">
-                View Onboarding{' '}
-                <span className="gapLine" style={{ color: 'white' }}>
+                View Onboarding{" "}
+                <span className="gapLine" style={{ color: "white" }}>
                   |
                 </span>
               </NavLink>
@@ -73,13 +73,13 @@ const Header = ({ roleId, setRoleId }) => {
             <li className="nav-item">
               {/* {roleId === 'Agg' || roleId === 'Agg2' ? (
                 <> */}
-                  <NavLink to="/Merchant" className="ani">
-                    Sales/Return Request{' '}
-                    <span className="gapLine" style={{ color: 'white' }}>
-                      |
-                    </span>
-                  </NavLink>
-                {/* </>
+              <NavLink to="/Merchant" className="ani">
+                Sales/Return Request{" "}
+                <span className="gapLine" style={{ color: "white" }}>
+                  |
+                </span>
+              </NavLink>
+              {/* </>
               ) : (
                 <>
                   <div
@@ -94,27 +94,27 @@ const Header = ({ roleId, setRoleId }) => {
                 </>
               )} */}
             </li>
-            {/* <li className="nav-item">
+            <li className="nav-item">
               <NavLink to="/ViewTx" className="ani">
-                View Sales/Return Requests{' '}
-              </NavLink>{' '}
-            </li> */}
+                View Sales/Return Requests{" "}
+              </NavLink>{" "}
+            </li>
           </ul>
           <div className="d-flex">
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: "flex" }}>
               <label
                 htmlFor="dropdown"
-                style={{ color: 'white', lineHeight: '35px' }}
+                style={{ color: "white", lineHeight: "35px" }}
                 className="dropLable"
               >
                 Role*: &nbsp;
               </label>
               <select
                 style={{
-                  width: '210px',
-                  backgroundColor: '#008555',
-                  height: '36px',
-                  color: 'white',
+                  width: "210px",
+                  backgroundColor: "#008555",
+                  height: "36px",
+                  color: "white",
                 }}
                 className="form-select"
                 id="dropdown"
@@ -149,7 +149,7 @@ const Header = ({ roleId, setRoleId }) => {
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

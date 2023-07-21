@@ -12,6 +12,7 @@ import ViewOnboardingStatic from './components/ViewOnboardingStatic/ViewOnboardi
 import Onboard from './components/Onboarding/Onboard'
 import SubmitTx from './components/Submit_Tx/SubmitTx'
 import NewViewOnboardingStatic from './components/ViewOnboardingStatic/NewViewOnboardingStatic'
+import ViewTx from './components/ViewTx'
 const IP = 'localhost'
 
 function App() {
@@ -50,7 +51,7 @@ function App() {
           path="/FileComponent"
           element={<FileComponent roleId={roleId} IP={IP} />}
         />
-
+        <Route path="/ViewTx" element={<ViewTx roleId={roleId} IP={IP} />} />
         <Route
           path="/View-Onboarding-Static"
           element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}

@@ -1,0 +1,113 @@
+a {
+  color: blue;
+}
+th,
+tr {
+  text-align: center;
+}
+#tbPlace {
+  display: flex;
+}
+.mainDiv {
+  width: auto;
+}
+.anchorTag {
+  color: red;
+}
+select {
+  background-color: #008555;
+  color: white;
+  height: 30px;
+  width: 150px;
+  border-radius: 5px;
+  border: 0 solid #008555;
+  cursor: pointer;
+}
+.msgLoader {
+  background-color: transparent !important;
+}
+.loader {
+  width: 25px;
+  height: 25px;
+  border: 10px solid #008555;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: rotation 1s linear infinite;
+  top: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    border: 0px solid #85002c;
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* button for SA Verified */
+.verifyButton {
+  border: 1px solid white;
+  background-color: #008555;
+  color: white;
+  border-radius: 5px;
+}
+.verifyDisable {
+  border: 0px;
+  background-color: gray;
+  color: black;
+  cursor: not-allowed;
+  border-radius: 5px;
+}
+.placingSAAGG {
+  text-align: start;
+}
+
+/* table */
+thead {
+  position: sticky;
+  top: 0px;
+  background-color: #cfe2ff;
+}
+.loadingRecords {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  transform: translate(-50%, 150px);
+  width: 600px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.loadingR {
+  position: absolute;
+  z-index: 1;
+  width: 600px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+abbr[title] {
+  border-bottom: none !important;
+  cursor: pointer;
+  text-decoration: none !important;
+}
+.tableDiv {
+  height: 500px !important;
+}
+table {
+  width: 1700px !important;
+}
+
+@media screen and (min-width: 1600px) {
+  .tableDiv {
+    height: 700px !important;
+  }
+  table {
+    width: 100% !important;
+  }
+}
