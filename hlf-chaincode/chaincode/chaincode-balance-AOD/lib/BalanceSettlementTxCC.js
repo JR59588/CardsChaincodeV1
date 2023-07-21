@@ -82,7 +82,7 @@ class BalanceSettlementTxCC extends Contract {
   async balanceTxByAOD(ctx, txIn) {
     var isBalanced = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
-    const hasTxposEntryMode = "TransactionReferenceNumber" in txIn;
+    const hasTxposEntryMode = "posEntryMode" in txIn;
     if (hasTxposEntryMode) {
       if (txIn.posEntryMode === "" || txIn.posEntryMode.length == 0) {
         isBalanced = false;
