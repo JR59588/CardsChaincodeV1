@@ -147,12 +147,12 @@ const NewViewOnboardingStatic = (props) => {
         );
         console.log(response.data.response);
         const responseData = response.data.response;
-        if (response.data.response.merchantID !== merchantId) {
-          setLoadingAnimatio(false);
-          msg = `Merchant not found !`;
-          setAlertState(true);
-          return;
-        }
+        // if (response.data.response.merchantID !== merchantId) {
+        //   setLoadingAnimatio(false);
+        //   msg = `Merchant not found !`;
+        //   setAlertState(true);
+        //   return;
+        // }
         setData({
           merchantName: responseData.merchantName,
           merchantID: responseData.merchantID,
