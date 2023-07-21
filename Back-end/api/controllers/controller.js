@@ -95,7 +95,7 @@ exports.requestSettlementTx = async function (req, res) {
 
     console.log(
       "trying to add data in requestsetllmentTx for merchantId",
-      stxObj.merchantId,
+      stxObj.MerchantId,
       ccFunctionName,
       contract
 
