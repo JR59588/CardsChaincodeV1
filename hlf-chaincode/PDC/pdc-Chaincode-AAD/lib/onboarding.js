@@ -331,25 +331,6 @@ class MerchantOnboardingPDC extends Contract {
   }
   //savePvAADAODMetaData
 
-   async retrieveOBMerchantData(ctx, merchantID) {
-
-    const merchantJSON = await ctx.stub.getPrivateData(
-        pv_CollectionName,
-        merchantID
-      );
-
-      const merchant = merchantJSON.toString();
-  
-      //No Asset found, return empty response
-      if (!merchant) {
-        throw new Error(
-          `${merchantID} does not exist in collection ${pv_CollectionName}.`
-        );
-      }
-      return merchant;
-  }
-  //retrieveOBMerchantData
-
     async retrievePvAADAODMetaData(ctx, merchantID) {
 
       const pv_IndividualCollectionName= "PDC3"
