@@ -365,7 +365,7 @@ const NewViewOnboarding = (props) => {
                     className="form-control"
                     placeholder="YES / NO"
                     aria-label="KYC Status"
-                    value={props.data.isContractSigned}
+                    value={props.data.kycStatus}
                   />
                 </div>
               </div>
