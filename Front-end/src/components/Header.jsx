@@ -8,7 +8,7 @@ import pdf from "../assets/Admin_User_guide.pdf";
 const Header = ({ roleId, setRoleId }) => {
   return (
     <nav
-      className="navbar navbar-expand-lg bg-body-tertiary "
+      className="navbar navbar-expand-lg"
       style={{ height: "70px", backgroundColor: "#008555", color: "white" }}
     >
       <div className="container-fluid" style={{ color: "white" }}>
