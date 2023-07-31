@@ -8,8 +8,8 @@ import { BsInfoCircle } from 'react-icons/bs'
 
 const message = (
   <h6>
-    Response 200: Successfully Endorsed by Aggregator, Servicing Agent, Customer
-    Accounting, Accounts Payable & EDI. <br /> <br />
+    Response 200: Successfully Endorsed by Customer Department , Operations Department &
+    Accounts Department. <br /> <br />
     Merchant Successfully Onboarded
   </h6>
 )
