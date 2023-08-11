@@ -7,7 +7,7 @@
 "use strict";
 const PYMTUtils = require("./PYMTUtils");
 const { Contract } = require("fabric-contract-api");
- const HLFEVENT = require("./HLFEVENT");
+const HLFEVENT = require("./HLFEVENT");
 const PYMTTX_MERCHANT_CC_SUFFIX = "PYMTTxMerchantCC";
 
 async function checkInvokeCCResponse(chaincodeResponse) {
@@ -123,7 +123,7 @@ class PYMTUtilsCC extends Contract {
       MerchantId: merchantId,
       CustomerID: CustomerId,
       LoanReferenceNumber: loanReferenceNumber,
-      merchantName:  merchantName,
+      merchantName: merchantName,
       primaryAccountNumber: primaryAccountNumber,
       processingCode: processingCode,
       transactionAmount: transactionAmount,
@@ -280,7 +280,7 @@ class PYMTUtilsCC extends Contract {
       MerchantId: MerchantId,
       CustomerId: CustomerId,
       LoanReferenceNumber: LoanReferenceNumber,
-      MerchantName:MerchantName,
+      MerchantName: MerchantName,
       primaryAccountNumber: primaryAccountNumber,
       processingCode: processingCode,
       transactionAmount: transactionAmount,
@@ -399,7 +399,7 @@ class PYMTUtilsCC extends Contract {
           eventPayload.length === 0
         )
       ) {
-        const eventPayloadBuffer = Buffer.from(JSON.stringify(eventPayload));
+        const eventPayloadBuffer = Buffer.from(eventPayload);
         await ctx.stub.setEvent(eventID, eventPayloadBuffer);
       }
     } catch (err) {

@@ -7,6 +7,7 @@
 "use strict";
 const PYMTUtils = require("./PYMTUtils");
 const { Contract } = require("fabric-contract-api");
+const HLFEVENT = require("./HLFEVENT");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class AuthorizeSettlementTxCC extends Contract {
   async authorizeSettlementTx(ctx, merchantId, customerId, loanReferenceNumber) {
@@ -73,6 +74,22 @@ class AuthorizeSettlementTxCC extends Contract {
       currentTxReadState.TxStatus = state;
       var txObj = await pymtutils.writeTxStatus(ctx, key, channelName, currentTxReadState);
       console.log("txObj", txObj);
+      var OrgMSPId = await ctx.clientIdentity.getMSPID();
+      var hlfevent = new HLFEVENT();
+      let { AAD_AOD_AT_EVENT } = await hlfevent.hlfevents();
+      try {
+        await this.emitEvent(
+          ctx,
+          AAD_AOD_AT_EVENT,
+          AAD_AOD_AT_EVENT.eventID,
+          key,
+          OrgMSPId,
+          channelName
+        );
+      } catch (err) {
+        console.log(err);
+        throw err;
+      }
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error));
       throw Error(error);
@@ -97,6 +114,35 @@ class AuthorizeSettlementTxCC extends Contract {
     }
 
     return isAuthorized;
+  }
+  async emitEvent(ctx, eventType, eventID, keyIn, txIn, MSPId, chName) {
+    let evtPayload = {
+      eventMap: eventType,
+      eventName: eventID,
+      emittingOrgMSP: MSPId,
+      channelName: chName,
+      emittingOrgType: "NA",
+      evTxId: "99999",
+      key: keyIn,
+    };
+    const eventPayload = JSON.stringify(evtPayload);
+
+    try {
+      if (
+        !(
+          !eventID ||
+          eventID.length === 0 ||
+          !eventPayload ||
+          eventPayload.length === 0
+        )
+      ) {
+        const eventPayloadBuffer = Buffer.from(eventPayload);
+        await ctx.stub.setEvent(eventID, eventPayloadBuffer);
+      }
+    } catch (err) {
+      console.log(" error in emitting event : ", err);
+      throw err;
+    }
   }
 }
 
