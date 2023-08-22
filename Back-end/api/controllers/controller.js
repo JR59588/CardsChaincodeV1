@@ -7,6 +7,7 @@ const { Wallets, Gateway } = require("fabric-network");
 const fs = require("fs");
 const path = require("path");
 const app = express();
+const ISO8583 = require("../iso8583");
 
 app.use(bodyParser.json());
 
@@ -180,6 +181,51 @@ function getFunctionName(mode, MSPId) {
 
 function makeTxObj(req, res) {
   //TODO: change the property values of the object according to the requirements
+  if (req.body.iso8583 != undefined) {
+    console.log("ISO8583:", req.body.iso8583);
+    try {
+      var iso = new ISO8583(req.body.iso8583, 1);
+      var data = iso.parseDataElement();
+      const dataObj = data.reduce((obj, item) => ({
+        ...obj,
+        [item.fieldName]: item.fieldValue
+      }), {});
+      const iso8583Obj = { ...iso, ...dataObj };
+
+      console.log("iso8583 object: ", iso8583Obj);
+
+    } catch (error) {
+      console.log("There was an error in decoding the ISO8583 message: ", error);
+    }
+    const tempData = ["MID001", "CID001", "LR0" + Math.floor(Math.random() * 100) + 1, "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
+    let localTxObj = {
+      MerchantId: tempData[0],
+      CustomerId: tempData[1],
+      LoanReferenceNumber: tempData[2],
+      MerchantName: tempData[3],
+      primaryAccountNumber: tempData[4],
+      processingCode: tempData[5],
+      transactionAmount: tempData[6],
+      transmissionDateAndTime: tempData[7],
+      systemTraceAuditNumber: tempData[8],
+      localTime: tempData[9],
+      localDate: tempData[10],
+      expirationDate: tempData[11],
+      merchantCategoryCode: tempData[12],
+      posEntryMode: tempData[13],
+      acquiringInstitutionIdentificationCode: tempData[14],
+      retrievalReferenceNumber: tempData[15],
+      cardAcceptorTerminalIdentification: tempData[16],
+      cardAcceptorIdentificationCode: tempData[17],
+      cardAcceptorNameAndLocation: tempData[18],
+      currencyCode: tempData[19],
+      personalIdentificationNumber: tempData[20],
+      additionalData: tempData[21],
+      posData: tempData[22],
+
+    };
+    return localTxObj;
+  }
   let localTxObj = {
     MerchantId: req.body.MerchantId,
     CustomerId: req.body.CustomerId,
