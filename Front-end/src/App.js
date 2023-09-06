@@ -13,7 +13,9 @@ import Onboard from './components/Onboarding/Onboard'
 import SubmitTx from './components/Submit_Tx/SubmitTx'
 import NewViewOnboardingStatic from './components/ViewOnboardingStatic/NewViewOnboardingStatic'
 import ViewTx from './components/ViewTx'
+import socketIOClient from 'socket.io-client';
 const IP = 'localhost'
+const ENDPOINT = 'http://localhost:3001';
 
 function App() {
   //storing the roleId...
@@ -51,7 +53,7 @@ function App() {
           path="/FileComponent"
           element={<FileComponent roleId={roleId} IP={IP} />}
         />
-        <Route path="/ViewTx" element={<ViewTx roleId={roleId} IP={IP} />} />
+        <Route path="/ViewTx" element={<ViewTx roleId={roleId} IP={IP} socketIOClient={socketIOClient} ENDPOINT={ENDPOINT} />} />
         <Route
           path="/View-Onboarding-Static"
           element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}

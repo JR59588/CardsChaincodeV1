@@ -36,8 +36,10 @@ const ViewTx = (props) => {
   };
 
   const IP = props.IP;
+  const socketIOClient = props.socketIOClient;
+  const ENDPOINT = props.ENDPOINT;
   const GetTxByRange_URL = `http://${IP}:3001/api/v1/GetTxByRange`;
-  const retrievePvMerchantMetaData_URL = `http://${IP}:3001/api/v1/retrievePvMerchantMetaData`;
+  const retrieveOBMerchantData_URL = `http://${IP}:3001/api/v1/retrieveOBMerchantData`;
   const retrievePvCustomerMetaData_URL = `http://${IP}:3001/api/v1/retrievePvCustomerMetaData`;
   //storing the combined response of getTxByRange & retrivePvMerchantData(only aggId) from response.
   const [dataMixed, setDataMixed] = useState([]);
@@ -81,6 +83,30 @@ const ViewTx = (props) => {
     setUpdatedRoleId(props.roleId);
   }, [props.roleId]);
 
+  useEffect(() => {
+    const socket = socketIOClient(ENDPOINT);
+    socket.on("status-change", (response) => {
+      console.log(
+        "inside use effect status change - viewtx.js",
+        response,
+        response.data.join("-")
+      );
+      console.log("Data mixed: ", dataMixed);
+      const key = response.data.join("-");
+      const newDataMixed = dataMixed.map((item) => {
+        if (item.Key == key) {
+          item.Record.TxStatus = response.data.status;
+          return item;
+        }
+      });
+      setDataMixed(newDataMixed);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   //side Effect for loading and mixing GetTxByRange and Pvdmerchat data
   useEffect(() => {
     setLoading(false);
@@ -94,7 +120,6 @@ const ViewTx = (props) => {
           const allData = await axios.get(
             `${GetTxByRange_URL}/${updatedRoleId}`
           );
-          console.log("allData is: ", allData.data.response);
           if (allData.data.response.length === 0) {
             setRecords(true);
           }
@@ -104,7 +129,7 @@ const ViewTx = (props) => {
           //     let isauthorized = true;
           //     try {
           //       merchantData = await axios.get(
-          //         `${retrievePvMerchantMetaData_URL}/${allData.data.response[i].Record.MerchantId}/${updatedRoleId}`
+          //         `${retrieveOBMerchantData_URL}/${allData.data.response[i].Record.MerchantId}/${updatedRoleId}`
           //       );
           //       console.log(
           //         "merchantdata in forloop 65",
@@ -150,7 +175,6 @@ const ViewTx = (props) => {
               CID: allData.data.response[i].Record.CustomerID,
             });
           }
-          console.log("forSorting dataa---125", forSorting);
           timer = setTimeout(() => {
             setLoading(true);
             setDataMixed(forSorting);
@@ -186,7 +210,7 @@ const ViewTx = (props) => {
     if (updatedRoleId === "CAcct") {
       try {
         const res1 = await axios.get(
-          `${retrievePvMerchantMetaData_URL}/${id}/CAcct`
+          `${retrieveOBMerchantData_URL}/${id}/CAcct`
         );
         const res2 = dataMixed.find((item) => item.Record.MerchantId === id);
         //setting the combined response in data for Main table.
@@ -205,7 +229,7 @@ const ViewTx = (props) => {
     } else {
       try {
         const res1 = await axios.get(
-          `${retrievePvMerchantMetaData_URL}/${id}/${updatedRoleId}`
+          `${retrieveOBMerchantData_URL}/${id}/${updatedRoleId}`
         );
         const res2 = dataMixed.find((item) => item.Record.MerchantId === id);
         //setting the combined response in data for Main table.
@@ -263,8 +287,6 @@ const ViewTx = (props) => {
       }
     }
   };
-  console.log("mergedCustomerData", mergedCustomerData);
-  //console.log("mixed customer data---151", mergedCustomerData);
 
   //CONVERTING TIMESTAMP TO DATE
   let localDate;
@@ -476,7 +498,6 @@ const ViewTx = (props) => {
   };
 
   const getStageDisplayComponent = (key, status, expectedStatus) => {
-    console.log("Expected status: ", expectedStatus);
     if (Math.abs(txStages[status]) > txStages[expectedStatus]) {
       return "Endorsed " + txStageEndorsers[expectedStatus];
     } else if (txStages[status] + txStages[expectedStatus] == 0) {

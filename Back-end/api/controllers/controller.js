@@ -45,6 +45,11 @@ exports.requestSettlementTx = async function (req, res) {
     if (!data[org]) {
       res.status(400).send("Error!. Invalid role name");
     }
+
+    let stxObj = makeTxObj(req);
+
+    console.log("stxObj: ", stxObj);
+
     let ccpPath = path.resolve(data[org].connectionPath);
     let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
     // Create a new file system based wallet for managing identities.
@@ -92,7 +97,6 @@ exports.requestSettlementTx = async function (req, res) {
 
     // Submit the specified transaction.
 
-    let stxObj = makeTxObj(req, res);
 
     console.log(
       "trying to add data in requestsetllmentTx for merchantId",
@@ -113,11 +117,11 @@ exports.requestSettlementTx = async function (req, res) {
       stxObj.transactionAmount,
       stxObj.transmissionDateAndTime,
       stxObj.systemTraceAuditNumber,
-      stxObj.localTime,
-      stxObj.localDate,
+      stxObj.timeLocalTransactionHHMMSS,
+      stxObj.dateLocalTransactionMMDD,
       stxObj.expirationDate,
       stxObj.merchantCategoryCode,
-      stxObj.posEntryMode,
+      stxObj.pointOfServiceEntryMode,
       stxObj.acquiringInstitutionIdentificationCode,
       stxObj.retrievalReferenceNumber,
       stxObj.cardAcceptorTerminalIdentification,
@@ -125,7 +129,7 @@ exports.requestSettlementTx = async function (req, res) {
       stxObj.cardAcceptorNameAndLocation,
       stxObj.currencyCode,
       stxObj.personalIdentificationNumber,
-      stxObj.additionalData,
+      stxObj.additionalDataPrivate,
       stxObj.posData
     );
     console.log("inside requestsetllmentTx ,Transaction has been submitted");
@@ -179,12 +183,12 @@ function getFunctionName(mode, MSPId) {
   return fnName;
 }
 
-function makeTxObj(req, res) {
+function makeTxObj(req) {
   //TODO: change the property values of the object according to the requirements
-  if (req.body.iso8583 != undefined) {
-    console.log("ISO8583:", req.body.iso8583);
+  if (req.body.ISO8583Message != undefined) {
+    console.log("ISO8583Message:", req.body.ISO8583Message);
     try {
-      var iso = new ISO8583(req.body.iso8583, 1);
+      var iso = new ISO8583(req.body.ISO8583Message, 1);
       var data = iso.parseDataElement();
       const dataObj = data.reduce((obj, item) => ({
         ...obj,
@@ -193,65 +197,37 @@ function makeTxObj(req, res) {
       const iso8583Obj = { ...iso, ...dataObj };
 
       console.log("iso8583 object: ", iso8583Obj);
-
+      const tempData = [req.body.merchantID, req.body.customerID, req.body.loanReferenceNumber, "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
+      let localTxObj = {
+        MerchantId: tempData[0],
+        CustomerId: tempData[1],
+        LoanReferenceNumber: tempData[2],
+        MerchantName: tempData[3],
+        primaryAccountNumber: iso8583Obj.primaryAccountNumber || tempData[4],
+        processingCode: iso8583Obj.processingCode || tempData[5],
+        transactionAmount: iso8583Obj.transactionAmount || tempData[6],
+        transmissionDateAndTime: iso8583Obj.transmissionDateAndTime || tempData[7],
+        systemTraceAuditNumber: iso8583Obj.systemTraceAuditNumber || tempData[8],
+        timeLocalTransactionHHMMSS: iso8583Obj.timeLocalTransactionHHMMSS || tempData[9],
+        dateLocalTransactionMMDD: iso8583Obj.dateLocalTransactionMMDD || tempData[10],
+        expirationDate: iso8583Obj.expirationData || tempData[11],
+        merchantCategoryCode: iso8583Obj.MerchantCategoryCode || tempData[12],
+        pointOfServiceEntryMode: iso8583Obj.pointOfServiceEntryMode || tempData[13],
+        acquiringInstitutionIdentificationCode: iso8583Obj.acquiringInstitutionIdentificationCode || tempData[14],
+        retrievalReferenceNumber: iso8583Obj.retrievalReferenceNumber || tempData[15],
+        cardAcceptorTerminalIdentification: iso8583Obj.cardAcceptorTerminalIdentification || tempData[16],
+        cardAcceptorIdentificationCode: iso8583Obj.cardAcceptorIdentificationCode || tempData[17],
+        cardAcceptorNameAndLocation: iso8583Obj.cardAcceptorNameAndLocation || tempData[18],
+        currencyCode: iso8583Obj.currencyCode || tempData[19],
+        personalIdentificationNumber: iso8583Obj.personalIdentificationNumber || tempData[20],
+        additionalDataPrivate: iso8583Obj.additionalDataPrivate || tempData[21],
+        posData: iso8583Obj.posData || tempData[22],
+      };
+      console.log("Constructed tx obj: ", localTxObj);
+      return localTxObj;
     } catch (error) {
       console.log("There was an error in decoding the ISO8583 message: ", error);
     }
-    const tempData = ["MID001", "CID001", "LR0" + Math.floor(Math.random() * 100) + 1, "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
-    let localTxObj = {
-      MerchantId: tempData[0],
-      CustomerId: tempData[1],
-      LoanReferenceNumber: tempData[2],
-      MerchantName: tempData[3],
-      primaryAccountNumber: tempData[4],
-      processingCode: tempData[5],
-      transactionAmount: tempData[6],
-      transmissionDateAndTime: tempData[7],
-      systemTraceAuditNumber: tempData[8],
-      localTime: tempData[9],
-      localDate: tempData[10],
-      expirationDate: tempData[11],
-      merchantCategoryCode: tempData[12],
-      posEntryMode: tempData[13],
-      acquiringInstitutionIdentificationCode: tempData[14],
-      retrievalReferenceNumber: tempData[15],
-      cardAcceptorTerminalIdentification: tempData[16],
-      cardAcceptorIdentificationCode: tempData[17],
-      cardAcceptorNameAndLocation: tempData[18],
-      currencyCode: tempData[19],
-      personalIdentificationNumber: tempData[20],
-      additionalData: tempData[21],
-      posData: tempData[22],
-
-    };
-    return localTxObj;
   }
-  let localTxObj = {
-    MerchantId: req.body.MerchantId,
-    CustomerId: req.body.CustomerId,
-    LoanReferenceNumber: req.body.LoanReferenceNumber,
-    MerchantName: req.body.MerchantName,
-    primaryAccountNumber: req.body.primaryAccountNumber,
-    processingCode: req.body.processingCode,
-    transactionAmount: req.body.transactionAmount,
-    transmissionDateAndTime: req.body.transmissionDateAndTime,
-    systemTraceAuditNumber: req.body.systemTraceAuditNumber,
-    localTime: req.body.localTime,
-    localDate: req.body.localDate,
-    expirationDate: req.body.expirationDate,
-    merchantCategoryCode: req.body.merchantCategoryCode,
-    posEntryMode: req.body.posEntryMode,
-    acquiringInstitutionIdentificationCode: req.body.acquiringInstitutionIdentificationCode,
-    retrievalReferenceNumber: req.body.retrievalReferenceNumber,
-    cardAcceptorTerminalIdentification: req.body.cardAcceptorTerminalIdentification,
-    cardAcceptorIdentificationCode: req.body.cardAcceptorIdentificationCode,
-    cardAcceptorNameAndLocation: req.body.cardAcceptorNameAndLocation,
-    currencyCode: req.body.currencyCode,
-    personalIdentificationNumber: req.body.personalIdentificationNumber,
-    additionalData: req.body.additionalData,
-    posData: req.body.posData,
-
-  };
-  return localTxObj;
 }
 

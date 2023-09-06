@@ -5,10 +5,10 @@ import { useState } from "react";
 import axios from "axios";
 import SuccessModal from "../SuccessModal/SuccessModal";
 
-const message ='Response 200: S/R Request Submitted'
-const header='S/R Request Submitted Succesfully...'
-let failureMsg='Invalid'
-let failureHead="Invalid"
+const message = "Response 200: S/R Request Submitted";
+const header = "S/R Request Submitted Succesfully...";
+let failureMsg = "Invalid";
+let failureHead = "Invalid";
 const ISO8583Component = (props) => {
   const settlementRequest_URL = `http://${props.IP}:3001/api/v1/merchantTx`;
   const [formFile, setFormFile] = useState("radio1");
@@ -19,15 +19,18 @@ const ISO8583Component = (props) => {
   //loading
   const [loading, setLoading] = useState(false);
 
-   //success Modal
-   const [modal, setModal] = useState(false);
+  //success Modal
+  const [modal, setModal] = useState(false);
 
-   //failure Modal
-   const[failureModal,setFailureModal]=useState(false)
+  //failure Modal
+  const [failureModal, setFailureModal] = useState(false);
 
   //const [file,setFile] =useState(false)
   const [txFormData, setTxFormData] = useState({
     ISO8583Message: "",
+    merchantID: "",
+    customerID: "",
+    loanReferenceNumber: "",
     roleId: props.roleId,
   });
 
@@ -43,7 +46,7 @@ const ISO8583Component = (props) => {
 
   //submiting form
   const SubmitISO8583 = (event) => {
-      console.log("Hello from submit 8583")
+    console.log("Hello from submit 8583");
     setLoading(true);
     event.preventDefault();
 
@@ -58,7 +61,7 @@ const ISO8583Component = (props) => {
         .then((response) => {
           console.log(response);
           setLoading(false);
-          setModal(true)
+          setModal(true);
           // alert("Response 200: S/R Request Submitted");
         })
 
@@ -70,14 +73,15 @@ const ISO8583Component = (props) => {
             console.log("No Server Response");
           } else if (err.response?.status === 400) {
             console.log(err.message);
-            failureHead='Transaction Failed...'
-            failureMsg ="Response 400:Transaction Failed / fields should not be empty"
-            setFailureModal(true)
+            failureHead = "Transaction Failed...";
+            failureMsg =
+              "Response 400:Transaction Failed / fields should not be empty";
+            setFailureModal(true);
           } else if (err.response?.status === 401) {
             console.log("Unauthorized");
-            failureHead='Unauthorized'
-            failureMsg='Invalid role / fields must not be empty'
-            setFailureModal(true)
+            failureHead = "Unauthorized";
+            failureMsg = "Invalid role / fields must not be empty";
+            setFailureModal(true);
           } else {
             console.log("error");
           }
@@ -88,7 +92,7 @@ const ISO8583Component = (props) => {
   };
   const getState = (state) => {
     setModal(state);
-    setFailureModal(state)
+    setFailureModal(state);
   };
   return (
     <div>
@@ -116,9 +120,7 @@ const ISO8583Component = (props) => {
               <div className="row">
                 <div className="col-md-6">
                   <div className="mb-1">
-                    <label className="col-form-label">
-                      ISO8583 Message:
-                    </label>
+                    <label className="col-form-label">ISO8583 Message:</label>
                   </div>
                 </div>
                 <div className="col-md-6">
@@ -131,6 +133,68 @@ const ISO8583Component = (props) => {
                       className="form-control"
                       placeholder="Enter ISO8583 message here"
                       name="ISO8583Message"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="mb-1">
+                    <label className="col-form-label">Merchant ID:</label>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-1">
+                    <input
+                      value={txFormData.merchantID}
+                      onChange={onChangeHandel}
+                      required
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Merchant ID here"
+                      name="merchantID"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="mb-1">
+                    <label className="col-form-label">Customer ID:</label>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-1">
+                    <input
+                      value={txFormData.customerID}
+                      onChange={onChangeHandel}
+                      required
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Customer ID here"
+                      name="customerID"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="mb-1">
+                    <label className="col-form-label">
+                      Loan Reference Number:
+                    </label>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-1">
+                    <input
+                      value={txFormData.loanReferenceNumber}
+                      onChange={onChangeHandel}
+                      required
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Loan Reference Number here"
+                      name="loanReferenceNumber"
                     />
                   </div>
                 </div>
@@ -176,9 +240,13 @@ const ISO8583Component = (props) => {
       {modal ? (
         <SuccessModal getState={getState} message={message} header={header} />
       ) : null}
-      {
-        failureModal ? <SuccessModal getState={getState} message={failureMsg} header={failureHead} /> : null
-      }
+      {failureModal ? (
+        <SuccessModal
+          getState={getState}
+          message={failureMsg}
+          header={failureHead}
+        />
+      ) : null}
     </div>
   );
 };

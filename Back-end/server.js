@@ -11,18 +11,18 @@ var http = require('http');
 let controller = require("./api/controllers/controller");
 // set up multer
 var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-      console.log("File Object",file);
-      let ext = '';
-      if(file.originalname.split('.').length >1 ){
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    console.log("File Object", file);
+    let ext = '';
+    if (file.originalname.split('.').length > 1) {
       ext = file.originalname.substring(file.originalname.lastIndexOf('.'));
-      }
-      console.log('ext', ext);
-      cb(null, file.fieldname + ext)
     }
+    console.log('ext', ext);
+    cb(null, file.fieldname + ext)
+  }
 })
 const IP = "";
 mongoose.set('strictQuery', false);
@@ -32,7 +32,7 @@ const upload = multer({ storage: storage });
 //var port = 9443;
 const fs = require("fs");
 const https = require("https");
-var db = "mongodb://"+IP+":27017/Hyperledger";
+var db = "mongodb://" + IP + ":27017/Hyperledger";
 console.log(db)
 mongoose.connect(db, (err) => {
   console.log("Connecting to mongodb");
@@ -44,8 +44,8 @@ mongoose.connect(db, (err) => {
 });
 
 app.get("/", (req, res) => {
-    res.status(200).send({ message: "Hello World from Node.JS" });
-  });
+  res.status(200).send({ message: "Hello World from Node.JS" });
+});
 app.use(bodyParser.urlencoded({ extended: true, limit: "100mb" }));
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(cors());
@@ -53,103 +53,107 @@ let routes = require("./api/routes/routes");
 const { checkResultErrors } = require("ethers/lib/utils");
 routes(app);
 
-app.listen(3001);
-logger.info("server started at port :3001");
-console.log("server started at port :3001");
 
 
- app.post('/uploadfile', upload.single('filetoupload'), function (req, res, next) {  
+
+app.post('/uploadfile', upload.single('filetoupload'), function (req, res, next) {
   //console.log(req.file);
   let ext = '.csv'
   filepath = "uploads/" + req.file.fieldname + ext
   //console.log(filepath)
-  let data = fs.createReadStream(filepath,'utf8')
+  let data = fs.createReadStream(filepath, 'utf8')
   //console.log(data)
   const results = []
   fs.createReadStream(filepath)
     .pipe(csv({}))
-    .on('data',(data) => results.push(data))
-    .on('end',() => {
+    .on('data', (data) => results.push(data))
+    .on('end', () => {
       console.log(results[0])
-      async function submitmerchantTx(data){
-        
+      async function submitmerchantTx(data) {
+
         try {
-          console.log("data = " , data);
-          console.log(" Inside upload file api " , req.body.roleId);
+          console.log("data = ", data);
+          console.log(" Inside upload file api ", req.body.roleId);
           data.roleId = req.body.roleId;
           let mode = "Aggregator";
-          data.mode = mode ;
-            const {body} = await superagent.post(
-              'http://'+IP+':3001/api/v1/merchantTx')                      
-          .send(data)                             
-            // Show response data
-            let msg =  "- For merchantId " + data.merchantId;
-            console.log("----server.js---Submission response : ---", msg , "(", body , ")");
-            msg = "" ;
-            return msg;
-           
+          data.mode = mode;
+          const { body } = await superagent.post(
+            'http://' + IP + ':3001/api/v1/merchantTx')
+            .send(data)
+          // Show response data
+          let msg = "- For merchantId " + data.merchantId;
+          console.log("----server.js---Submission response : ---", msg, "(", body, ")");
+          msg = "";
+          return msg;
+
         } catch (err) {
-            console.error(err)
-           
+          console.error(err)
+
         }
       }
       //temp(0)
       //let counter = 0;
-      let txmsg = "" ;
-      for(let i=0;i<results.length;i++){
-      //   for ( i = 0; i < counter.length; i++) {
-      //    console.log("The No Transaction Submited : ",counter);
-      //  }
-       
-      //  let txpromise = submitmerchantTx(results[i]);
-      // let txpromise = new Promise(function (myresolve , myreject) {
-      //  let m = submitmerchantTx(results[i]);
-      //  console.log("m = ", m);
-      //  if ( ! m ){
-      //   myresolve(m);
-      //  }else{
-      //   myreject(m);
-      //  }
-      // } );
+      let txmsg = "";
+      for (let i = 0; i < results.length; i++) {
+        //   for ( i = 0; i < counter.length; i++) {
+        //    console.log("The No Transaction Submited : ",counter);
+        //  }
 
-      let txpromise = Promise.resolve(submitmerchantTx(results[i]));
-       txpromise.then(
-        function (value) { txmsg = value; console.log("1 :" , value); },
-        function (error) { txmsg = error; console.log("2"); }
-       )
-       console.log("*****" , txmsg);
+        //  let txpromise = submitmerchantTx(results[i]);
+        // let txpromise = new Promise(function (myresolve , myreject) {
+        //  let m = submitmerchantTx(results[i]);
+        //  console.log("m = ", m);
+        //  if ( ! m ){
+        //   myresolve(m);
+        //  }else{
+        //   myreject(m);
+        //  }
+        // } );
+
+        let txpromise = Promise.resolve(submitmerchantTx(results[i]));
+        txpromise.then(
+          function (value) { txmsg = value; console.log("1 :", value); },
+          function (error) { txmsg = error; console.log("2"); }
+        )
+        console.log("*****", txmsg);
       }
-      res.status(200).send({'status' : "file uploaded","result": results,"length": results.length ,"message" : "To be completed tomm"});
-      
+      res.status(200).send({ 'status': "file uploaded", "result": results, "length": results.length, "message": "To be completed tomm" });
+
     })
-  
+
 })
 
 
-app.post('/user',(req,res)=>{
- const Name = req.body.Name
- const Details = req.body.Details
- const What = req.body.What
-res.status(200).send({'message' : "success","Name": Name,"Details":Details,"What":What});
+app.post('/user', (req, res) => {
+  const Name = req.body.Name
+  const Details = req.body.Details
+  const What = req.body.What
+  res.status(200).send({ 'message': "success", "Name": Name, "Details": Details, "What": What });
 })
 
 
 const superagent = require('superagent');
 
-app.get('/check', function(req, res) {
+app.get('/check', function (req, res) {
   (async () => {
     const data = {
-        email : "email",
-        pwd : "pwd"
+      email: "email",
+      pwd: "pwd"
     }
     try {
-        const {body} = await superagent.post(
-  'http://'+IP+':3001/user')
-      .send(data)                             
-        // Show response data
-        console.log(body)
+      const { body } = await superagent.post(
+        'http://' + IP + ':3001/user')
+        .send(data)
+      // Show response data
+      console.log(body)
     } catch (err) {
-        console.error(err)
+      console.error(err)
     }
   })();
 });
+
+// app.listen(3001);
+logger.info("server started at port :3001");
+
+const server = http.createServer(app);
+module.exports = server;
