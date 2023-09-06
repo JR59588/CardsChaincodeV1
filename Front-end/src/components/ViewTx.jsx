@@ -86,20 +86,24 @@ const ViewTx = (props) => {
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT);
     socket.on("status-change", (response) => {
-      console.log(
-        "inside use effect status change - viewtx.js",
-        response,
-        response.data.join("-")
-      );
-      console.log("Data mixed: ", dataMixed);
-      const key = response.data.join("-");
-      const newDataMixed = dataMixed.map((item) => {
-        if (item.Key == key) {
-          item.Record.TxStatus = response.data.status;
+      
+      setDataMixed((dataMixed) => {
+        console.log(
+          "inside use effect status change - viewtx.js",
+          response,
+          response.data.join("-")
+        );
+        console.log("Data mixed: ", dataMixed);
+        const key = response.data.join("-");
+        const newDataMixed = dataMixed.map((item) => {
+          if (item.Key == key) {
+            item.Record.TxStatus = response.status;
+          }
           return item;
-        }
+        });
+
+        return newDataMixed;
       });
-      setDataMixed(newDataMixed);
     });
 
     return () => {
@@ -341,9 +345,9 @@ const ViewTx = (props) => {
       )
       .then((response) => {
         console.log("response for onClickVerify", response);
-        if (response.status === 200) {
-          setRefresh(true);
-        }
+        // if (response.status === 200) {
+        //   setRefresh(true);
+        // }
       })
       .catch((error) => {
         console.log(error);
@@ -354,144 +358,7 @@ const ViewTx = (props) => {
         }
       });
   };
-  //   //Confirm Tx Verify
-  //   const onClickVerifyConfirmTx = (key) => {
-  //     const verificationData = dataMixed.find((customer) => customer.Key === key);
-  //     console.log("verificationData--218", verificationData);
-  //     verifyData.customerId = verificationData.Record.CustomerID;
-  //     verifyData.merchantId = verificationData.Record.MerchantId;
-  //     verifyData.loanReferenceNumber = verificationData.Key.split("-")[2];
-  //     verifyData.roleId = updatedRoleId;
-  //     verifyData.merchantName = verificationData.Record.MerchantName;
-  //     console.log("onClickConfirmTx---208", verifyData);
-  //     axios
-  //       .post(`http://${IP}:3001/api/v1/verifyAcceptTx`, verifyData, {
-  //         header: { "Content-Type": "application/json" },
-  //       })
-  //       .then((response) => {
-  //         console.log("response for onClickVerifyConfirmTx --214", response);
-  //         if (response.status === 200) {
-  //           setRefresh(true);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //         if (error?.response.status === 400) {
-  //           msg = error.response.data.message.split(",");
-  //           console.log(msg);
-  //           setAlertState(true);
-  //         }
-  //       });
-  //   };
-  //   // Submit Tx Verify
-  //   const onClickVerifySubmitTx = (key) => {
-  //     const verificationData = dataMixed.find((customer) => customer.Key === key);
-  //     verifyData.customerId = verificationData.Record.CustomerID;
-  //     verifyData.merchantId = verificationData.Record.MerchantId;
-  //     verifyData.loanReferenceNumber = verificationData.Key.split("-")[2];
-  //     verifyData.roleId = updatedRoleId;
-  //     verifyData.merchantName = verificationData.Record.MerchantName;
-  //     console.log("onClickVerifySubmitTx---239", verifyData);
-  //     console.log(dataMixed);
-  //     axios
-  //       .post(`http://${IP}:3001/api/v1/verifySubmitTx`, verifyData, {
-  //         header: { "Content-Type": "application/json" },
-  //       })
-  //       .then((response) => {
-  //         console.log("response for onClickVerifySubmitTx --245", response);
-  //         if (response.status === 200) {
-  //           setRefresh(true);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //         if (error?.response.status === 400) {
-  //           msg = error.response.data.message;
-  //           setAlertState(true);
-  //         }
-  //       });
-  //   };
-  //   //Balance Tx Verify
-  //   const onClickVerifyBalanceTx = (key) => {
-  //     const verificationData = dataMixed.find((customer) => customer.Key === key);
-  //     verifyData.customerId = verificationData.Record.CustomerID;
-  //     verifyData.merchantId = verificationData.Record.MerchantId;
-  //     verifyData.loanReferenceNumber = verificationData.Key.split("-")[2];
-  //     verifyData.roleId = updatedRoleId;
-  //     verifyData.merchantName = verificationData.Record.MerchantName;
-  //     console.log("onClickVerifySubmitTx---250", verifyData);
-  //     axios
-  //       .post(`http://${IP}:3001/api/v1/verifyBalanceTx`, verifyData, {
-  //         header: { "Content-Type": "application/json" },
-  //       })
-  //       .then((response) => {
-  //         console.log("response for onClickVerifyBalanceTx --276", response);
-  //         if (response.status === 200) {
-  //           setRefresh(true);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         if (error?.response.status === 400) {
-  //           msg = error.response.data.message;
-  //           setAlertState(true);
-  //         }
-  //         console.log(error);
-  //       });
-  //   };
-  //   //Account Tx Verify
-  //   const onClickVerifyAccountTx = (key) => {
-  //     const verificationData = dataMixed.find((customer) => customer.Key === key);
-  //     verifyData.customerId = verificationData.Record.CustomerID;
-  //     verifyData.merchantId = verificationData.Record.MerchantId;
-  //     verifyData.loanReferenceNumber = verificationData.Key.split("-")[2];
-  //     verifyData.roleId = updatedRoleId;
-  //     verifyData.merchantName = verificationData.Record.MerchantName;
-  //     console.log("onClickVerifyAccountTx---301", verifyData);
-  //     axios
-  //       .post(`http://${IP}:3001/api/v1/verifyAccountTx`, verifyData, {
-  //         header: { "Content-Type": "application/json" },
-  //       })
-  //       .then((response) => {
-  //         console.log("response for onClickVerifyAccountTx --307", response);
-  //         if (response.status === 200) {
-  //           setRefresh(true);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         if (error?.response.status === 400) {
-  //           msg = error.response.data.message;
-  //           setAlertState(true);
-  //         }
-  //         console.log(error);
-  //       });
-  //   };
-  //   //Clear Tx Verify
-  //   const onClickVerifyClearTx = (key) => {
-  //     const verificationData = dataMixed.find((customer) => customer.Key === key);
-  //     verifyData.customerId = verificationData.Record.CustomerID;
-  //     verifyData.merchantId = verificationData.Record.MerchantId;
-  //     verifyData.loanReferenceNumber = verificationData.Key.split("-")[2];
-  //     verifyData.roleId = updatedRoleId;
-  //     verifyData.merchantName = verificationData.Record.MerchantName;
-  //     console.log("onClickVerifyClearTx---332", verifyData);
-  //     axios
-  //       .post(`http://${IP}:3001/api/v1/verifyClearTx`, verifyData, {
-  //         header: { "Content-Type": "application/json" },
-  //       })
-  //       .then((response) => {
-  //         console.log("response for onClickVerifyClearTx --338", response);
-  //         if (response.status === 200) {
-  //           setRefresh(true);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         if (error?.response.status === 400) {
-  //           msg = error.response.data.message;
-  //           setAlertState(true);
-  //         }
-  //         console.log(error);
-  //       });
-  //   };
+ 
 
   const getAlertState = (state) => {
     setAlertState(state);

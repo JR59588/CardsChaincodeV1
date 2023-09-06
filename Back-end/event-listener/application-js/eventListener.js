@@ -283,137 +283,7 @@ async function initGatewayForOrgAOD(useCommitEvents) {
 	}
 }
 
-// async function main() {
-// 	console.log(`${BLUE} **** START ****${RESET}`);
-// 	try {
 
-// 		const gateway1Org1 = await initGatewayForOrg1(true);
-// 		const gateway1OrgPSP = await initGatewayForOrgPSP(true); // transaction handling uses commit events
-// 		const gateway1OrgACD = await initGatewayForOrgACD(true); // transaction handling uses commit events
-// 		const gateway1OrgAAD = await initGatewayForOrgAAD(true); // transaction handling uses commit events
-// 		const gateway1OrgAOD = await initGatewayForOrgAOD(true); // transaction handling uses commit events
-// 		try {
-// 			console.log(`${BLUE} **** CHAINCODE EVENTS ****${RESET}`);
-// 			let transaction;
-// 			const network1Org1 = await gateway1Org1.getNetwork(channelName);
-// 			const network1OrgPSP = await gateway1OrgPSP.getNetwork(channelName);
-// 			const network1OrgACD = await gateway1OrgACD.getNetwork(channelName);
-// 			const network1OrgAAD = await gateway1OrgAAD.getNetwork(channelName);
-// 			const network1OrgAOD = await gateway1OrgAOD.getNetwork(channelName);
-// 			const contractPYMTUTILSCCOrg1 = network1Org1.getContract("PYMTUtilsCC");
-// 			const contractSubmitSettlementTxCCOrgPSP = network1OrgPSP.getContract("SubmitSettlementTxCC");
-// 			const contractSubmitSettlementTxCCOrgACD = network1OrgACD.getContract("SubmitSettlementTxCC");
-// 			const contractAuthorizeSettlementTxCCOrgACD = network1OrgACD.getContract("AuthorizeSettlementTxCC");
-// 			const contractAuthorizeSettlementTxCCOrgAAD = network1OrgAAD.getContract("AuthorizeSettlementTxCC");
-// 			const contractBalanceSettlementTxCCOrgAAD = network1OrgAAD.getContract("BalanceSettlementTxCC");
-// 			const contractBalanceSettlementTxCCOrgAOD = network1OrgAOD.getContract("BalanceSettlementTxCC");
-// 			const contractClearSettlementTxCCOrgAOD = network1OrgAOD.getContract("ClearSettlementTxCC");
-// 			try {
-// 				let listenerOrg1 = async (event) => {
-// 					const stateObj = JSON.parse(event.payload.toString());
-// 					console.log(`${stateObj.channelName}, ${stateObj.key}`);
-// 					console.log(`${GREEN}<-- Contract Event Received: ${event.eventName} - ${stateObj} - ${JSON.stringify(stateObj)}${RESET}`);
-// 					console.log(`*** Event: ${event.eventName}`);
-// 					try {
-// 						if (event.eventName == 'EMT-RT') {
-// 							console.log(`${GREEN}--> Submit SubmitSettlementTxCC Transaction submitSettlementTx, ${stateObj.key}`);
-// 							transaction = contractSubmitSettlementTxCCOrgPSP.createTransaction('submitSettlementTx');
-// 							await transaction.submit(...stateObj.key.split("-"));
-// 							console.log(`${GREEN}<-- Submit SubmitSettlementTxCC submitSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
-// 						}
-// 					} catch (error) {
-// 						console.log(`${RED}<-- Submit Failed: SubmitSettlementTxCC verifyAndChangeStatus - ${createError}${RESET}`);
-// 					}
-// 				};
-// 				// now start the client side event service and register the listener
-// 				console.log(`${GREEN}--> Start contract event stream to peer in Org1${RESET}`);
-// 				await contractPYMTUTILSCCOrg1.addContractListener(listenerOrg1);
-
-
-
-
-// 				let listenerOrgACD = async (event) => {
-// 					const stateObj = JSON.parse(event.payload.toString());
-// 					console.log(`${stateObj.channelName}, ${stateObj.key}`);
-// 					console.log(`${GREEN}<-- Contract Event Received: ${event.eventName} - ${stateObj} - ${JSON.stringify(stateObj)}${RESET}`);
-// 					console.log(`*** Event: ${event.eventName}`);
-// 					try {
-// 						if (event.eventName == 'EACD-ST') {
-// 							console.log(`${GREEN}--> Submit AuthorizeSettlementTxCC Transaction authorizeSettlementTx, ${stateObj.key}`);
-// 							transaction = contractAuthorizeSettlementTxCCOrgACD.createTransaction('authorizeSettlementTx');
-// 							await transaction.submit(...stateObj.key.split("-"));
-// 							console.log(`${GREEN}<-- Authorize AuthorizeSettlementTxCC authorizeSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
-// 						}
-// 					} catch (error) {
-// 						console.log(`${RED}<-- Authorize Failed: AuthorizeSettlementTxCC verifyAndChangeStatus - ${createError}${RESET}`);
-// 					}
-// 				};
-// 				// now start the client side event service and register the listener
-// 				console.log(`${GREEN}--> Start contract event stream to peer in ACD${RESET}`);
-// 				await contractSubmitSettlementTxCCOrgACD.addContractListener(listenerOrgACD);
-
-
-// 				let listenerOrgAAD = async (event) => {
-// 					const stateObj = JSON.parse(event.payload.toString());
-// 					console.log(`${stateObj.channelName}, ${stateObj.key}`);
-// 					console.log(`${GREEN}<-- Contract Event Received: ${event.eventName} - ${stateObj} - ${JSON.stringify(stateObj)}${RESET}`);
-// 					console.log(`*** Event: ${event.eventName}`);
-// 					try {
-// 						if (event.eventName == 'EAADAOD-AT') {
-// 							console.log(`${GREEN}--> Submit BalanceSettlementTxCC Transaction balanceSettlementTx, ${stateObj.key}`);
-// 							transaction = contractBalanceSettlementTxCCOrgAAD.createTransaction('balanceSettlementTx');
-// 							await transaction.submit(...stateObj.key.split("-"));
-// 							console.log(`${GREEN}<-- Submit BalanceSettlementTxCC balanceSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
-// 						}
-// 					} catch (error) {
-// 						console.log(`${RED}<-- Balance Failed: BalanceSettlementTxCC verifyAndChangeStatus - ${createError}${RESET}`);
-// 					}
-// 				};
-
-// 				console.log(`${GREEN}--> Start contract event stream to peer in AAD${RESET}`);
-// 				await contractAuthorizeSettlementTxCCOrgAAD.addContractListener(listenerOrgAAD);
-
-// 				let listenerOrgAOD = async (event) => {
-// 					const stateObj = JSON.parse(event.payload.toString());
-// 					console.log(`${stateObj.channelName}, ${stateObj.key}`);
-// 					console.log(`${GREEN}<-- Contract Event Received: ${event.eventName} - ${stateObj} - ${JSON.stringify(stateObj)}${RESET}`);
-// 					console.log(`*** Event: ${event.eventName}`);
-// 					try {
-// 						if (event.eventName == 'EAODACD-BT') {
-// 							console.log(`${GREEN}--> Submit ClearSettlementTxCC Transaction clearSettlementTx, ${stateObj.key}`);
-// 							transaction = contractClearSettlementTxCCOrgAOD.createTransaction('clearSettlementTx');
-// 							await transaction.submit(...stateObj.key.split("-"));
-// 							console.log(`${GREEN}<-- Submit ClearSettlementTxCC clearSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
-// 						}
-// 					} catch (error) {
-// 						console.log(`${RED}<-- Submit Failed: ClearSettlementTxCC verifyAndChangeStatus - ${createError}${RESET}`);
-// 					}
-// 				};
-
-// 				console.log(`${GREEN}--> Start contract event stream to peer in AOD${RESET}`);
-// 				await contractBalanceSettlementTxCCOrgAOD.addContractListener(listenerOrgAOD);
-
-
-// 			} catch (eventError) {
-// 				console.log(`${RED}<-- Failed: Setup contract events - ${eventError}${RESET}`);
-// 			}
-// 		} catch (runError) {
-// 			console.error(`Error in transaction: ${runError}`);
-// 			if (runError.stack) {
-// 				console.error(runError.stack);
-// 			}
-// 		}
-// 	} catch (error) {
-// 		console.error(`Error in setup: ${error}`);
-// 		if (error.stack) {
-// 			console.error(error.stack);
-// 		}
-// 		process.exit(1);
-// 	}
-// }
-
-
-// main();
 
 io.on('connection', async (socket) => {
 	console.log('Client connected');
@@ -441,6 +311,8 @@ io.on('connection', async (socket) => {
 			const contractBalanceSettlementTxCCOrgAAD = network1OrgAAD.getContract("BalanceSettlementTxCC");
 			const contractBalanceSettlementTxCCOrgAOD = network1OrgAOD.getContract("BalanceSettlementTxCC");
 			const contractClearSettlementTxCCOrgAOD = network1OrgAOD.getContract("ClearSettlementTxCC");
+			const contractClearSettlementTxCCOrgAAD = network1OrgAAD.getContract("ClearSettlementTxCC");
+
 			try {
 				// let listenerOrg1 = async (event) => {
 				// 	const stateObj = JSON.parse(event.payload.toString());
@@ -540,6 +412,25 @@ io.on('connection', async (socket) => {
 				await contractBalanceSettlementTxCCOrgAOD.addContractListener(listenerOrgAOD);
 
 
+				let listenerOrgAAD2 = async (event) => {
+					const stateObj = JSON.parse(event.payload.toString());
+					console.log(`${stateObj.channelName}, ${stateObj.key}`);
+					console.log(`${GREEN}<-- Contract Event Received: ${event.eventName} - ${stateObj} - ${JSON.stringify(stateObj)}${RESET}`);
+					console.log(`*** Event: ${event.eventName}`);
+					try {
+						if (event.eventName == 'EACDAAD-CT') {
+							const splitKey = [...stateObj.key.split("-")];
+							socket.emit('status-change', { status: 'TxCleared', data: splitKey });
+							console.log("Emitted status-change for TxCleared - ", { status: 'TxCleared', data: splitKey });
+							await transaction.submit(...splitKey);
+						}
+					} catch (error) {
+						console.log(`${RED}<-- Clear Failed: ClearSettlementTxCC Listening to Events -${RESET}`);
+					}
+				};
+
+				console.log(`${GREEN}--> Start clear contract event stream to peer in AAD${RESET}`);
+				await contractClearSettlementTxCCOrgAAD.addContractListener(listenerOrgAAD2);
 			} catch (eventError) {
 				console.log(`${RED}<-- Failed: Setup contract events - ${eventError}${RESET}`);
 			}
