@@ -97,4 +97,10 @@ module.exports = function (app) {
 
   .post(merchantController.verifyClearTx);
 
+  app
+    
+  .route("/api/v1/testOrgAddition")
+
+  .post(merchantController.testOrgAddition);
+
 };

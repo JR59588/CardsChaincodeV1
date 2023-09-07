@@ -412,6 +412,51 @@ exports.saveOBMerchantSummary = async function (req, res) {
 };
 
 
+exports.testOrgAddition = async function(req, res) {
+  try {
+    console.log("req.body: ", req.body);
+    const orgName = req.body.orgName;
+    if (orgName !== undefined) {
+      console.log("Adding organization ", req.body.orgName);
+
+      const { exec } = require('child_process');
+      const path = require('path');
+
+      // Replace 'yourScript.sh' with the path to your Bash script.
+      const bashScriptPath = '/home/zenlabs/Cards_POC/hyperledger2.2/HLF-Cards/hlf-cards/generate.sh';
+
+      // Get the directory where the Bash script resides.
+      const scriptDirectory = path.dirname(bashScriptPath);
+
+      // Define the arguments to pass to the Bash script.
+      const currentValue = 23;
+      const nextValue = currentValue + 2;
+      const currentGlobal = 8;
+      const nextGlobal = currentGlobal + 1;
+      const scriptArguments = ['ACD', req.body.orgName, '15051', '15052', '15054', '10084', nextValue + '051', nextValue + '052', nextValue + '054', nextValue + '084', nextGlobal + '', '5'];
+
+      // Create a command string that includes the Bash script path and its arguments.
+      const command = `bash ${bashScriptPath} ${scriptArguments.join(' ')}`;
+
+      // Run the Bash script using exec with the CWD option set to the script's directory.
+      exec(command, { cwd: scriptDirectory }, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error executing Bash script: ${error}`);
+          return;
+        }
+        console.log(`Bash script output: ${stdout}`);
+        console.error(`Bash script errors: ${stderr}`);
+      });
+    } else {
+      throw new Error("Orgnaization name not found!");
+    }
+
+  } catch (error) {
+    console.log("Error adding organization ", req.body.orgName);
+    console.log(error);
+  }
+};
+
 exports.verifySubmitTx = async function (req, res) {
   const channelName = "channel1";
   const contractName = "SubmitSettlementTxCC";
