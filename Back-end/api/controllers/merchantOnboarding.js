@@ -423,7 +423,7 @@ exports.testOrgAddition = async function(req, res) {
       const path = require('path');
 
       //Path to your Bash script.
-      const bashScriptPath = '/home/zenlabs/Cards_POC/hyperledger2.2/HLF-Cards/hlf-cards/generate.sh';
+      const bashScriptPath = path.join(__dirname, '..', '..', '..', '..', 'HLF-Cards', 'hlf-cards', 'generate.sh');
 
       // Get the directory where the Bash script resides.
       const scriptDirectory = path.dirname(bashScriptPath);
