@@ -4,11 +4,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const data = require("./data.json");
 const app = express();
+const fs = require('fs');
 app.use(bodyParser.json());
 
 // Setting for Hyperledger Fabric
 const { Wallets, Gateway } = require("fabric-network");
-const fs = require("fs");
 const path = require("path");
 const channelName = "channel1";
 const contractName = "onboardingMerchantC";
@@ -422,17 +422,19 @@ exports.testOrgAddition = async function(req, res) {
       const { exec } = require('child_process');
       const path = require('path');
 
-      // Replace 'yourScript.sh' with the path to your Bash script.
+      //Path to your Bash script.
       const bashScriptPath = '/home/zenlabs/Cards_POC/hyperledger2.2/HLF-Cards/hlf-cards/generate.sh';
 
       // Get the directory where the Bash script resides.
       const scriptDirectory = path.dirname(bashScriptPath);
 
       // Define the arguments to pass to the Bash script.
-      const currentValue = 23;
-      const nextValue = currentValue + 2;
-      const currentGlobal = 8;
-      const nextGlobal = currentGlobal + 1;
+      const jsonStr = fs.readFileSync(path.join(__dirname, "..", "newOrgVars.json"));
+      const jsonObj = JSON.parse(jsonStr);
+
+      const nextValue = jsonObj.currentValue + 2;
+      const nextGlobal = jsonObj.currentGlobal + 1;
+
       const scriptArguments = ['ACD', req.body.orgName, '15051', '15052', '15054', '10084', nextValue + '051', nextValue + '052', nextValue + '054', nextValue + '084', nextGlobal + '', '5'];
 
       // Create a command string that includes the Bash script path and its arguments.
@@ -442,10 +444,14 @@ exports.testOrgAddition = async function(req, res) {
       exec(command, { cwd: scriptDirectory }, (error, stdout, stderr) => {
         if (error) {
           console.error(`Error executing Bash script: ${error}`);
-          return;
+          throw new Error(error);
         }
         console.log(`Bash script output: ${stdout}`);
         console.error(`Bash script errors: ${stderr}`);
+        jsonObj.currentValue = nextValue;
+        jsonObj.currentGlobal = nextGlobal;
+        fs.writeFileSync(path.join(__dirname, "..", "newOrgVars.json"), JSON.stringify(jsonObj));
+        res.status(200).send('Organization added succesfully');
       });
     } else {
       throw new Error("Orgnaization name not found!");
@@ -454,6 +460,7 @@ exports.testOrgAddition = async function(req, res) {
   } catch (error) {
     console.log("Error adding organization ", req.body.orgName);
     console.log(error);
+    res.status(400).send('Something went wrong in adding the organization');
   }
 };
 
