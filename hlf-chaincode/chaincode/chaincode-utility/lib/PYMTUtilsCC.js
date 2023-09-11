@@ -417,7 +417,10 @@ class PYMTUtilsCC extends Contract {
       console.log("Line 389", txID);
       txIn.txID = txID;
       let txTimestamp = ctx.stub.getTxTimestamp();
-      txIn.txTimestamp = txTimestamp.toString();
+      console.log("Timestamp is: ", txTimestamp, "Timestamp toString: ", txTimestamp.toString());
+      const milliseconds = (timestamp.seconds.low + ((timestamp.nanos / 1000000) / 1000)) * 1000;
+      const date = new Date(milliseconds);
+      txIn.txTimestamp = date.toString();
       await ctx.stub.putState(key, Buffer.from(JSON.stringify(txIn)));
       console.log("successfully putstate for key :", key);
 
