@@ -295,8 +295,8 @@ const ViewTx = (props) => {
   //CONVERTING TIMESTAMP TO DATE
   let localDate;
   const dateFunc = (timestamp) => {
-    const actualTime = timestamp.substring(0, 10);
-    let datetime = new Date(actualTime * 1000);
+    // const actualTime = timestamp.substring(0, 10);
+    let datetime = new Date(Date.parse(timestamp))//new Date(actualTime * 1000);
     localDate = datetime.toDateString();
     return localDate;
   };
@@ -304,11 +304,11 @@ const ViewTx = (props) => {
   //CONVERTING TIMESTAMP TO TIME
   let UTC;
   const timeFunc = (timestamp) => {
-    const actualTime = timestamp.substring(0, 10);
-    let datetime = new Date(actualTime * 1000);
+    // const actualTime = timestamp.substring(0, 10);
+    let datetime = new Date(Date.parse(timestamp))//new Date(actualTime * 1000);
     const timeUT = datetime.toLocaleTimeString();
-    UTC = timeUT.substring(0, 12);
-    return UTC;
+    // UTC = timeUT.substring(0, 12);
+    return timeUT;
   };
   // console.log( org === null ? null : org  );
 
