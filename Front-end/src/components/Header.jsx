@@ -9,7 +9,7 @@ const Header = ({ roleId, setRoleId }) => {
   return (
     <nav
       className="navbar navbar-expand-lg"
-      style={{ height: "70px", backgroundColor: "#008555", color: "white" }}
+      style={{ height: "70px", backgroundColor: "#1fa1f8", color: "white" }}
     >
       <div className="container-fluid" style={{ color: "white" }}>
         <a className="navbar-brand" href="#" style={{ color: "white" }}>
@@ -112,7 +112,7 @@ const Header = ({ roleId, setRoleId }) => {
               <select
                 style={{
                   width: "210px",
-                  backgroundColor: "#008555",
+                  backgroundColor: "#1fa1f8",
                   height: "36px",
                   color: "white",
                 }}
