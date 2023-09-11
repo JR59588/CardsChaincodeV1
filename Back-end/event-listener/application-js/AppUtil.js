@@ -7,87 +7,20 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 
-exports.buildCCPOrg1 = () => {
-	// load the common connection configuration file
-	const ccpPath = path.resolve(__dirname, '../../connection-org1.json');
-	const fileExists = fs.existsSync(ccpPath);
+exports.buildCCP = (pathStr) => {
+	const fileExists = fs.existsSync(pathStr);
 	if (!fileExists) {
 		throw new Error(`Inside event listener no such file or directory: ${ccpPath}`);
 	}
-	const contents = fs.readFileSync(ccpPath, 'utf8');
+	const contents = fs.readFileSync(pathStr, 'utf8');
 
 	// build a JSON object from the file contents
 	const ccp = JSON.parse(contents);
 
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
+	console.log(`Loaded the network configuration located at ${pathStr}`);
 	return ccp;
-};
-
-exports.buildCCPAAD = () => {
-	// load the common connection configuration file
-	const ccpPath = path.resolve(__dirname, '../../connection-AAD.json');
-	const fileExists = fs.existsSync(ccpPath);
-	if (!fileExists) {
-		throw new Error(`no such file or directory: ${ccpPath}`);
-	}
-	const contents = fs.readFileSync(ccpPath, 'utf8');
-
-	// build a JSON object from the file contents
-	const ccp = JSON.parse(contents);
-
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
-	return ccp;
-};
-
-exports.buildCCPACD = () => {
-	// load the common connection configuration file
-	const ccpPath = path.resolve(__dirname, '../../connection-ACD.json');
-	const fileExists = fs.existsSync(ccpPath);
-	if (!fileExists) {
-		throw new Error(`no such file or directory: ${ccpPath}`);
-	}
-	const contents = fs.readFileSync(ccpPath, 'utf8');
-
-	// build a JSON object from the file contents
-	const ccp = JSON.parse(contents);
-
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
-	return ccp;
-};
-
-exports.buildCCPAOD = () => {
-	// load the common connection configuration file
-	const ccpPath = path.resolve(__dirname, '../../connection-AOD.json');
-	const fileExists = fs.existsSync(ccpPath);
-	if (!fileExists) {
-		throw new Error(`no such file or directory: ${ccpPath}`);
-	}
-	const contents = fs.readFileSync(ccpPath, 'utf8');
-
-	// build a JSON object from the file contents
-	const ccp = JSON.parse(contents);
-
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
-	return ccp;
-};
-
-exports.buildCCPPSP = () => {
-	// load the common connection configuration file
-	const ccpPath = path.resolve(__dirname, '../../connection-PSP.json');
-	const fileExists = fs.existsSync(ccpPath);
-	if (!fileExists) {
-		throw new Error(`no such file or directory: ${ccpPath}`);
-	}
-	const contents = fs.readFileSync(ccpPath, 'utf8');
-
-	// build a JSON object from the file contents
-	const ccp = JSON.parse(contents);
-
-	console.log(`Loaded the network configuration located at ${ccpPath}`);
-	return ccp;
-};
+}
 
 exports.buildWallet = async (Wallets, walletPath) => {
 	// Create a new  wallet : Note that wallet is for managing identities.
