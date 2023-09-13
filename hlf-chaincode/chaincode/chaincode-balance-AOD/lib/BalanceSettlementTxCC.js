@@ -101,10 +101,10 @@ class BalanceSettlementTxCC extends Contract {
     // TODO : check the validations and change accordingly (discussion with nishanth)
     const hasTxposEntryMode = "pointOfServiceEntryMode" in txIn;
     if (hasTxposEntryMode) {
-      if (txIn.posEntryMode === "" || txIn.pointOfServiceEntryMode.length == 0) {
+      if (txIn.pointOfServiceEntryMode === "" || txIn.pointOfServiceEntryMode.length == 0) {
         isBalanced = false;
         console.log(
-          "Validation by AOD... posEntryMode not valid: ",
+          "Validation by AOD... pointOfServiceEntryMode not valid: ",
           isBalanced
         );
         return isBalanced;
