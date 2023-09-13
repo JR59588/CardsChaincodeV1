@@ -22,6 +22,9 @@ const Onboard = (props) => {
   //setting role message
   const [roleMsg, setRoleMsg] = useState(false)
 
+  //summary state
+  const[summaryState,setSummaryState]=useState(false)
+
   //loading
   const [loading, setLoading] = useState(false)
 
@@ -71,11 +74,10 @@ const Onboard = (props) => {
       [e.target.name]: e.target.value,
     })
   }
-
-  const submitForm = (event) => {
-    event.preventDefault()
-    setLoading(true)
-    if (props.roleId.length !== 0) {
+const onClickContinue =()=>{
+// api call
+setSummaryState(false)
+ if (props.roleId.length !== 0) {
       onboardingFormData.customerID = 'C' + onboardingFormData.merchantID
       setRoleMsg(false)
       console.log(onboardingFormData)
@@ -90,6 +92,7 @@ const Onboard = (props) => {
         .then((response) => {
           console.log(response)
           setLoading(false)
+          
           setModal(true)
         })
 
@@ -124,6 +127,17 @@ const Onboard = (props) => {
     } else {
       setRoleMsg(true)
     }
+
+}
+const onClickClose=()=>{
+  setSummaryState(false)
+}
+  const submitForm = (event) => {
+    event.preventDefault()
+    //enabling 
+    setSummaryState(true)
+    //setLoading(true)
+   
   }
   const getState = (state) => {
     console.log(state)
@@ -624,6 +638,36 @@ const Onboard = (props) => {
           header={failureHead}
         />
       ) : null}
+
+    {
+      summaryState &&  <div className="blur">
+      <div className="modalDemo">
+        <span
+          className="cross"
+          onClick={onClickClose}
+          style={{ fontSize: "20px" }}
+        >
+          ✖
+        </span>
+        <div className="modalHeader">
+          <h4>Confirm Details</h4>
+        </div>
+        <hr />
+        <div className="modalBody">
+          <h5>By confirming this details you are about to add a new organisation to the network.</h5>
+        </div>
+        <hr />
+        <div className="modalFooter">
+        <button onClick={onClickContinue}  className="btn btn-primary">
+            Confirm
+          </button>
+          <button onClick={onClickClose} style={{ marginRight:'10px'}} className="btn btn-outline-danger">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+    }
       <Footer />
     </div>
   )
