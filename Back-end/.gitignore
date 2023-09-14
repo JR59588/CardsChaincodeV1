@@ -10,3 +10,5 @@ connection-*.json
 logger.js
 combined.log
 node_modules
+api/newOrgVars.json
+api/orgsAdded.json
