@@ -24,7 +24,7 @@ var storage = multer.diskStorage({
     cb(null, file.fieldname + ext)
   }
 })
-const IP = "";
+const IP = "localhost";
 mongoose.set('strictQuery', false);
 
 //create multer instance

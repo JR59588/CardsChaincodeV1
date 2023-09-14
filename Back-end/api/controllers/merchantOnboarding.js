@@ -76,7 +76,7 @@ exports.savePvAADMetaData = async function (req, res) {
     const merchantBankCode = req.body.merchantBankCode;
     const merchantAccountNumber = req.body.merchantAccountNumber;
     const securityDeposits = req.body.securityDeposits;
-   
+
     console.log(JSON.stringify(req.body));
     console.log("line 100 ");
 
@@ -117,7 +117,7 @@ exports.savePvAADMetaData = async function (req, res) {
 };
 
 
-exports.savePvAODMetaData= async function (req, res) {
+exports.savePvAODMetaData = async function (req, res) {
   const channelName = "channel1";
   const contractName = "onboardingMerchantC";
   const pv_IndividualCollectionName = "PDC1";
@@ -164,12 +164,12 @@ exports.savePvAODMetaData= async function (req, res) {
 
     // Submit the specified transaction
     const merchantID = req.body.merchantID;
-    const product =req.body.product ;
-    const numberOfPOSTerminalsRequired= req.body.numberOfPOSTerminalsRequired;
-    const POSID= req.body.POSID;
+    const product = req.body.product;
+    const numberOfPOSTerminalsRequired = req.body.numberOfPOSTerminalsRequired;
+    const POSID = req.body.POSID;
 
     console.log(JSON.stringify(req.body));
-   
+
 
     let result;
     let merchant_properties = {
@@ -177,9 +177,9 @@ exports.savePvAODMetaData= async function (req, res) {
       product: product,
       numberOfPOSTerminalsRequired: numberOfPOSTerminalsRequired,
       POSID: POSID,
-     };
+    };
 
-    console.log(" merchant_properties ",  merchant_properties);
+    console.log(" merchant_properties ", merchant_properties);
 
     let statefulTxn = contract.createTransaction("savePvAODMetaData");
 
@@ -196,7 +196,7 @@ exports.savePvAODMetaData= async function (req, res) {
 
     // Disconnect from the gateway.
     await gateway.disconnect();
-    
+
     console.log("Transaction has been submitted for AOD");
   } catch (error) {
     console.error(
@@ -206,7 +206,7 @@ exports.savePvAODMetaData= async function (req, res) {
   }
 };
 
-exports.savePvAADAODMetaData= async function (req, res) {
+exports.savePvAADAODMetaData = async function (req, res) {
   const channelName = "channel1";
   const contractName = "onboardingMerchantC";
   const pv_IndividualCollectionName = "PDC3";
@@ -254,11 +254,11 @@ exports.savePvAADAODMetaData= async function (req, res) {
     // Submit the specified transaction
     const merchantID = req.body.merchantID;
     const txcMaxTxPerDay = req.body.txcMaxTxPerDay;
-    const txcMinTxAmount =req.body.txcMinTxAmount ;
-    const txcMaxTxAmount= req.body.txcMaxTxAmount;
-    const txcTxCurrency= req.body.txcTxCurrency;
-    const txcNegotiatedMDR= req.body.txcNegotiatedMDR;
-    const promoCode= req.body.promoCode;
+    const txcMinTxAmount = req.body.txcMinTxAmount;
+    const txcMaxTxAmount = req.body.txcMaxTxAmount;
+    const txcTxCurrency = req.body.txcTxCurrency;
+    const txcNegotiatedMDR = req.body.txcNegotiatedMDR;
+    const promoCode = req.body.promoCode;
 
 
     console.log(JSON.stringify(req.body));
@@ -273,7 +273,7 @@ exports.savePvAADAODMetaData= async function (req, res) {
       txcTxCurrency: txcTxCurrency,
       txcNegotiatedMDR: txcNegotiatedMDR,
       promoCode: promoCode
-     };
+    };
 
     console.log(" merchant_properties ", merchant_properties);
 
@@ -292,7 +292,7 @@ exports.savePvAADAODMetaData= async function (req, res) {
 
     // Disconnect from the gateway.
     await gateway.disconnect();
-    
+
     console.log("Transaction has been submitted for AOD and AAD");
   } catch (error) {
     console.error(
@@ -302,6 +302,22 @@ exports.savePvAADAODMetaData= async function (req, res) {
   }
 };
 
+const addOrgToDatabase = (req, res) => {
+  const jsonStr = fs.readFileSync(path.join(__dirname, "..", "orgsAdded.json"));
+  const jsonObj = JSON.parse(jsonStr);
+
+  const orgs = jsonObj.orgs;
+  if (orgs.findIndex((org) => org.orgId == req.body.merchantID) != -1) {
+    throw new Error("There is an existing organization with the ID: " + req.body.merchantID);
+  } else {
+    jsonObj.orgs.push({
+      orgName: req.body.merchantName,
+      orgId: req.body.merchantID
+    });
+    fs.writeFileSync(path.join(__dirname, "..", "orgsAdded.json"), JSON.stringify(jsonObj));
+  }
+
+}
 
 exports.saveOBMerchantSummary = async function (req, res) {
   const channelName = "channel1";
@@ -350,6 +366,9 @@ exports.saveOBMerchantSummary = async function (req, res) {
       collectionNames: [pv_CollectionName],
     });
 
+    // To check if the merchantID organization is already present in the database(For now, in a JSON file.)
+    addOrgToDatabase(req, res);
+
     // Submit the specified transaction.
 
     const merchantID = req.body.merchantID;
@@ -396,6 +415,8 @@ exports.saveOBMerchantSummary = async function (req, res) {
     await module.exports.savePvAADMetaData(req, res);
     await module.exports.savePvAADAODMetaData(req, res);
     await module.exports.savePvAODMetaData(req, res);
+    await orgAddition(req, res);
+
 
     res.status(200).json({
       success: true,
@@ -403,7 +424,7 @@ exports.saveOBMerchantSummary = async function (req, res) {
     });
   } catch (error) {
     console.log(`Failed to submit transaction: ${error}`);
-    console.error(`Failed to submit transaction: ${error}`);
+    // console.error(`Failed to submit transaction: ${error}`);
     return res.status(401).json({
       success: false,
       message: "Error" + error,
@@ -412,55 +433,48 @@ exports.saveOBMerchantSummary = async function (req, res) {
 };
 
 
-exports.testOrgAddition = async function(req, res) {
-  try {
-    console.log("req.body: ", req.body);
-    const orgName = req.body.orgName;
-    if (orgName !== undefined) {
-      console.log("Adding organization ", req.body.orgName);
+const orgAddition = async function (req, res) {
+  console.log("req.body: ", req.body);
+  const orgName = req.body.merchantID;
+  if (orgName !== undefined) {
+    console.log("Adding organization ", req.body.merchantID);
 
-      const { exec } = require('child_process');
-      const path = require('path');
+    const { exec } = require('child_process');
+    const path = require('path');
 
-      //Path to your Bash script.
-      const bashScriptPath = path.join(__dirname, '..', '..', '..', '..', 'HLF-Cards', 'hlf-cards', 'generate.sh');
+    //Path to your Bash script.
+    const bashScriptPath = path.join(__dirname, '..', '..', '..', '..', 'HLF-Cards', 'hlf-cards', 'generate.sh');
 
-      // Get the directory where the Bash script resides.
-      const scriptDirectory = path.dirname(bashScriptPath);
+    // Get the directory where the Bash script resides.
+    const scriptDirectory = path.dirname(bashScriptPath);
 
-      // Define the arguments to pass to the Bash script.
-      const jsonStr = fs.readFileSync(path.join(__dirname, "..", "newOrgVars.json"));
-      const jsonObj = JSON.parse(jsonStr);
+    // Define the arguments to pass to the Bash script.
+    const jsonStr = fs.readFileSync(path.join(__dirname, "..", "newOrgVars.json"));
+    const jsonObj = JSON.parse(jsonStr);
 
-      const nextValue = jsonObj.currentValue + 2;
-      const nextGlobal = jsonObj.currentGlobal + 1;
+    const nextValue = jsonObj.currentValue + 2;
+    const nextGlobal = jsonObj.currentGlobal + 1;
 
-      const scriptArguments = ['ACD', req.body.orgName, '15051', '15052', '15054', '10084', nextValue + '051', nextValue + '052', nextValue + '054', nextValue + '084', nextGlobal + '', '5'];
+    const scriptArguments = ['ACD', orgName, '15051', '15052', '15054', '10084', nextValue + '051', nextValue + '052', nextValue + '054', nextValue + '084', nextGlobal + '', '5'];
 
-      // Create a command string that includes the Bash script path and its arguments.
-      const command = `bash ${bashScriptPath} ${scriptArguments.join(' ')}`;
+    // Create a command string that includes the Bash script path and its arguments.
+    const command = `bash ${bashScriptPath} ${scriptArguments.join(' ')}`;
 
-      // Run the Bash script using exec with the CWD option set to the script's directory.
-      exec(command, { cwd: scriptDirectory }, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error executing Bash script: ${error}`);
-          throw new Error(error);
-        }
-        console.log(`Bash script output: ${stdout}`);
-        console.error(`Bash script errors: ${stderr}`);
-        jsonObj.currentValue = nextValue;
-        jsonObj.currentGlobal = nextGlobal;
-        fs.writeFileSync(path.join(__dirname, "..", "newOrgVars.json"), JSON.stringify(jsonObj));
-        res.status(200).send('Organization added succesfully');
-      });
-    } else {
-      throw new Error("Orgnaization name not found!");
-    }
-
-  } catch (error) {
-    console.log("Error adding organization ", req.body.orgName);
-    console.log(error);
-    res.status(400).send('Something went wrong in adding the organization');
+    // Run the Bash script using exec with the CWD option set to the script's directory.
+    exec(command, { cwd: scriptDirectory }, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing Bash script: ${error}`);
+        throw new Error(error);
+      }
+      console.log(`Bash script output: ${stdout}`);
+      console.error(`Bash script errors: ${stderr}`);
+      jsonObj.currentValue = nextValue;
+      jsonObj.currentGlobal = nextGlobal;
+      fs.writeFileSync(path.join(__dirname, "..", "newOrgVars.json"), JSON.stringify(jsonObj));
+      // res.status(200).send('Organization added succesfully');
+    });
+  } else {
+    throw new Error("Orgnaization name not found!");
   }
 };
 

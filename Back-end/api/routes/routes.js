@@ -20,9 +20,9 @@ module.exports = function (app) {
 
   app
 
-  .route("/api/v1/retrievePvAADAODMetaData/:merchantID/:roleId")
+    .route("/api/v1/retrievePvAADAODMetaData/:merchantID/:roleId")
 
-  .get(viewTxcontroller.retrievePvAADAODMetaData);
+    .get(viewTxcontroller.retrievePvAADAODMetaData);
 
   app
 
@@ -67,40 +67,40 @@ module.exports = function (app) {
 
     .post(merchantController.savePvAADAODMetaData);
 
-    app
-    
-  .route("/api/v1/savePvAODMetaData")
+  app
 
-  .post(merchantController.savePvAODMetaData);
+    .route("/api/v1/savePvAODMetaData")
+
+    .post(merchantController.savePvAODMetaData);
 
   app
-    
-  .route("/api/v1/verifySubmitTx")
 
-  .post(merchantController.verifySubmitTx);
+    .route("/api/v1/verifySubmitTx")
 
-  app
-    
-  .route("/api/v1/verifyBalanceTx")
-
-  .post(merchantController.verifyBalanceTx);
+    .post(merchantController.verifySubmitTx);
 
   app
-    
-  .route("/api/v1/verifyAuthorizeTx")                              
 
-  .post(merchantController.verifyAuthorizeTx);
+    .route("/api/v1/verifyBalanceTx")
 
-  app
-    
-  .route("/api/v1/verifyClearTx")
-
-  .post(merchantController.verifyClearTx);
+    .post(merchantController.verifyBalanceTx);
 
   app
-    
-  .route("/api/v1/testOrgAddition")
 
-  .post(merchantController.testOrgAddition);
+    .route("/api/v1/verifyAuthorizeTx")
+
+    .post(merchantController.verifyAuthorizeTx);
+
+  app
+
+    .route("/api/v1/verifyClearTx")
+
+    .post(merchantController.verifyClearTx);
+
+  // app
+
+  // .route("/api/v1/testOrgAddition")
+
+  // .post(merchantController.testOrgAddition);
 
 };

@@ -1,155 +1,155 @@
-import React, { useState } from 'react'
-import Footer from '../Footer'
-import styles from './Onboard.module.css'
-import axios from 'axios'
-import { useEffect } from 'react'
-import SuccessModal from '../SuccessModal/SuccessModal'
-import { BsInfoCircle } from 'react-icons/bs'
+import React, { useState } from "react";
+import Footer from "../Footer";
+import styles from "./Onboard.module.css";
+import axios from "axios";
+import { useEffect } from "react";
+import SuccessModal from "../SuccessModal/SuccessModal";
+import { BsInfoCircle } from "react-icons/bs";
 
 const message = (
   <h6>
-    Response 200: Successfully Endorsed by Customer Department , Operations Department &
-    Accounts Department. <br /> <br />
+    Response 200: Successfully Endorsed by Customer Department , Operations
+    Department & Accounts Department. <br /> <br />
     Merchant Successfully Onboarded
   </h6>
-)
-const header = 'Merchant Onboarding Successful'
-let failureMsg = 'Invalid'
-let failureHead = 'Invalid'
+);
+const header = "Merchant Onboarding Successful";
+let failureMsg = "Invalid";
+let failureHead = "Invalid";
 const Onboard = (props) => {
-  console.log(props.roleId)
-  const IP = props.IP
+  const IP = props.IP;
   //setting role message
-  const [roleMsg, setRoleMsg] = useState(false)
+  const [roleMsg, setRoleMsg] = useState(false);
 
   //summary state
-  const[summaryState,setSummaryState]=useState(false)
+  const [summaryState, setSummaryState] = useState(false);
 
   //loading
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   //success Modal
-  const [modal, setModal] = useState(false)
+  const [modal, setModal] = useState(false);
 
-  const [failureModal, setFailureModal] = useState(false)
+  const [failureModal, setFailureModal] = useState(false);
 
   const [onboardingFormData, setOnboardingFormData] = useState({
-    merchantName: '',
-    merchantID: '',
-    merchantDescription: '',
-    merchantCategoryCode: '',
-    product: '',
-    txcNegotiatedMDR: '',
-    promoCode: '',
-    txcMaxTxPerDay: '',
-    txcTxCurrency: '',
-    txcMaxTxAmount: '',
-    txcMinTxAmount: '',
-    transactionGeographiesAllowed: '',
-    merchantAccountNumber: '',
-    merchantBankCode: '',
-    isContractSigned: '',
-    kycStatus: '',
-    customerID: '',
-    securityDeposits: '',
-    numberOfPOSTerminalsRequired: '',
-    loanExpiryDate: '',
-    maxLoanAmount: '',
-    currentOutstandingAmount: '',
-    totalDisbursedAmount: '',
-    isDefaulter: '',
-    customerName: '',
-    POSID: '',
+    merchantName: "",
+    merchantID: "",
+    merchantDescription: "",
+    merchantCategoryCode: "",
+    product: "",
+    txcNegotiatedMDR: "",
+    promoCode: "",
+    txcMaxTxPerDay: "",
+    txcTxCurrency: "",
+    txcMaxTxAmount: "",
+    txcMinTxAmount: "",
+    transactionGeographiesAllowed: "",
+    merchantAccountNumber: "",
+    merchantBankCode: "",
+    isContractSigned: "",
+    kycStatus: "",
+    customerID: "",
+    securityDeposits: "",
+    numberOfPOSTerminalsRequired: "",
+    loanExpiryDate: "",
+    maxLoanAmount: "",
+    currentOutstandingAmount: "",
+    totalDisbursedAmount: "",
+    isDefaulter: "",
+    customerName: "",
+    POSID: "",
     roleId: props.roleId,
-  })
+  });
 
   //reading roleId from header
   useEffect(() => {
-    onboardingFormData.roleId = props.roleId
-  }, [props.roleId])
+    setOnboardingFormData((onboardingFormData) => {
+      return { ...onboardingFormData, roleId: props.roleId };
+    });
+    console.log(props.roleId);
+  }, [props.roleId]);
 
   const onChangeHandel = (e) => {
     setOnboardingFormData({
       ...onboardingFormData,
       [e.target.name]: e.target.value,
-    })
-  }
-const onClickContinue =()=>{
-// api call
-setSummaryState(false)
- if (props.roleId.length !== 0) {
-      onboardingFormData.customerID = 'C' + onboardingFormData.merchantID
-      setRoleMsg(false)
-      console.log(onboardingFormData)
+    });
+  };
+  const onClickContinue = () => {
+    // api call
+    setSummaryState(false);
+    if (props.roleId.length !== 0) {
+      onboardingFormData.customerID = "C" + onboardingFormData.merchantID;
+      setRoleMsg(false);
+      console.log(onboardingFormData);
       axios
         .post(
           `http://${IP}:3001/api/v1/saveOBMerchantSummary`,
           onboardingFormData,
           {
-            header: { 'Content-Type': 'application/json' },
-          },
+            header: { "Content-Type": "application/json" },
+          }
         )
         .then((response) => {
-          console.log(response)
-          setLoading(false)
-          
-          setModal(true)
+          console.log(response);
+          setLoading(false);
+
+          setModal(true);
         })
 
         .catch((err) => {
-          setLoading(false)
-          console.log(err)
+          setLoading(false);
+          console.log(err);
           if (!err?.response) {
-            console.log('No Server Response')
-            console.log('No Server Response')
-            failureHead = 'No Service'
-            failureMsg = `No Server Response`
-            setFailureModal(true)
+            console.log("No Server Response");
+            console.log("No Server Response");
+            failureHead = "No Service";
+            failureMsg = `No Server Response`;
+            setFailureModal(true);
           } else if (err.response?.status === 400) {
-            console.log(err.message)
-            console.log(err.message)
-            failureHead = 'Transaction Failed'
-            failureMsg = `Response 400:Transaction Failed ${err.message}`
-            setFailureModal(true)
+            console.log(err.message);
+            console.log(err.message);
+            failureHead = "Transaction Failed";
+            failureMsg = `Response 400:Transaction Failed ${err.message}`;
+            setFailureModal(true);
           } else if (err.response?.status === 401) {
-            console.log('Unauthorized')
-            failureHead = 'Transaction Failed'
+            console.log("Unauthorized");
+            failureHead = "Transaction Failed";
             failureMsg = !err.response.data.message
-              ? 'Something went wrong please try again'
-              : err.response.data.message
-            setFailureModal(true)
+              ? "Something went wrong please try again"
+              : err.response.data.message;
+            setFailureModal(true);
           } else {
-            console.log('error')
+            console.log("error");
           }
-        })
+        });
 
-      localStorage.submit = true
+      localStorage.submit = true;
     } else {
-      setRoleMsg(true)
+      setRoleMsg(true);
     }
-
-}
-const onClickClose=()=>{
-  setSummaryState(false)
-}
+  };
+  const onClickClose = () => {
+    setSummaryState(false);
+  };
   const submitForm = (event) => {
-    event.preventDefault()
-    //enabling 
-    setSummaryState(true)
+    event.preventDefault();
+    //enabling
+    setSummaryState(true);
     //setLoading(true)
-   
-  }
+  };
   const getState = (state) => {
-    console.log(state)
-    setModal(state)
-    setFailureModal(state)
-  }
+    console.log(state);
+    setModal(state);
+    setFailureModal(state);
+  };
 
   return (
-    <div className={modal ? 'mainBlur' : 'main'}>
+    <div className={modal ? "mainBlur" : "main"}>
       <div className="container">
         <div className="cols2">
-          <h4 style={{ textAlign: 'center' }} className="mt-4 mb-4">
+          <h4 style={{ textAlign: "center" }} className="mt-4 mb-4">
             Merchant Onboarding (Representative**)
           </h4>
         </div>
@@ -196,7 +196,7 @@ const onClickClose=()=>{
               <div className="row">
                 <div className="col">
                   <label htmlFor="name" className="col-form-label">
-                    Payment Acceptor Description:{' '}
+                    Payment Acceptor Description:{" "}
                   </label>
                 </div>
                 <div className="col">
@@ -219,7 +219,7 @@ const onClickClose=()=>{
                 </div>
                 <div className="col">
                   <select
-                    style={{ height: '40px', fontSize: '14px' }}
+                    style={{ height: "40px", fontSize: "14px" }}
                     name="merchantCategoryCode"
                     className="form-select"
                     onChange={onChangeHandel}
@@ -242,7 +242,7 @@ const onClickClose=()=>{
                 </div>
                 <div className="col">
                   <select
-                    style={{ height: '40px', fontSize: '14px' }}
+                    style={{ height: "40px", fontSize: "14px" }}
                     name="product"
                     onChange={onChangeHandel}
                     value={onboardingFormData.product}
@@ -272,7 +272,7 @@ const onClickClose=()=>{
                 </div>
                 <div className="col">
                   <select
-                    style={{ height: '40px', fontSize: '14px' }}
+                    style={{ height: "40px", fontSize: "14px" }}
                     name="txcNegotiatedMDR"
                     id="txcNegotiatedMDR"
                     className="form-select"
@@ -301,11 +301,11 @@ const onClickClose=()=>{
                     name="promoCode"
                     onChange={onChangeHandel}
                     value={onboardingFormData.promoCode}
-                  />{' '}
+                  />{" "}
                   <span
-                    class={styles.tool}
+                    className={styles.tool}
                     data-tip="Promo code should start with PROMO- e.g. PROMO-ONE."
-                    tabindex="1"
+                    tabIndex="1"
                   >
                     <BsInfoCircle />
                   </span>
@@ -410,7 +410,7 @@ const onClickClose=()=>{
               <div className="row">
                 <div className="col">
                   <label htmlFor="name" className="col-form-label">
-                    Account Number{' '}
+                    Account Number{" "}
                   </label>
                 </div>
                 <div className="col">
@@ -442,9 +442,9 @@ const onClickClose=()=>{
                     onChange={onChangeHandel}
                   />
                   {/* <span
-                    class={styles.tool}
+                    className={styles.tool}
                     data-tip="Bank code should start with B e.g. B2010003."
-                    tabindex="1"
+                    tabIndex="1"
                   >
                     <span className={styles.hoverMsg}>
                       {' '}
@@ -459,7 +459,7 @@ const onClickClose=()=>{
             <span className={styles.floatingD}>d. POS Terminal Details:</span>
             <div className={`${styles.placeInputsNames}`}>
               <div className="row">
-                <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                <span style={{ fontSize: "14px", fontWeight: "bold" }}>
                   {/* Merchant's Bank Details: */}
                 </span>
                 <div className="col">
@@ -478,19 +478,19 @@ const onClickClose=()=>{
                     value={onboardingFormData.numberOfPOSTerminalsRequired}
                   />
                   <span
-                    class={styles.tool}
+                    className={styles.tool}
                     data-tip=" number should be numeric e.g. 9X"
-                    tabindex="1"
+                    tabIndex="1"
                   >
                     <span className={styles.hoverMsg}>
-                      {' '}
-                      <BsInfoCircle />{' '}
+                      {" "}
+                      <BsInfoCircle />{" "}
                     </span>
                   </span>
                 </div>
               </div>
               <div className="row">
-                <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                <span style={{ fontSize: "14px", fontWeight: "bold" }}>
                   {/* Merchant's Bank Details: */}
                 </span>
                 <div className="col">
@@ -527,13 +527,13 @@ const onClickClose=()=>{
                     value={onboardingFormData.securityDeposits}
                   />
                   <span
-                    class={styles.tool}
+                    className={styles.tool}
                     data-tip="Number of deposits should start a number e.g. 12."
-                    tabindex="1"
+                    tabIndex="1"
                   >
                     <span className={styles.hoverMsg}>
-                      {' '}
-                      <BsInfoCircle />{' '}
+                      {" "}
+                      <BsInfoCircle />{" "}
                     </span>
                   </span>
                 </div>
@@ -557,7 +557,7 @@ const onClickClose=()=>{
                     type="radio"
                     name="isContractSigned"
                     value="NO"
-                    style={{ marginLeft: '10px' }}
+                    style={{ marginLeft: "10px" }}
                     onChange={onChangeHandel}
                   />
                   &nbsp;No
@@ -581,7 +581,7 @@ const onClickClose=()=>{
                     type="radio"
                     name="kycStatus"
                     value="NO"
-                    style={{ marginLeft: '10px' }}
+                    style={{ marginLeft: "10px" }}
                     onChange={onChangeHandel}
                   />
                   &nbsp;Not Completed
@@ -596,10 +596,10 @@ const onClickClose=()=>{
           would be chosen as per business need.
         </p>
         <div className="col-md-12 mt-4 d-flex justify-content-center align-items-center">
-          {props.roleId === 'Agg2' ||
-          props.roleId === 'CAcct' ||
-          props.roleId === 'EDI' ||
-          props.roleId === 'AP' ? (
+          {props.roleId === "Agg2" ||
+          props.roleId === "CAcct" ||
+          props.roleId === "EDI" ||
+          props.roleId === "AP" ? (
             <button
               type="button"
               className="btn btn-outline-success bt1"
@@ -622,7 +622,7 @@ const onClickClose=()=>{
             Cancel
           </button>
           {roleMsg ? (
-            <p style={{ color: 'red', textAlign: 'center' }}>
+            <p style={{ color: "red", textAlign: "center" }}>
               Select the Role*
             </p>
           ) : null}
@@ -639,38 +639,45 @@ const onClickClose=()=>{
         />
       ) : null}
 
-    {
-      summaryState &&  <div className="blur">
-      <div className="modalDemo">
-        <span
-          className="cross"
-          onClick={onClickClose}
-          style={{ fontSize: "20px" }}
-        >
-          ✖
-        </span>
-        <div className="modalHeader">
-          <h4>Confirm Details</h4>
+      {summaryState && (
+        <div className="blur">
+          <div className="modalDemo">
+            <span
+              className="cross"
+              onClick={onClickClose}
+              style={{ fontSize: "20px" }}
+            >
+              ✖
+            </span>
+            <div className="modalHeader">
+              <h4>Confirm Details</h4>
+            </div>
+            <hr />
+            <div className="modalBody">
+              <h5>
+                By confirming this details you are about to add a new
+                organisation to the network.
+              </h5>
+            </div>
+            <hr />
+            <div className="modalFooter">
+              <button onClick={onClickContinue} className="btn btn-primary">
+                Confirm
+              </button>
+              <button
+                onClick={onClickClose}
+                style={{ marginRight: "10px" }}
+                className="btn btn-outline-danger"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
-        <hr />
-        <div className="modalBody">
-          <h5>By confirming this details you are about to add a new organisation to the network.</h5>
-        </div>
-        <hr />
-        <div className="modalFooter">
-        <button onClick={onClickContinue}  className="btn btn-primary">
-            Confirm
-          </button>
-          <button onClick={onClickClose} style={{ marginRight:'10px'}} className="btn btn-outline-danger">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-    }
+      )}
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Onboard
+export default Onboard;
