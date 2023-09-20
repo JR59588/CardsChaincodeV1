@@ -4,42 +4,63 @@
     "ccpPath": "ccpPathOrg1",
     "walletOrg": "walletorg1",
     "clientMSPId": "Org1MSP",
-    "userWallet": "appUSERForOrg1",
+    "userWallet": "appUSER3ForOrg1",
     "admin": "admin"
   },
   "Org2": {
     "connectionPath": "./connection-org2.json",
     "walletOrg": "walletorg2",
     "clientMSPId": "Org2MSP",
-    "userWallet": "appUSERForOrg2",
+    "userWallet": "appUSER3ForOrg2",
     "admin": "admin"
   },
   "ACD": {
     "connectionPath": "./connection-ACD.json",
     "walletOrg": "wallet3ACD",
     "clientMSPId": "ACDMSP",
-    "userWallet": "appUSERForACD",
+    "userWallet": "appUSER3ForACD",
     "admin": "admin"
   },
   "AOD": {
     "connectionPath": "./connection-AOD.json",
     "walletOrg": "wallet4AOD",
     "clientMSPId": "AODMSP",
-    "userWallet": "appUSERForAOD",
+    "userWallet": "appUSER3ForAOD",
     "admin": "admin"
   },
   "AAD": {
     "connectionPath": "./connection-AAD.json",
     "walletOrg": "wallet5AAD",
     "clientMSPId": "AADMSP",
-    "userWallet": "appUSERForAAD",
+    "userWallet": "appUSER3ForAAD",
     "admin": "admin"
   },
   "PSP": {
     "connectionPath": "./connection-PSP.json",
     "walletOrg": "wallet5PSP",
     "clientMSPId": "PSPMSP",
-    "userWallet": "appUSERForPSP",
+    "userWallet": "appUSER3ForPSP",
+    "admin": "admin"
+  },
+  "HON202": {
+    "connectionPath": "./connection-HON202",
+    "walletOrg": "walletHON202",
+    "clientMSPId": "HON202MSP",
+    "userWallet": "appUserForHON202",
+    "admin": "admin"
+  },
+  "JAG30": {
+    "connectionPath": "./connection-JAG30",
+    "walletOrg": "walletJAG30",
+    "clientMSPId": "JAG30MSP",
+    "userWallet": "appUserForJAG30",
+    "admin": "admin"
+  },
+  "KNG50": {
+    "connectionPath": "./connection-KNG50",
+    "walletOrg": "walletKNG50",
+    "clientMSPId": "KNG50MSP",
+    "userWallet": "appUserForKNG50",
     "admin": "admin"
   }
 }

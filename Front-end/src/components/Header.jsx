@@ -5,11 +5,15 @@ import { useState } from "react";
 import { useEffect } from "react";
 import pdf from "../assets/Admin_User_guide.pdf";
 
-const Header = ({ roleId, setRoleId }) => {
+const Header = ({ roleId, setRoleId, orgOptions }) => {
   return (
     <nav
       className="navbar navbar-expand-lg"
-      style={{ height: "70px", backgroundColor: "#1fa1f8", color: "white" }}
+      style={{
+        height: "70px",
+        backgroundColor: "rgb(7, 78, 125)",
+        color: "white",
+      }}
     >
       <div className="container-fluid" style={{ color: "white" }}>
         <a className="navbar-brand" href="#" style={{ color: "white" }}>
@@ -122,7 +126,17 @@ const Header = ({ roleId, setRoleId }) => {
                 value={roleId}
                 onChange={(event) => setRoleId(event.target.value)}
               >
-                <option value="AP" id="AP" className="dropdown-item">
+                {orgOptions.map((orgOption, index) => (
+                  <option
+                    value={orgOption.orgId}
+                    id={orgOption.orgId}
+                    key={"org" + index}
+                    className="dropdown-item"
+                  >
+                    {orgOption.orgName}
+                  </option>
+                ))}
+                {/* <option value="AP" id="AP" className="dropdown-item">
                   Select Role
                 </option>
                 <option value="Org1" id="Org1" className="dropdown-item">
@@ -142,7 +156,7 @@ const Header = ({ roleId, setRoleId }) => {
                 </option>
                 <option value="AOD" id="AOD" className="dropdown-item">
                   Acquirer Operations Department
-                </option>
+                </option> */}
               </select>
             </div>
           </div>

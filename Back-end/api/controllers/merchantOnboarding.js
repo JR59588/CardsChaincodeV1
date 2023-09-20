@@ -3,13 +3,16 @@ var logger = require("../../logger");
 const express = require("express");
 const bodyParser = require("body-parser");
 const data = require("./data.json");
+const enrollAdmin = require("../../enrollAdmin");
+const registerUser = require("../../registerUser");
+const { exec } = require('child_process');
+const path = require('path');
 const app = express();
 const fs = require('fs');
 app.use(bodyParser.json());
 
 // Setting for Hyperledger Fabric
 const { Wallets, Gateway } = require("fabric-network");
-const path = require("path");
 const channelName = "channel1";
 const contractName = "onboardingMerchantC";
 
@@ -319,6 +322,22 @@ const addOrgToDatabase = (req, res) => {
 
 }
 
+const saveConnectionDetails = (org) => {
+  const jsonStr = fs.readFileSync(path.join(__dirname, "data.json"));
+  const jsonObj = JSON.parse(jsonStr);
+  jsonObj[org] = {
+    connectionPath: "./connection-" + org + ".json",
+    walletOrg: "wallet" + org,
+    clientMSPId: org + "MSP",
+    userWallet: "appUserFor" + org,
+    admin: "admin"
+  }
+  const connectionFilePath = path.join(__dirname, "..", "..", "..", "..", "HLF-Cards", "hlf-cards", "organizations", "peerOrganizations", org + ".hlfcards.com", "connection-" + org + ".json");
+  const connectionDetails = fs.readFileSync(connectionFilePath);
+  fs.writeFileSync(path.join(__dirname, "..", "..", "connection-" + org + ".json"), connectionDetails);
+  fs.writeFileSync(path.join(__dirname, "data.json"), JSON.stringify(jsonObj));
+}
+
 exports.saveOBMerchantSummary = async function (req, res) {
   const channelName = "channel1";
   const contractName = "onboardingMerchantC";
@@ -415,8 +434,7 @@ exports.saveOBMerchantSummary = async function (req, res) {
     await module.exports.savePvAADMetaData(req, res);
     await module.exports.savePvAADAODMetaData(req, res);
     await module.exports.savePvAODMetaData(req, res);
-    await orgAddition(req, res);
-
+    orgAddition(req, res);
 
     res.status(200).json({
       success: true,
@@ -433,46 +451,58 @@ exports.saveOBMerchantSummary = async function (req, res) {
 };
 
 
-const orgAddition = async function (req, res) {
+const orgAddition = function (req, res) {
   console.log("req.body: ", req.body);
   const orgName = req.body.merchantID;
   if (orgName !== undefined) {
-    console.log("Adding organization ", req.body.merchantID);
+    try {
+      console.log("Adding organization ", req.body.merchantID);
 
-    const { exec } = require('child_process');
-    const path = require('path');
 
-    //Path to your Bash script.
-    const bashScriptPath = path.join(__dirname, '..', '..', '..', '..', 'HLF-Cards', 'hlf-cards', 'generate.sh');
 
-    // Get the directory where the Bash script resides.
-    const scriptDirectory = path.dirname(bashScriptPath);
+      //Path to your Bash script.
+      const bashScriptPath = path.join(__dirname, '..', '..', '..', '..', 'HLF-Cards', 'hlf-cards', 'generate.sh');
 
-    // Define the arguments to pass to the Bash script.
-    const jsonStr = fs.readFileSync(path.join(__dirname, "..", "newOrgVars.json"));
-    const jsonObj = JSON.parse(jsonStr);
+      // Get the directory where the Bash script resides.
+      const scriptDirectory = path.dirname(bashScriptPath);
 
-    const nextValue = jsonObj.currentValue + 2;
-    const nextGlobal = jsonObj.currentGlobal + 1;
+      // Define the arguments to pass to the Bash script.
+      const jsonStr = fs.readFileSync(path.join(__dirname, "..", "newOrgVars.json"));
+      const jsonObj = JSON.parse(jsonStr);
 
-    const scriptArguments = ['ACD', orgName, '15051', '15052', '15054', '10084', nextValue + '051', nextValue + '052', nextValue + '054', nextValue + '084', nextGlobal + '', '5'];
+      const nextValue = jsonObj.currentValue + 2;
+      const nextGlobal = jsonObj.currentGlobal + 1;
 
-    // Create a command string that includes the Bash script path and its arguments.
-    const command = `bash ${bashScriptPath} ${scriptArguments.join(' ')}`;
+      const scriptArguments = ['ACD', orgName, '15051', '15052', '15054', '10084', nextValue + '051', nextValue + '052', nextValue + '054', nextValue + '084', nextGlobal + '', '5'];
 
-    // Run the Bash script using exec with the CWD option set to the script's directory.
-    exec(command, { cwd: scriptDirectory }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error executing Bash script: ${error}`);
-        throw new Error(error);
-      }
-      console.log(`Bash script output: ${stdout}`);
-      console.error(`Bash script errors: ${stderr}`);
-      jsonObj.currentValue = nextValue;
-      jsonObj.currentGlobal = nextGlobal;
-      fs.writeFileSync(path.join(__dirname, "..", "newOrgVars.json"), JSON.stringify(jsonObj));
-      // res.status(200).send('Organization added succesfully');
-    });
+      // Create a command string that includes the Bash script path and its arguments.
+      const command = `bash ${bashScriptPath} ${scriptArguments.join(' ')}`;
+
+      // Run the Bash script using exec with the CWD option set to the script's directory.
+      exec(command, { cwd: scriptDirectory }, (error, stdout, stderr) => {
+        console.log(`Bash script output: ${stdout}`);
+        console.error(`Bash script errors: ${stderr}`);
+        if (error) {
+          console.error(`Error executing Bash script: ${error}`);
+          throw new Error(error);
+        }
+        console.log(`Bash script output: ${stdout}`);
+        console.error(`Bash script errors: ${stderr}`);
+        jsonObj.currentValue = nextValue;
+        jsonObj.currentGlobal = nextGlobal;
+        fs.writeFileSync(path.join(__dirname, "..", "newOrgVars.json"), JSON.stringify(jsonObj));
+        // res.status(200).send('Organization added succesfully');
+
+        //saving connection details and enrolling users for future request settlement tx's.
+        saveConnectionDetails(req.body.merchantID);
+        console.log("Merchant ID is: ", req.body.merchantID);
+        enrollAdmin(req.body.merchantID);
+        registerUser(req.body.merchantID);
+      });
+    } catch (error) {
+      console.log("Error while adding organization to network (orgAddition): ", error);
+      throw new Error(error);
+    }
   } else {
     throw new Error("Orgnaization name not found!");
   }

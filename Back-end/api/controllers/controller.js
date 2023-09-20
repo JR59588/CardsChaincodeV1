@@ -150,6 +150,21 @@ exports.requestSettlementTx = async function (req, res) {
   }
 };
 
+exports.getOrgs = async function (req, res) {
+  try {
+    const jsonStr = fs.readFileSync(path.resolve(__dirname, "..", "orgsAdded.json"));
+    const jsonObj = JSON.parse(jsonStr);
+
+    res.status(200).json(jsonObj);
+  } catch (error) {
+    console.log("Error when reading organizations data: ", error);
+    res.status(500).json({
+      message: "There was an error fetching organization data"
+    });
+  }
+
+}
+
 function getChannelName(mode, MSPId) {
   //14.02.23 todo: this logic has to be completed
   var chName;

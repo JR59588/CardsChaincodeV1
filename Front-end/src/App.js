@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 import { Routes } from 'react-router-dom'
@@ -14,12 +14,31 @@ import SubmitTx from './components/Submit_Tx/SubmitTx'
 import NewViewOnboardingStatic from './components/ViewOnboardingStatic/NewViewOnboardingStatic'
 import ViewTx from './components/ViewTx'
 import socketIOClient from 'socket.io-client';
+import axios from 'axios'
 const IP = 'localhost'
 const ENDPOINT = 'http://localhost:3001';
 
 function App() {
   //storing the roleId...
   const [roleId, setRoleId] = useState('Org1')
+  const [orgOptions, setOrgOptions] = useState([]);
+
+  function fetchOrganizationData() {
+    axios
+      .get(
+        `http://${IP}:3001/api/v1/getOrgs`
+      )
+      .then((response) => {
+        setOrgOptions([...response.data.orgs]);
+      })
+      .catch((err) => {
+        console.log("Error fetching organization data: ", err);
+      });
+  }
+
+  useEffect(() => {
+    fetchOrganizationData();
+  }, []);
 
   const getRoleFromFile = (roleState) => {
     console.log('app', roleState)
@@ -28,7 +47,7 @@ function App() {
 
   return (
     <div>
-      <Header roleId={roleId} setRoleId={setRoleId} />
+      <Header roleId={roleId} setRoleId={setRoleId} orgOptions={orgOptions} />
       <Routes>
         <Route
           path="/Merchant"
@@ -43,11 +62,11 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route
           path="/Aggregator"
-          element={<Onboard roleId={roleId} IP={IP} />}
+          element={<Onboard roleId={roleId} IP={IP} fetchOrganizationData={fetchOrganizationData} />}
         />
         <Route
           path="/Onboard"
-          element={<Onboard roleId={roleId} IP={IP} />}
+          element={<Onboard roleId={roleId} IP={IP} fetchOrganizationData={fetchOrganizationData} />}
         />
         <Route
           path="/FileComponent"

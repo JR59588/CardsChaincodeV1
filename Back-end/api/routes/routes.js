@@ -9,6 +9,12 @@ module.exports = function (app) {
 
   app
 
+    .route("/api/v1/getOrgs")
+
+    .get(controller.getOrgs);
+
+  app
+
     .route("/api/v1/merchantTx")
 
     .post(controller.requestSettlementTx); //merchant App

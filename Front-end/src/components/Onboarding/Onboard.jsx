@@ -94,7 +94,7 @@ const Onboard = (props) => {
         .then((response) => {
           console.log(response);
           setLoading(false);
-
+          props.fetchOrganizationData();
           setModal(true);
         })
 

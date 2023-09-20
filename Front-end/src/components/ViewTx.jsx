@@ -86,14 +86,13 @@ const ViewTx = (props) => {
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT);
     socket.on("status-change", (response) => {
-      
       setDataMixed((dataMixed) => {
-        console.log(
-          "inside use effect status change - viewtx.js",
-          response,
-          response.data.join("-")
-        );
-        console.log("Data mixed: ", dataMixed);
+        // console.log(
+        //   "inside use effect status change - viewtx.js",
+        //   response,
+        //   response.data.join("-")
+        // );
+        // console.log("Data mixed: ", dataMixed);
         const key = response.data.join("-");
         const newDataMixed = dataMixed.map((item) => {
           if (item.Key == key) {
@@ -296,7 +295,7 @@ const ViewTx = (props) => {
   let localDate;
   const dateFunc = (timestamp) => {
     // const actualTime = timestamp.substring(0, 10);
-    let datetime = new Date(Date.parse(timestamp))//new Date(actualTime * 1000);
+    let datetime = new Date(Date.parse(timestamp)); //new Date(actualTime * 1000);
     localDate = datetime.toDateString();
     return localDate;
   };
@@ -305,7 +304,7 @@ const ViewTx = (props) => {
   let UTC;
   const timeFunc = (timestamp) => {
     // const actualTime = timestamp.substring(0, 10);
-    let datetime = new Date(Date.parse(timestamp))//new Date(actualTime * 1000);
+    let datetime = new Date(Date.parse(timestamp)); //new Date(actualTime * 1000);
     const timeUT = datetime.toLocaleTimeString();
     // UTC = timeUT.substring(0, 12);
     return timeUT;
@@ -358,7 +357,6 @@ const ViewTx = (props) => {
         }
       });
   };
- 
 
   const getAlertState = (state) => {
     setAlertState(state);
