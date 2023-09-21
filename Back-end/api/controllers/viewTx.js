@@ -49,6 +49,10 @@ exports.GetTxByRange = async function (req, res) {
   const contractName = "PYMTUtilsCC";
   try {
     let org = req.params.roleId;
+    const dataStr = fs.readFileSync(path.join(__dirname, "data.json"));
+    console.log(dataStr);
+    const data = JSON.parse(dataStr);
+    console.log(data);
     if (!data[org]) {
       res.status(400).send("Error!. Invalid role name");
     }

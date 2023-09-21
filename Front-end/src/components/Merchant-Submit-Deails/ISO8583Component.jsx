@@ -55,7 +55,7 @@ const ISO8583Component = (props) => {
       console.log(txFormData);
       setRoleMsg(false);
       axios
-        .post(settlementRequest_URL, txFormData, {
+        .post(settlementRequest_URL, {...txFormData, roleId: "Org1"}, {
           header: { "Content-Type": "application/json" },
         })
         .then((response) => {

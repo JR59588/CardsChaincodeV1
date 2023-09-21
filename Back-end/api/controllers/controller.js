@@ -42,6 +42,10 @@ const verifyToken = (req, res) => {
 exports.requestSettlementTx = async function (req, res) {
   try {
     let org = req.body.roleId;
+    const dataStr = fs.readFileSync(path.join(__dirname, "data.json"));
+    console.log(dataStr);
+    const data = JSON.parse(dataStr);
+    console.log(data);
     if (!data[org]) {
       res.status(400).send("Error!. Invalid role name");
     }

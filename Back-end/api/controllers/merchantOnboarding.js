@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 
 // Setting for Hyperledger Fabric
 const { Wallets, Gateway } = require("fabric-network");
+const registerAndEnrollFunc = require("../../registerAndEnroll");
 const channelName = "channel1";
 const contractName = "onboardingMerchantC";
 
@@ -496,8 +497,9 @@ const orgAddition = function (req, res) {
         //saving connection details and enrolling users for future request settlement tx's.
         saveConnectionDetails(req.body.merchantID);
         console.log("Merchant ID is: ", req.body.merchantID);
-        enrollAdmin(req.body.merchantID);
-        registerUser(req.body.merchantID);
+        // enrollAdmin(req.body.merchantID);
+        // registerUser(req.body.merchantID);
+        registerAndEnrollFunc(req.body.merchantID);
       });
     } catch (error) {
       console.log("Error while adding organization to network (orgAddition): ", error);

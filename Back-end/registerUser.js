@@ -12,33 +12,33 @@ const path = require("path");
 
 
 async function registerUserFunc(org) {
-  const dataStr = fs.readFileSync("./api/controllers/data.json");
-  const db = JSON.parse(dataStr);
+  const userDataStr = fs.readFileSync("./api/controllers/data.json");
+  const dbUser = JSON.parse(userDataStr);
   console.log("org name register: ", org);
   try {
-    const connectionPath = db[org].connectionPath;
+    const userConnectionPath = dbUser[org].userConnectionPath;
 
-    const ccpPath = path.resolve(connectionPath);
+    const userCcpPath = path.resolve(userConnectionPath);
     // load the network configuration
 
-    console.log("-----ccppath-----", ccpPath);
+    console.log("-----userCcpPath-----", userCcpPath);
 
-    let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+    let userCcp = JSON.parse(fs.readFileSync(userCcpPath, "utf8"));
 
     // Create a new CA client for interacting with the CA.
 
-    const caURL = ccp.certificateAuthorities["ca_" + org].url;
+    const userCaUrl = userCcp.certificateAuthorities["ca_" + org].url;
 
-    const ca = new FabricCAServices(caURL);
+    const userCa = new FabricCAServices(userCaUrl);
 
-    console.log("-----ccp-----", ccp);
+    console.log("-----userCcp-----", userCcp);
 
-    console.log("-----caURL-----", caURL);
+    console.log("-----userCaUrl-----", userCaUrl);
 
     // Create a new file system based wallet for managing identities.
 
     // const walletPath = path.join(process.cwd(), "wallet");
-    const walletPath = path.join(process.cwd(), db[org].walletOrg);
+    const walletPath = path.join(process.cwd(), dbUser[org].walletOrg);
 
     const wallet = await Wallets.newFileSystemWallet(walletPath);
 
@@ -46,23 +46,23 @@ async function registerUserFunc(org) {
 
     // Check to see if we've already enrolled the user.
 
-    const userIdentity = await wallet.get(db[org].userWallet);
+    const userIdentity = await wallet.get(dbUser[org].userWallet);
 
     if (userIdentity) {
       console.log(
-        `An identity for the user ${db[org].userWallet} already exists in the wallet`
+        `An identity for the user ${dbUser[org].userWallet} already exists in the wallet`
       );
 
       return;
     }
 
-    // Check to see if we've already enrolled the db[org].admin user.
+    // Check to see if we've already enrolled the dbUser[org].admin user.
 
-    const adminIdentity = await wallet.get(db[org].admin);
+    const adminIdentity = await wallet.get(dbUser[org].admin);
 
     if (!adminIdentity) {
       console.log(
-        `An identity for the admin user ${db[org].admin} does not exist in the wallet`
+        `An identity for the admin user ${dbUser[org].admin} does not exist in the wallet`
       );
 
       console.log("Run the enrollAdmin.js application before retrying");
@@ -76,22 +76,22 @@ async function registerUserFunc(org) {
       .getProviderRegistry()
       .getProvider(adminIdentity.type);
 
-    const adminUser = await provider.getUserContext(adminIdentity, db[org].admin);
+    const adminUser = await provider.getUserContext(adminIdentity, dbUser[org].admin);
 
     // Register the user, enroll the user, and import the new identity into the wallet.
 
-    const secret = await ca.register(
+    const secret = await userCa.register(
       {
 
-        enrollmentID: db[org].userWallet,
+        enrollmentID: dbUser[org].userWallet,
 
         role: "client",
       },
       adminUser
     );
 
-    const enrollment = await ca.enroll({
-      enrollmentID: db[org].userWallet,
+    const enrollment = await userCa.enroll({
+      enrollmentID: dbUser[org].userWallet,
 
       enrollmentSecret: secret,
     });
@@ -103,18 +103,18 @@ async function registerUserFunc(org) {
         privateKey: enrollment.key.toBytes(),
       },
 
-      mspId: db[org].clientMSPId,
+      mspId: dbUser[org].clientMSPId,
 
       type: "X.509",
     };
 
-    await wallet.put(db[org].userWallet, x509Identity);
+    await wallet.put(dbUser[org].userWallet, x509Identity);
 
     console.log(
-      `Successfully registered and enrolled db[org].admin user ${db[org].userWallet} and imported it into the wallet`
+      `Successfully registered and enrolled dbUser[org].admin user ${dbUser[org].userWallet} and imported it into the wallet`
     );
   } catch (error) {
-    console.error(`Failed to register user ${db[org].userWallet}: ${error}`);
+    console.error(`Failed to register user ${dbUser[org].userWallet}: ${error}`);
 
     process.exit(1);
   }
