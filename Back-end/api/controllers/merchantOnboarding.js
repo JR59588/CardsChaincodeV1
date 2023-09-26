@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 // Setting for Hyperledger Fabric
 const { Wallets, Gateway } = require("fabric-network");
 const registerAndEnrollFunc = require("../../registerAndEnroll");
+const { transactionVerification } = require("./utils");
 const channelName = "channel1";
 const contractName = "onboardingMerchantC";
 
@@ -444,7 +445,7 @@ exports.saveOBMerchantSummary = async function (req, res) {
   } catch (error) {
     console.log(`Failed to submit transaction: ${error}`);
     // console.error(`Failed to submit transaction: ${error}`);
-    return res.status(401).json({
+    return res.status(400).json({
       success: false,
       message: "Error" + error,
     });
@@ -893,3 +894,106 @@ exports.verifyClearTx = async function (req, res) {
   }
 };
 
+exports.verifySubmitTxUtils = async function (req, res) {
+  const { roleId, merchantId, customerId, loanReferenceNumber } = req.body;
+
+  if (!(roleId && merchantId && customerId && loanReferenceNumber)) {
+    res.status(400).json({
+      success: false,
+      message: `Ensure to provide valid request parameters for verifying submit tx`
+    });
+  }
+  const { error, result } = await transactionVerification(roleId, channelName, "SubmitSettlementTxCC", "submitSettlementTx", [merchantId, customerId, loanReferenceNumber]);
+
+  if (error) {
+    console.log(`verify submit tx error: ${error}`)
+    res.status(400).json({
+      success: false,
+      message: `Error in submit tx verification ${error}`
+    });
+  } else {
+    console.log(`verify submit tx result: ${result}`);
+    res.status(200).json({
+      success: true,
+      message: `Successfully invoked submit tx verification`
+    });
+  }
+}
+
+exports.verifyAuthorizeTxUtils = async function (req, res) {
+  const { roleId, merchantId, customerId, loanReferenceNumber } = req.body;
+
+  if (!(roleId && merchantId && customerId && loanReferenceNumber)) {
+    res.status(400).json({
+      success: false,
+      message: `Ensure to provide valid request parameters for verifying authorize tx`
+    });
+  }
+  const { error, result } = await transactionVerification(roleId, channelName, "AuthorizeSettlementTxCC", "authorizeSettlementTx", [merchantId, customerId, loanReferenceNumber]);
+
+  if (error) {
+    console.log(`verify authorize tx error: ${error}`)
+    res.status(400).json({
+      success: false,
+      message: `Error in authorize tx verification ${error}`
+    });
+  } else {
+    console.log(`verify authorize tx result: ${result}`);
+    res.status(200).json({
+      success: true,
+      message: `Successfully invoked authorize tx verification`
+    });
+  }
+}
+
+exports.verifyBalanceTxUtils = async function (req, res) {
+  const { roleId, merchantId, customerId, loanReferenceNumber } = req.body;
+
+  if (!(roleId && merchantId && customerId && loanReferenceNumber)) {
+    res.status(400).json({
+      success: false,
+      message: `Ensure to provide valid request parameters for verifying balance tx`
+    });
+  }
+  const { error, result } = await transactionVerification(roleId, channelName, "BalanceSettlementTxCC", "balanceSettlementTx", [merchantId, customerId, loanReferenceNumber]);
+
+  if (error) {
+    console.log(`verify balance tx error: ${error}`)
+    res.status(400).json({
+      success: false,
+      message: `Error in balance tx verification ${error}`
+    });
+  } else {
+    console.log(`verify balance tx result: ${result}`);
+    res.status(200).json({
+      success: true,
+      message: `Successfully invoked balance tx verification`
+    });
+  }
+}
+
+exports.verifyClearTxUtils = async function (req, res) {
+  const { roleId, merchantId, customerId, loanReferenceNumber } = req.body;
+
+  if (!(roleId && merchantId && customerId && loanReferenceNumber)) {
+    res.status(400).json({
+      success: false,
+      message: `Ensure to provide valid request parameters for verifying clear tx`
+    });
+  }
+  const { error, result } = await transactionVerification(roleId, channelName, "ClearSettlementTxCC", "clearSettlementTx", [merchantId, customerId, loanReferenceNumber]);
+
+  if (error) {
+    console.log(`verify clear tx error: ${error}`)
+    res.status(400).json({
+      success: false,
+      message: `Error in clear tx verification ${error}`
+    });
+  } else {
+    console.log(`verify clear tx result: ${result}`);
+    res.status(200).json({
+      success: true,
+      message: `Successfully invoked clear tx verification`
+    });
+  }
+}

@@ -42,7 +42,7 @@ const ViewTx = (props) => {
   const retrieveOBMerchantData_URL = `http://${IP}:3001/api/v1/retrieveOBMerchantData`;
   const retrievePvCustomerMetaData_URL = `http://${IP}:3001/api/v1/retrievePvCustomerMetaData`;
   //storing the combined response of getTxByRange & retrivePvMerchantData(only aggId) from response.
-  const [dataMixed, setDataMixed] = useState([]);
+  const [transactionsData, setTransactionsData] = useState([]);
 
   //storing merged responses for Merchant Details pop-up
   const [mergedMerchantData, setMergedMerchantData] = useState([]);
@@ -60,7 +60,7 @@ const ViewTx = (props) => {
   const [crId, setCrId] = useState("");
 
   //refresh the screen on verify button
-  const [refresh, setRefresh] = useState(false);
+  // const [refresh, setRefresh] = useState(false);
 
   //loading
   const [loading, setLoading] = useState(false);
@@ -86,15 +86,15 @@ const ViewTx = (props) => {
   useEffect(() => {
     const socket = socketIOClient(ENDPOINT);
     socket.on("status-change", (response) => {
-      setDataMixed((dataMixed) => {
+      setTransactionsData((transactionsData) => {
         // console.log(
         //   "inside use effect status change - viewtx.js",
         //   response,
         //   response.data.join("-")
         // );
-        // console.log("Data mixed: ", dataMixed);
+        // console.log("Data mixed: ", transactionsData);
         const key = response.data.join("-");
-        const newDataMixed = dataMixed.map((item) => {
+        const newDataMixed = transactionsData.map((item) => {
           if (item.Key == key) {
             item.Record.TxStatus = response.status;
           }
@@ -110,80 +110,39 @@ const ViewTx = (props) => {
     };
   }, []);
 
+  const orderFunc = (timestamp) => {
+    const actualTime = timestamp.substring(0, 10);
+    let datetime = new Date(actualTime * 1000);
+    const timeUT = datetime.toTimeString();
+    let UTC = timeUT.substring(0, 8);
+    localDate = datetime.toDateString();
+    return localDate + " " + UTC;
+  };
   //side Effect for loading and mixing GetTxByRange and Pvdmerchat data
   useEffect(() => {
-    setLoading(false);
-    setRefresh(false);
-    setRecords(false);
-    let merchantData = "";
-    let timer;
+    // setRefresh(false);
+    // setRecords(false);
     if (updatedRoleId.length !== 0) {
       const fetchData = async () => {
         try {
+          setLoading(true);
           const allData = await axios.get(
             `${GetTxByRange_URL}/${updatedRoleId}`
           );
           if (allData.data.response.length === 0) {
             setRecords(true);
           }
-          // const mixed = [];
-          // const getMerchantData = async () => {
-          //   for (let i = 0; i < allData.data.response.length; i++) {
-          //     let isauthorized = true;
-          //     try {
-          //       merchantData = await axios.get(
-          //         `${retrieveOBMerchantData_URL}/${allData.data.response[i].Record.MerchantId}/${updatedRoleId}`
-          //       );
-          //       console.log(
-          //         "merchantdata in forloop 65",
-          //         merchantData,
-          //         isauthorized
-          //       );
-          //     } catch (error) {
-          //       console.log("error from merchantdata--61", error);
-          //       if (error.response.status === 401) {
-          //         isauthorized = false;
-          //       }
-          //     }
-          //     mixed.push({
-          //       ...allData.data.response[i],
-          //       aggId: isauthorized
-          //         ? merchantData.data.response.aggID
-          //         : UNAUTHORIZED,
-          //     });
-          //   }
-          //   return mixed;
-          // };
-          // const mixedDetails = await getMerchantData();
-          // let size = Object.keys(mixedDetails).length;
-          // if (size === 0) {
-          //   setRecords(true);
-          // }
-          //for sorting---
-          let mixedDate;
-          const orderFunc = (timestamp) => {
-            const actualTime = timestamp.substring(0, 10);
-            let datetime = new Date(actualTime * 1000);
-            const timeUT = datetime.toTimeString();
-            let UTC = timeUT.substring(0, 8);
-            localDate = datetime.toDateString();
-            mixedDate = localDate + " " + UTC;
-            return mixedDate;
-          };
-          let forSorting = [];
-          for (let i = 0; i < allData.data.response.length; i++) {
-            forSorting.push({
-              ...allData.data.response[i],
-              timestamp: orderFunc(allData.data.response[i].Record.txTimestamp),
-              CID: allData.data.response[i].Record.CustomerID,
-            });
-          }
-          timer = setTimeout(() => {
-            setLoading(true);
-            setDataMixed(forSorting);
-            // setDataMixed(allData.data.response);
-          }, 2000);
+          const viewTxData = allData.data.response.map((item) => {
+            return {
+              ...item,
+              timestamp: orderFunc(item.Record.txTimestamp),
+              CID: item.Record.CustomerID,
+            };
+          });
+          setTransactionsData(viewTxData);
+          setLoading(false);
         } catch (error) {
+          setLoading(false);
           console.log(error);
           if (!error?.allData) {
             console.log("No Server Response");
@@ -198,8 +157,7 @@ const ViewTx = (props) => {
       };
       fetchData();
     }
-    return () => clearTimeout(timer);
-  }, [updatedRoleId, refresh]);
+  }, [updatedRoleId]);
   //Modifying txId
   const txIdModify = (id) => {
     let modifiedTxId = id.slice(1, 5) + "......" + id.slice(59, 64);
@@ -215,7 +173,9 @@ const ViewTx = (props) => {
         const res1 = await axios.get(
           `${retrieveOBMerchantData_URL}/${id}/CAcct`
         );
-        const res2 = dataMixed.find((item) => item.Record.MerchantId === id);
+        const res2 = transactionsData.find(
+          (item) => item.Record.MerchantId === id
+        );
         //setting the combined response in data for Main table.
         setAuthorization(true);
         console.log("res1 data 137-", res1);
@@ -234,7 +194,9 @@ const ViewTx = (props) => {
         const res1 = await axios.get(
           `${retrieveOBMerchantData_URL}/${id}/${updatedRoleId}`
         );
-        const res2 = dataMixed.find((item) => item.Record.MerchantId === id);
+        const res2 = transactionsData.find(
+          (item) => item.Record.MerchantId === id
+        );
         //setting the combined response in data for Main table.
         setAuthorization(true);
         console.log("res1 data 186-", res1);
@@ -262,7 +224,7 @@ const ViewTx = (props) => {
       //console.log(JSON.parse(customerResponse.data.response));
       const customerParseResponse = JSON.parse(customerResponse.data.response);
 
-      const alldataResponse = dataMixed.find(
+      const alldataResponse = transactionsData.find(
         (item) =>
           item.Record.MerchantId === customerParseResponse.merchantID &&
           item.Record.CustomerID === customerParseResponse.customerID
@@ -328,7 +290,9 @@ const ViewTx = (props) => {
   };
 
   const onClickVerify = (key, status) => {
-    const verificationData = dataMixed.find((customer) => customer.Key === key);
+    const verificationData = transactionsData.find(
+      (customer) => customer.Key === key
+    );
     verifyData.customerId = verificationData.Record.CustomerId;
     verifyData.merchantId = verificationData.Record.MerchantId;
     verifyData.loanReferenceNumber = verificationData.Key.split("-")[2];
@@ -385,14 +349,14 @@ const ViewTx = (props) => {
 
   const sorting = (sortFor) => {
     if (sortFor === "txDateTime") {
-      const sorted = [...dataMixed].sort(
+      const sorted = [...transactionsData].sort(
         (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
       );
       console.log("sorted", sorted);
-      setDataMixed(sorted);
+      setTransactionsData(sorted);
     }
     if (sortFor === "CID") {
-      const sorted = [...dataMixed].sort((a, b) => {
+      const sorted = [...transactionsData].sort((a, b) => {
         const numA = parseInt(a.CID.match(/\d+/)[0]);
         const numB = parseInt(b.CID.match(/\d+/)[0]);
         if (numA < numB) {
@@ -404,7 +368,7 @@ const ViewTx = (props) => {
         return 0;
       });
       console.log("sorted", sorted);
-      setDataMixed(sorted);
+      setTransactionsData(sorted);
     }
   };
   const loadingMsg = (
@@ -512,8 +476,10 @@ const ViewTx = (props) => {
               </tr>
             </thead>
             <tbody>
-              {dataMixed.length !== 0 && loading ? (
-                dataMixed.map((value, index) => {
+              {loading ? (
+                loadingMsg
+              ) : transactionsData.length > 0 ? (
+                transactionsData.map((value, index) => {
                   return (
                     <tr key={index}>
                       <td>{index + 1}</td>
@@ -602,14 +568,12 @@ const ViewTx = (props) => {
                     </tr>
                   );
                 })
-              ) : records ? (
+              ) : (
                 <>
                   <tr key={"noRecords"} className="loadingR">
                     <td>No Records......</td>
                   </tr>
                 </>
-              ) : (
-                loadingMsg
               )}
             </tbody>
           </table>

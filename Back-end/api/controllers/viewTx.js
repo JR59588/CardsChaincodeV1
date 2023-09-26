@@ -10,6 +10,7 @@ app.use(bodyParser.json());
 const { Wallets, Gateway } = require("fabric-network");
 const fs = require("fs");
 const path = require("path");
+const { parseJSONFile } = require("./utils");
 const channelName = "channel1";
 const contractName = "onboardingMerchantC";
 const UNAUTHORIZED = "Not Authorized"
@@ -49,12 +50,11 @@ exports.GetTxByRange = async function (req, res) {
   const contractName = "PYMTUtilsCC";
   try {
     let org = req.params.roleId;
-    const dataStr = fs.readFileSync(path.join(__dirname, "data.json"));
-    console.log(dataStr);
-    const data = JSON.parse(dataStr);
-    console.log(data);
+    // get data to get wallet id of an organization (role)
+    const data = parseJSONFile(path.join(__dirname, "data.json"));
+
     if (!data[org]) {
-      res.status(400).send("Error!. Invalid role name");
+      return res.status(400).send("Error!. Invalid role name");
     }
     let ccpPath = path.resolve(data[org].connectionPath);
     let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
@@ -157,14 +157,14 @@ exports.retrieveOBMerchantData = async function (req, res) {
     //ctx is
     //const ClientMSPID = await ctx.clientIdentity.getMSPID();
     const merchantID = req.params.merchantID;
-    
+
     if (!merchantID) {
       return res.status(400).json({
         success: false,
         message: "Request cannot be processed.Please provide valid inputs",
       });
     }
-   
+
     const result = await contract.evaluateTransaction(
       "retrieveOBMerchantData",
       merchantID
@@ -232,14 +232,14 @@ exports.retrievePvAADMetaData = async function (req, res) {
     // Get the contract from the network.
     const contract = network.getContract(contractName);
     const merchantID = req.params.merchantID;
-    
+
     if (!merchantID) {
       return res.status(400).json({
         success: false,
         message: "Request cannot be processed.Please provide valid inputs",
       });
     }
-   
+
     const result = await contract.evaluateTransaction(
       "retrievePvAADMetaData",
       merchantID
@@ -302,7 +302,7 @@ exports.retrievePvAODMetaData = async function (req, res) {
     // Get the contract from the network.
     const contract = network.getContract(contractName);
     const merchantID = req.body.merchantID;
-    
+
     if (!merchantID) {
       return res.status(400).json({
         success: false,
@@ -370,7 +370,7 @@ exports.retrievePvAADAODMetaData = async function (req, res) {
     // Get the contract from the network.
     const contract = network.getContract(contractName);
     const merchantID = req.body.merchantID;
-    
+
     if (!merchantID) {
       return res.status(400).json({
         success: false,
@@ -477,7 +477,7 @@ exports.lookUpMerchantMetaData = async function (req, res) {
       "txcTxCurrency": UNAUTHORIZED,
       "promoCode": UNAUTHORIZED,
     }
-    
+
     let defaultValueAADPDC = {
       "merchantBankCode": UNAUTHORIZED,
       "merchantAccountNumber": UNAUTHORIZED,
@@ -519,7 +519,7 @@ exports.lookUpMerchantMetaData = async function (req, res) {
     try {
       retrievePvAADMetaDataResult = await contract.evaluateTransaction(
         "retrievePvAADMetaData",
-         merchantID
+        merchantID
         // merchantID
       );
       //  console.log(`Transaction has been evaluated, result is: ${result.toString()}`);

@@ -83,25 +83,25 @@ module.exports = function (app) {
 
     .route("/api/v1/verifySubmitTx")
 
-    .post(merchantController.verifySubmitTx);
+    .post(merchantController.verifySubmitTxUtils);
 
   app
 
     .route("/api/v1/verifyBalanceTx")
 
-    .post(merchantController.verifyBalanceTx);
+    .post(merchantController.verifyBalanceTxUtils);
 
   app
 
     .route("/api/v1/verifyAuthorizeTx")
 
-    .post(merchantController.verifyAuthorizeTx);
+    .post(merchantController.verifyAuthorizeTxUtils);
 
   app
 
     .route("/api/v1/verifyClearTx")
 
-    .post(merchantController.verifyClearTx);
+    .post(merchantController.verifyClearTxUtils);
 
   // app
 

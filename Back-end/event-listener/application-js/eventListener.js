@@ -19,19 +19,19 @@ const io = socketIo(server, {
 const channelName = 'channel1';
 
 const org1MSP = 'Org1MSP';
-const Org1UserId = 'appOrg1User8';
+const Org1UserId = 'appOrg1User10';
 
 const orgPSPMSP = 'PSPMSP';
-const OrgPSPUserId = 'appOrgPSPUser8';
+const OrgPSPUserId = 'appOrgPSPUser10';
 
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser8';
+const OrgACDUserId = 'appOrgACDUser10';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser8';
+const OrgAADUserId = 'appOrgAADUser10';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser8';
+const OrgAODUserId = 'appOrgAODUser10';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';
@@ -213,7 +213,6 @@ io.on('connection', async (socket) => {
 							const splitKey = [...stateObj.key.split("-")];
 							socket.emit('status-change', { status: 'TxCleared', data: splitKey });
 							console.log("Emitted status-change for TxCleared - ", { status: 'TxCleared', data: splitKey });
-							await transaction.submit(...splitKey);
 						}
 					} catch (error) {
 						console.log(`${RED}<-- Clear Failed: ClearSettlementTxCC Listening to Events -${RESET}`);
