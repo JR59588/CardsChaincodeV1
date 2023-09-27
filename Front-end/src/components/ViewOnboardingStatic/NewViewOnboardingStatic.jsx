@@ -197,9 +197,10 @@ const NewViewOnboardingStatic = (props) => {
           }, 1000);
         }
       } catch (error) {
+        console.log(error);
         setLoadingAnimatio(false);
-        console.log(error.response);
-        if (error.response.status === 400 && updatedRoleId === "Agg2") {
+        console.log(error.data.response);
+        if (error.data.response.status === 400 && updatedRoleId === "Agg2") {
           msg = "You are Not Authorized to view the Merchant details";
           setAlertState(true);
         }

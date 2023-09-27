@@ -20,7 +20,7 @@ const transactionVerification = async (orgName, channelName, contractName, funct
     try {
         const data = parseJSONFile(path.join(__dirname, "data.json"));
         if (!data[orgName]) {
-            throw new Error(`Organization ${orgName} not found!`);
+            return { error: `Organization ${orgName} not found!`, result: null };
         }
 
         const { connectionPath, walletOrg, userWallet } = data[orgName];
@@ -33,7 +33,7 @@ const transactionVerification = async (orgName, channelName, contractName, funct
 
         if (!identity) {
             console.log("An identity for the user " + userWallet + " does not exist in the wallet");
-            throw new Error(`An identity for the organization ${orgName} doesn't exist in the wallet!`);
+            return { error: `An identity for the organization ${orgName} doesn't exist in the wallet!`, result: null }
         }
 
         const gateway = new Gateway();
@@ -59,7 +59,7 @@ const transactionVerification = async (orgName, channelName, contractName, funct
 
         return { error: null, result: result };
     } catch (error) {
-        console.log("Inside catch block: ", error)
+        console.log("Error during verification transaction: ", error)
         return { error: error, result: null };
     }
 

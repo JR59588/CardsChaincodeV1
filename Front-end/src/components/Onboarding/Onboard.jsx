@@ -5,6 +5,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import SuccessModal from "../SuccessModal/SuccessModal";
 import { BsInfoCircle } from "react-icons/bs";
+import Loader from "../ViewOnboardingStatic/Loader/Loader";
 
 const message = (
   <h6>
@@ -14,12 +15,16 @@ const message = (
   </h6>
 );
 const header = "Merchant Onboarding Successful";
-let failureMsg = "Invalid";
-let failureHead = "Invalid";
 const Onboard = (props) => {
   const IP = props.IP;
   //setting role message
   const [roleMsg, setRoleMsg] = useState(false);
+
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupHeading, setPopupHeading] = useState("");
+  const [popupReason, setPopupReason] = useState("");
+  //loader state
+  const [loader, setLoader] = useState(false);
 
   //summary state
   const [summaryState, setSummaryState] = useState(false);
@@ -76,9 +81,11 @@ const Onboard = (props) => {
       [e.target.name]: e.target.value,
     });
   };
+
   const onClickContinue = () => {
     // api call
     setSummaryState(false);
+    setLoader(true);
     if (props.roleId.length !== 0) {
       onboardingFormData.customerID = "C" + onboardingFormData.merchantID;
       setRoleMsg(false);
@@ -94,35 +101,22 @@ const Onboard = (props) => {
         .then((response) => {
           console.log(response);
           setLoading(false);
+          setLoader(false);
           props.fetchOrganizationData();
+          setPopupHeading("Merchant Onboarding Successful");
+          setPopupMessage(response.data.message);
           setModal(true);
         })
 
         .catch((err) => {
           setLoading(false);
           console.log(err);
-          if (!err?.response) {
-            console.log("No Server Response");
-            console.log("No Server Response");
-            failureHead = "No Service";
-            failureMsg = `No Server Response`;
-            setFailureModal(true);
-          } else if (err.response?.status === 400) {
-            console.log(err.message);
-            console.log(err.message);
-            failureHead = "Transaction Failed";
-            failureMsg = `Response 400:Transaction Failed ${err.message}`;
-            setFailureModal(true);
-          } else if (err.response?.status === 401) {
-            console.log("Unauthorized");
-            failureHead = "Transaction Failed";
-            failureMsg = !err.response.data.message
-              ? "Something went wrong please try again"
-              : err.response.data.message;
-            setFailureModal(true);
-          } else {
-            console.log("error");
-          }
+          setLoading(false);
+          console.log("Error while onboarding merchant", err);
+          setPopupHeading("Error in Merchant Onboarding");
+          setPopupMessage(err.response.data.message);
+          setPopupReason(err.response.data.reason);
+          setModal(true);
         });
 
       localStorage.submit = true;
@@ -629,13 +623,19 @@ const Onboard = (props) => {
         </div>
       </div>
       {modal ? (
-        <SuccessModal getState={getState} message={message} header={header} />
+        <SuccessModal
+          getState={getState}
+          message={popupMessage}
+          reason={popupReason}
+          header={popupHeading}
+        />
       ) : null}
       {failureModal ? (
         <SuccessModal
           getState={getState}
-          message={failureMsg}
-          header={failureHead}
+          message={popupMessage}
+          header={popupHeading}
+          reason={popupReason}
         />
       ) : null}
 
@@ -675,6 +675,7 @@ const Onboard = (props) => {
           </div>
         </div>
       )}
+      {Loader && <Loader merchantID={"loading"} />}
       <Footer />
     </div>
   );

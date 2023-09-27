@@ -9,7 +9,7 @@ import Alert from "./Alert";
 let UNAUTHORIZED = "Unauthorized";
 
 //let showVerifyDefault=true;
-let msg;
+
 const ViewTx = (props) => {
   const txStages = {
     TxRequested: 0,
@@ -43,7 +43,7 @@ const ViewTx = (props) => {
   const retrievePvCustomerMetaData_URL = `http://${IP}:3001/api/v1/retrievePvCustomerMetaData`;
   //storing the combined response of getTxByRange & retrivePvMerchantData(only aggId) from response.
   const [transactionsData, setTransactionsData] = useState([]);
-
+  const [errorMessage, setErrorMessage] = useState("");
   //storing merged responses for Merchant Details pop-up
   const [mergedMerchantData, setMergedMerchantData] = useState([]);
 
@@ -64,9 +64,6 @@ const ViewTx = (props) => {
 
   //loading
   const [loading, setLoading] = useState(false);
-
-  //records
-  const [records, setRecords] = useState(true);
 
   //alert
   const [alertState, setAlertState] = useState(false);
@@ -121,17 +118,14 @@ const ViewTx = (props) => {
   //side Effect for loading and mixing GetTxByRange and Pvdmerchat data
   useEffect(() => {
     // setRefresh(false);
-    // setRecords(false);
     if (updatedRoleId.length !== 0) {
       const fetchData = async () => {
         try {
           setLoading(true);
+          setTransactionsData([]);
           const allData = await axios.get(
             `${GetTxByRange_URL}/${updatedRoleId}`
           );
-          if (allData.data.response.length === 0) {
-            setRecords(true);
-          }
           const viewTxData = allData.data.response.map((item) => {
             return {
               ...item,
@@ -144,15 +138,8 @@ const ViewTx = (props) => {
         } catch (error) {
           setLoading(false);
           console.log(error);
-          if (!error?.allData) {
-            console.log("No Server Response");
-          } else if (error.allData?.status === 400) {
-            console.log("400 - GetTxByRange");
-          } else if (error.allData?.status === 401) {
-            console.log("Unauthorized");
-          } else {
-            console.log("failed - GetTxByRange");
-          }
+          setErrorMessage(error.response.data.message);
+          setAlertState(true);
         }
       };
       fetchData();
@@ -308,22 +295,12 @@ const ViewTx = (props) => {
       )
       .then((response) => {
         console.log("response for onClickVerify", response);
-        // if (response.status === 200) {
-        //   setRefresh(true);
-        // }
       })
       .catch((error) => {
         console.log(error);
-        if (error?.response.status === 400) {
-          msg = error.response.data.message.split(",");
-          console.log(msg);
-          setAlertState(true);
-        }
+        setErrorMessage(error.response.data.message);
+        setAlertState(true);
       });
-  };
-
-  const getAlertState = (state) => {
-    setAlertState(state);
   };
 
   const getStageDisplayComponent = (key, status, expectedStatus) => {
@@ -393,7 +370,9 @@ const ViewTx = (props) => {
   return (
     <div className="mainDiv">
       {/* <div className="container"> */}
-      {alertState ? <Alert getAlertState={getAlertState} msg={msg} /> : null}
+      {alertState ? (
+        <Alert msg={errorMessage} closeAlert={() => setAlertState(false)} />
+      ) : null}
       <div
         className="col-md-12"
         style={{ paddingLeft: "30px", paddingRight: "30px" }}

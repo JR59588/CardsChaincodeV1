@@ -11,14 +11,14 @@ const message = (
     Merchant Successfully Onboarded
   </h6>
 );
-const header='Onboarding Succesfully...'
-let failureMsg='Invalid'
-let failureHead="Invalid"
+const header = "Onboarding Succesfully...";
 const Aggregator = (props) => {
   const IP = props.IP;
   //setting role message
   const [roleMsg, setRoleMsg] = useState(false);
 
+  const [failureMessage, setFailureMessage] = useState("");
+  const [failureHeading, setFailureHeading] = useState("");
   //loading
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +26,7 @@ const Aggregator = (props) => {
   const [modal, setModal] = useState(false);
 
   //failure Modal
-  const[failureModal,setFailureModal]=useState(false)
+  const [failureModal, setFailureModal] = useState(false);
 
   const [onboardingFormData, setOnboardingFormData] = useState({
     merchantName: "", //
@@ -94,28 +94,9 @@ const Aggregator = (props) => {
 
         .catch((err) => {
           setLoading(false);
-          console.log(err);
-          if (!err?.response) {
-            console.log("No Server Response");
-            failureHead='No Service'
-            failureMsg=`No Server Response`
-            setFailureModal(true)
-            // alert('No Server Response')
-          } else if (err.response?.status === 400) {
-            console.log(err.message);
-            failureHead='Transaction Failed'
-            failureMsg=`Response 400:Transaction Failed ${err.message}`
-            setFailureModal(true)
-            // alert("Response 400:Transaction Failed");
-          } else if (err.response?.status === 401) {
-            console.log("Unauthorized");
-            failureHead='Unauthorized'
-            failureMsg=`Invalid Role / fields must not be Empty`
-            setFailureModal(true)
-            //alert('Unauthorized')
-          } else {
-            console.log("error");
-          }
+          console.log("Error while onboarding merchant", err);
+          setFailureHeading("Error in Merchant Onboarding");
+          setFailureMessage(err.response.data.message);
         });
 
       localStorage.submit = true;
@@ -125,9 +106,9 @@ const Aggregator = (props) => {
   };
   const getState = (state) => {
     setModal(state);
-    setFailureModal(state)
+    setFailureModal(state);
   };
-console.log(modal);
+  console.log(modal);
   return (
     <div className={modal ? "mainBlur" : "main"} style={{ height: "99vh" }}>
       <div className="container">
@@ -584,9 +565,13 @@ console.log(modal);
       {modal ? (
         <SuccessModal getState={getState} message={message} header={header} />
       ) : null}
-      {
-        failureModal ? <SuccessModal getState={getState} message={failureMsg} header={failureHead} /> : null
-      }
+      {failureModal ? (
+        <SuccessModal
+          getState={getState}
+          message={failureMessage}
+          header={failureHeading}
+        />
+      ) : null}
       <Footer />
     </div>
   );

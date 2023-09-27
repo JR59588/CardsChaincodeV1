@@ -55,11 +55,11 @@ module.exports = function (app) {
 
     .get(viewTxcontroller.retrieveOBMerchantData);
 
-  app
+  // app
 
-    .route("/api/v1/savePvAADMetaData")
+  //   .route("/api/v1/savePvAADMetaData")
 
-    .post(merchantController.savePvAADMetaData);
+  //   .post(merchantController.savePvAADMetaData);
 
   app
 
@@ -67,17 +67,17 @@ module.exports = function (app) {
 
     .post(merchantController.saveOBMerchantSummary);
 
-  app
+  // app
 
-    .route("/api/v1/savePvAADAODMetaData")
+  //   .route("/api/v1/savePvAADAODMetaData")
 
-    .post(merchantController.savePvAADAODMetaData);
+  //   .post(merchantController.savePvAADAODMetaData);
 
-  app
+  // app
 
-    .route("/api/v1/savePvAODMetaData")
+  //   .route("/api/v1/savePvAODMetaData")
 
-    .post(merchantController.savePvAODMetaData);
+  //   .post(merchantController.savePvAODMetaData);
 
   app
 
