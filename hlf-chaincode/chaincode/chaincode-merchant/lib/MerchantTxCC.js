@@ -34,7 +34,7 @@ class MerchantTxCC extends Contract {
       throw err;
     }
     // TODO: remove hardcoded Ord1MSP
-    const accessValid = await pymtutils.validateOrganization(ctx, OrgMSPID);
+    const accessValid = true; //await pymtutils.validateOrganization(ctx, OrgMSPID);
 
     if (!accessValid) {
       throw new Error(
@@ -69,12 +69,12 @@ class MerchantTxCC extends Contract {
     console.log('Contents: ', txObjJSON);
 
     let verified = false;
-    if (OrgMSPID == MRT1_ORG_NAME) {
-      verified = await this.doVerifyRequestSettlementTx(ctx, tx);
+    // if (OrgMSPID == MRT1_ORG_NAME) {
+    verified = await this.doVerifyRequestSettlementTx(ctx, tx);
 
-      console.log("After verifying merchantchecks: " + verified);
+    console.log("After verifying merchantchecks: " + verified);
 
-    }
+    //}
     return verified;
     // === Save transaction to state ===
     // await ctx.stub.putState(key, Buffer.from(JSON.stringify(settlementTx)));
@@ -144,7 +144,7 @@ class MerchantTxCC extends Contract {
 
       // TODO: remove hardcoded Ord3MSP
       // const accessValid = await validateOrganization(ctx, "Org3MSP");
-      const accessValid = await pymtutils.validateOrganization(ctx, "Org3MSP");
+      const accessValid = true; //await pymtutils.validateOrganization(ctx, "Org3MSP");
 
       if (!accessValid) {
         throw new Error(

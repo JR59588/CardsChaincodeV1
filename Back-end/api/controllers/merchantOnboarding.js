@@ -56,7 +56,7 @@ const savePvAADMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
@@ -147,7 +147,7 @@ const savePvAODMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
@@ -236,7 +236,7 @@ const savePvAADAODMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
@@ -307,7 +307,7 @@ const savePvAADAODMetaData = async function (req, res) {
   }
 };
 
-const addOrgToDatabase = (orgName, orgId) => {
+const addOrgToDatabase = (orgId, orgName) => {
   try {
     const jsonStr = fs.readFileSync(path.join(__dirname, "..", "orgsAdded.json"));
     const jsonObj = JSON.parse(jsonStr);
@@ -370,7 +370,7 @@ exports.saveOBMerchantSummary = async function (req, res) {
     if (!identity) {
       console.log(`An identity for the user ${data[org].userWallet} does not exist in the wallet`);
       console.log("Run the registerUser.js application before retrying");
-      return res.status(400).send(`Unable to find user wallet for the organization ${org}`);
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -579,7 +579,7 @@ exports.verifySubmitTx = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -675,7 +675,7 @@ exports.verifyAuthorizeTx = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -772,7 +772,7 @@ exports.verifyBalanceTx = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -868,7 +868,7 @@ exports.verifyClearTx = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.

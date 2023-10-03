@@ -72,7 +72,7 @@ exports.GetTxByRange = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -137,7 +137,7 @@ exports.retrieveOBMerchantData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -216,7 +216,7 @@ exports.retrievePvAADMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -285,7 +285,7 @@ exports.retrievePvAODMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -353,7 +353,7 @@ exports.retrievePvAADAODMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.

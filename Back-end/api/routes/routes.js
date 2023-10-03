@@ -20,6 +20,12 @@ module.exports = function (app) {
     .post(controller.requestSettlementTx); //merchant App
 
   app
+
+    .route("/api/v1/uploadCSV")
+
+    .post(controller.processISO8583CSV);
+
+  app
     .route("/api/v1/GetTxByRange/:roleId")
 
     .get(viewTxcontroller.GetTxByRange);

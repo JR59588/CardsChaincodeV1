@@ -473,8 +473,8 @@ const ViewTx = (props) => {
                       </td>
                       <td>{value.Record["TxStatus"]}</td>
                       <td>
-                        {value.Record["TransactionAmount"]}{" "}
-                        {value.Record["TransactionCurrency"]}
+                        {parseInt(value.Record.transactionAmount)}{" "}
+                        {value.Record.currencyCode}
                       </td>
                       <td>
                         {value.Record["MerchantId"]}
