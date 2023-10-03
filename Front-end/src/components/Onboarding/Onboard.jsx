@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import SuccessModal from "../SuccessModal/SuccessModal";
 import { BsInfoCircle } from "react-icons/bs";
 import Loader from "../ViewOnboardingStatic/Loader/Loader";
+import Spinner from "react-bootstrap/Spinner";
 
 const message = (
   <h6>
@@ -110,8 +111,8 @@ const Onboard = (props) => {
 
         .catch((err) => {
           setLoading(false);
+          setLoader(false);
           console.log(err);
-          setLoading(false);
           console.log("Error while onboarding merchant", err);
           setPopupHeading("Error in Merchant Onboarding");
           setPopupMessage(err.response.data.message);
@@ -675,7 +676,13 @@ const Onboard = (props) => {
           </div>
         </div>
       )}
-      {Loader && <Loader merchantID={"loading"} />}
+      {loader && (
+        <div className="blur">
+          <Spinner animation="border" role="status"></Spinner>
+
+          <span>Loading...</span>
+        </div>
+      )}
       <Footer />
     </div>
   );
