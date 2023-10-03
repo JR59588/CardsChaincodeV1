@@ -201,7 +201,8 @@ exports.processISO8583CSV = async function (req, res) {
           .on('data', (data) => results.push(data))
           .on('end', async () => {
             console.log("Results after reading csv: ", results);
-            results.forEach(async ({ merchantID, customerID, loanReferenceNumber, ISO8583Message }, index) => {
+            for (let i = 0; i < results.length; i++) {
+              const { merchantID, customerID, loanReferenceNumber, ISO8583Message } = results[i];
               const settlementTxObject = makeTxObj(merchantID, customerID, loanReferenceNumber, ISO8583Message);
               console.log("Settlement Tx Object: ", settlementTxObject)
               const { error, result } = await transactionVerification(req.body.roleId, 'channel1', 'PYMTUtilsCC', 'requestTx',
@@ -230,12 +231,11 @@ exports.processISO8583CSV = async function (req, res) {
                 settlementTxObject.posData]);
 
               if (error) {
-                responses.push({ index, success: false, result });
+                responses.push({ i, success: false, result });
               } else {
-                responses.push({ index, success: true, result });
+                responses.push({ i, success: true, result });
               }
-
-            });
+            }
             return res.status(200).json({
               success: true,
               message: "Successfully uploaded the ISO8583 CSV",
