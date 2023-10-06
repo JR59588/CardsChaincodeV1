@@ -54,7 +54,7 @@ exports.GetTxByRange = async function (req, res) {
     const data = parseJSONFile(path.join(__dirname, "data.json"));
 
     if (!data[org]) {
-      return res.status(400).send("Error!. Invalid role name");
+      return res.status(400).send({ success: false, message: `The organization ${org} doesn't exist` });
     }
     let ccpPath = path.resolve(data[org].connectionPath);
     let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
@@ -72,7 +72,7 @@ exports.GetTxByRange = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -137,7 +137,7 @@ exports.retrieveOBMerchantData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -216,7 +216,7 @@ exports.retrievePvAADMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -285,7 +285,7 @@ exports.retrievePvAODMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -353,7 +353,7 @@ exports.retrievePvAADAODMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -404,9 +404,9 @@ exports.lookUpMerchantMetaData = async function (req, res) {
   const contractName = "onboardingMerchantC";
   try {
     let org = req.params.roleId;
-
+    const data = parseJSONFile(path.join(__dirname, "data.json"));
     if (!data[org]) {
-      res.status(400).send("Error!. Invalid role name");
+      return res.status(400).send("Error!. Invalid role name");
     }
 
     const merchantID = req.params.merchantID;
@@ -437,7 +437,10 @@ exports.lookUpMerchantMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({
+        success: false,
+        message: `An identity for the user ${data[org].userWallet} doesn't exist in the wallet`,
+      });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -576,7 +579,7 @@ exports.lookUpMerchantMetaData = async function (req, res) {
   } catch (error) {
     console.error(`Failed to submit transaction: ${error}`);
 
-    return res.status(401).json({
+    return res.status(400).json({
       success: false,
       message: "Error" + error,
     });

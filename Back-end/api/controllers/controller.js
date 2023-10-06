@@ -6,8 +6,12 @@ const data = require("./data.json");
 const { Wallets, Gateway } = require("fabric-network");
 const fs = require("fs");
 const path = require("path");
-const app = express();
 const ISO8583 = require("../iso8583");
+const multer = require('multer');
+const csv = require('csv-parser');
+const { transactionVerification } = require("./utils");
+
+const app = express();
 
 app.use(bodyParser.json());
 
@@ -39,6 +43,28 @@ const verifyToken = (req, res) => {
   }
 };
 
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'iso8583FileUploads'))
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, file.fieldname + '-' + uniqueSuffix + ".csv")
+  }
+})
+
+const upload = multer({
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    if (path.extname(file.originalname) !== '.csv') {
+      return cb(new Error('Only csv files are allowed'))
+    }
+    cb(null, true)
+  }
+}).single('file');
+
+
 exports.requestSettlementTx = async function (req, res) {
   try {
     let org = req.body.roleId;
@@ -50,7 +76,7 @@ exports.requestSettlementTx = async function (req, res) {
       res.status(400).send("Error!. Invalid role name");
     }
 
-    let stxObj = makeTxObj(req);
+    let stxObj = makeTxObj(req.body.merchantID, req.body.customerID, req.body.loanReferenceNumber, req.body.ISO8583Message);
 
     console.log("stxObj: ", stxObj);
 
@@ -70,7 +96,10 @@ exports.requestSettlementTx = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({
+        success: false,
+        message: `An identity for the organization ${org} doesn't exist in the wallet`
+      });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -138,18 +167,91 @@ exports.requestSettlementTx = async function (req, res) {
     );
     console.log("inside requestsetllmentTx ,Transaction has been submitted");
 
-    res.status(200).json({
-      success: true,
-      message: "Transaction has been submitted",
-    });
 
     // Disconnect from the gateway.
     await gateway.disconnect();
+    return res.status(200).json({
+      success: true,
+      message: "Transaction has been submitted",
+    });
   } catch (error) {
     console.error(`Failed to submit transaction: ${error}`);
     return res.status(400).json({
       success: false,
       message: "Error" + error,
+    });
+  }
+};
+
+exports.processISO8583CSV = async function (req, res) {
+  try {
+    upload(req, res, function (err) {
+      if (err) {
+        console.log("Error uploading file: ", err);
+        return res.status(400).json({
+          success: false,
+          message: "Error in uploading ISO8583 CSV file",
+          reason: err.message
+        });
+      } else {
+        const results = [];
+        const responses = [];
+        fs.createReadStream(req.file.path)
+          .pipe(csv())
+          .on('data', (data) => results.push(data))
+          .on('end', async () => {
+            console.log("Results after reading csv: ", results);
+            for (let i = 0; i < results.length; i++) {
+              const { merchantID, customerID, loanReferenceNumber, ISO8583Message } = results[i];
+              const settlementTxObject = makeTxObj(merchantID, customerID, loanReferenceNumber, ISO8583Message);
+              console.log("Settlement Tx Object: ", settlementTxObject)
+              const { error, result } = await transactionVerification(req.body.roleId, 'channel1', 'PYMTUtilsCC', 'requestTx',
+                [settlementTxObject.MerchantId,
+                settlementTxObject.CustomerId,
+                settlementTxObject.LoanReferenceNumber,
+                settlementTxObject.MerchantName,
+                settlementTxObject.primaryAccountNumber,
+                settlementTxObject.processingCode,
+                settlementTxObject.transactionAmount,
+                settlementTxObject.transmissionDateAndTime,
+                settlementTxObject.systemTraceAuditNumber,
+                settlementTxObject.timeLocalTransactionHHMMSS,
+                settlementTxObject.dateLocalTransactionMMDD,
+                settlementTxObject.expirationDate,
+                settlementTxObject.merchantCategoryCode,
+                settlementTxObject.pointOfServiceEntryMode,
+                settlementTxObject.acquiringInstitutionIdentificationCode,
+                settlementTxObject.retrievalReferenceNumber,
+                settlementTxObject.cardAcceptorTerminalIdentification,
+                settlementTxObject.cardAcceptorIdentificationCode,
+                settlementTxObject.cardAcceptorNameAndLocation,
+                settlementTxObject.currencyCode,
+                settlementTxObject.personalIdentificationNumber,
+                settlementTxObject.additionalDataPrivate,
+                settlementTxObject.posData]);
+
+              if (error) {
+                responses.push({ i, success: false, result });
+              } else {
+                responses.push({ i, success: true, result });
+              }
+            }
+            return res.status(200).json({
+              success: true,
+              message: "Successfully uploaded the ISO8583 CSV",
+              responses
+            });
+          });
+      }
+
+    });
+
+  } catch (error) {
+    console.log("Error in processing submitted ISO8583 CSV");
+    return res.status(400).json({
+      success: false,
+      message: "Error in processing submitted ISO8583 CSV file",
+      reason: "Something went wrong in processing the ISO8583 CSV file"
     });
   }
 };
@@ -202,21 +304,19 @@ function getFunctionName(mode, MSPId) {
   return fnName;
 }
 
-function makeTxObj(req) {
+function makeTxObj(merchantID, customerID, loanReferenceNumber, iso8583Message) {
   //TODO: change the property values of the object according to the requirements
-  if (req.body.ISO8583Message != undefined) {
-    console.log("ISO8583Message:", req.body.ISO8583Message);
+  if (iso8583Message != undefined) {
+    console.log("ISO8583Message:", iso8583Message);
     try {
-      var iso = new ISO8583(req.body.ISO8583Message, 1);
+      var iso = new ISO8583(iso8583Message, 1);
       var data = iso.parseDataElement();
       const dataObj = data.reduce((obj, item) => ({
         ...obj,
         [item.fieldName]: item.fieldValue
       }), {});
       const iso8583Obj = { ...iso, ...dataObj };
-
-      console.log("iso8583 object: ", iso8583Obj);
-      const tempData = [req.body.merchantID, req.body.customerID, req.body.loanReferenceNumber, "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
+      const tempData = [merchantID, customerID, loanReferenceNumber, "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
       let localTxObj = {
         MerchantId: tempData[0],
         CustomerId: tempData[1],

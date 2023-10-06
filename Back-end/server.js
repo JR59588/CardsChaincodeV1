@@ -91,25 +91,10 @@ app.post('/uploadfile', upload.single('filetoupload'), function (req, res, next)
 
         }
       }
-      //temp(0)
-      //let counter = 0;
+
       let txmsg = "";
       for (let i = 0; i < results.length; i++) {
-        //   for ( i = 0; i < counter.length; i++) {
-        //    console.log("The No Transaction Submited : ",counter);
-        //  }
-
-        //  let txpromise = submitmerchantTx(results[i]);
-        // let txpromise = new Promise(function (myresolve , myreject) {
-        //  let m = submitmerchantTx(results[i]);
-        //  console.log("m = ", m);
-        //  if ( ! m ){
-        //   myresolve(m);
-        //  }else{
-        //   myreject(m);
-        //  }
-        // } );
-
+        console.log("results[i]", results[i]);
         let txpromise = Promise.resolve(submitmerchantTx(results[i]));
         txpromise.then(
           function (value) { txmsg = value; console.log("1 :", value); },

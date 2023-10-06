@@ -30,7 +30,7 @@ exports.enrollAdmin = async (caClient, wallet, orgMspId) => {
 		const identity = await wallet.get(adminUserId);
 		if (identity) {
 			console.log('An identity for the admin user already exists in the wallet');
-			return;
+			return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
 		}
 
 		// Enroll the admin user, and import the new identity into the wallet.
@@ -56,7 +56,7 @@ exports.registerAndEnrollUser = async (caClient, wallet, orgMspId, userId, affil
 		const userIdentity = await wallet.get(userId);
 		if (userIdentity) {
 			console.log(`An identity for the user ${userId} already exists in the wallet`);
-			return;
+			return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
 		}
 
 		// Must use an admin to register a new user
@@ -64,7 +64,7 @@ exports.registerAndEnrollUser = async (caClient, wallet, orgMspId, userId, affil
 		if (!adminIdentity) {
 			console.log('An identity for the admin user does not exist in the wallet');
 			console.log('Enroll the admin user before retrying');
-			return;
+			return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
 		}
 
 		// build a user object for authenticating with the CA

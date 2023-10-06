@@ -1,6 +1,6 @@
 import React from "react";
 
-const SuccessModal = ({ getState, message,header }) => {
+const SuccessModal = ({ getState, message, header, reason }) => {
   const onClickCross = () => {
     getState(false);
   };
@@ -20,6 +20,7 @@ const SuccessModal = ({ getState, message,header }) => {
         <hr />
         <div className="modalBody">
           <h5>{message}</h5>
+          {reason && <p>Reason: {reason}</p>}
         </div>
         <hr />
         <div className="modalFooter">

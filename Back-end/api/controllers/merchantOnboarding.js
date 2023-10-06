@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const data = require("./data.json");
 const enrollAdmin = require("../../enrollAdmin");
 const registerUser = require("../../registerUser");
-const { exec } = require('child_process');
+const { exec, execSync } = require('child_process');
 const path = require('path');
 const app = express();
 const fs = require('fs');
@@ -31,7 +31,7 @@ function getRandomString(length) {
 }
 
 
-exports.savePvAADMetaData = async function (req, res) {
+const savePvAADMetaData = async function (req, res) {
   const channelName = "channel1";
   const contractName = "onboardingMerchantC";
   const pv_IndividualCollectionName = "PDC2";
@@ -56,7 +56,7 @@ exports.savePvAADMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
@@ -122,7 +122,7 @@ exports.savePvAADMetaData = async function (req, res) {
 };
 
 
-exports.savePvAODMetaData = async function (req, res) {
+const savePvAODMetaData = async function (req, res) {
   const channelName = "channel1";
   const contractName = "onboardingMerchantC";
   const pv_IndividualCollectionName = "PDC1";
@@ -147,7 +147,7 @@ exports.savePvAODMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
@@ -211,7 +211,7 @@ exports.savePvAODMetaData = async function (req, res) {
   }
 };
 
-exports.savePvAADAODMetaData = async function (req, res) {
+const savePvAADAODMetaData = async function (req, res) {
   const channelName = "channel1";
   const contractName = "onboardingMerchantC";
   const pv_IndividualCollectionName = "PDC3";
@@ -236,7 +236,7 @@ exports.savePvAADAODMetaData = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
@@ -307,21 +307,29 @@ exports.savePvAADAODMetaData = async function (req, res) {
   }
 };
 
-const addOrgToDatabase = (req, res) => {
+const addOrgToDatabase = (orgId, orgName) => {
+  try {
+    const jsonStr = fs.readFileSync(path.join(__dirname, "..", "orgsAdded.json"));
+    const jsonObj = JSON.parse(jsonStr);
+    jsonObj.orgs.push({ orgName, orgId });
+    fs.writeFileSync(path.join(__dirname, "..", "orgsAdded.json"), JSON.stringify(jsonObj));
+    return { error: null };
+  } catch (error) {
+    return { error: "Error adding organization to the database" };
+  }
+}
+
+const checkOrgPresent = (orgName) => {
   const jsonStr = fs.readFileSync(path.join(__dirname, "..", "orgsAdded.json"));
   const jsonObj = JSON.parse(jsonStr);
 
   const orgs = jsonObj.orgs;
-  if (orgs.findIndex((org) => org.orgId == req.body.merchantID) != -1) {
-    throw new Error("There is an existing organization with the ID: " + req.body.merchantID);
-  } else {
-    jsonObj.orgs.push({
-      orgName: req.body.merchantName,
-      orgId: req.body.merchantID
-    });
-    fs.writeFileSync(path.join(__dirname, "..", "orgsAdded.json"), JSON.stringify(jsonObj));
+
+  if (orgs.findIndex((org) => org.orgId == orgName) != -1) {
+    return true;
   }
 
+  return false;
 }
 
 const saveConnectionDetails = (org) => {
@@ -348,7 +356,7 @@ exports.saveOBMerchantSummary = async function (req, res) {
   try {
     let org = req.body.roleId;
     if (!data[org]) {
-      res.status(400).send("Error!. Invalid role name");
+      return res.status(400).send("Error!. Invalid role name");
     }
     let ccpPath = path.resolve(data[org].connectionPath);
     let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
@@ -360,13 +368,9 @@ exports.saveOBMerchantSummary = async function (req, res) {
     // Check to see if we've already enrolled the user.
     const identity = await wallet.get(data[org].userWallet);
     if (!identity) {
-      console.log(
-        "An identity for the user" +
-        data[org].userWallet +
-        "does not exist in the wallet"
-      );
+      console.log(`An identity for the user ${data[org].userWallet} does not exist in the wallet`);
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -388,7 +392,10 @@ exports.saveOBMerchantSummary = async function (req, res) {
     });
 
     // To check if the merchantID organization is already present in the database(For now, in a JSON file.)
-    addOrgToDatabase(req, res);
+    if (checkOrgPresent(req.body.merchantID)) {
+      return res.status(400).send(`There's already a merchant with the ID: ${req.body.merchantID}`);
+    }
+
 
     // Submit the specified transaction.
 
@@ -433,82 +440,101 @@ exports.saveOBMerchantSummary = async function (req, res) {
 
     console.log("Transaction has been submitted by saveOBMerchantSummary");
 
-    await module.exports.savePvAADMetaData(req, res);
-    await module.exports.savePvAADAODMetaData(req, res);
-    await module.exports.savePvAODMetaData(req, res);
-    orgAddition(req, res);
+    await savePvAADMetaData(req, res);
+    await savePvAADAODMetaData(req, res);
+    await savePvAODMetaData(req, res);
 
-    res.status(200).json({
+    const { orgAddnError } = addOrganization(req.body.merchantID);
+
+    if (orgAddnError) {
+      return res.status(400).json({
+        success: false,
+        message: "Unable to add the merchant organization"
+      });
+    }
+
+    const { error } = addOrgToDatabase(req.body.merchantID, req.body.merchantName);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Error adding organization to the database"
+      });
+    }
+
+    return res.status(200).json({
       success: true,
-      message: "Transaction has been submitted",
+      message: "Merchant onboarded successfully",
     });
   } catch (error) {
-    console.log(`Failed to submit transaction: ${error}`);
+    console.log(`Failed to onboard new merchant: ${error}`);
     // console.error(`Failed to submit transaction: ${error}`);
     return res.status(400).json({
       success: false,
-      message: "Error" + error,
+      message: "Merchant onboarding failure",
+      reason: error.message,
     });
   }
 };
 
 
-const orgAddition = function (req, res) {
-  console.log("req.body: ", req.body);
-  const orgName = req.body.merchantID;
-  if (orgName !== undefined) {
-    try {
-      console.log("Adding organization ", req.body.merchantID);
+const addOrganization = function (orgName) {
+
+  console.log("Adding organization ", orgName);
+
+  //Path to your Bash script.
+  const bashScriptPath = path.join(__dirname, '..', '..', '..', '..', 'HLF-Cards', 'hlf-cards', 'generate.sh');
+
+  // Get the directory where the Bash script resides.
+  const scriptDirectory = path.dirname(bashScriptPath);
+
+  // Define the arguments to pass to the Bash script.
+  const jsonStr = fs.readFileSync(path.join(__dirname, "..", "newOrgVars.json"));
+  const jsonObj = JSON.parse(jsonStr);
 
 
+  const nextValue = jsonObj.currentValue + 2;
+  const nextGlobal = jsonObj.currentGlobal + 1;
 
-      //Path to your Bash script.
-      const bashScriptPath = path.join(__dirname, '..', '..', '..', '..', 'HLF-Cards', 'hlf-cards', 'generate.sh');
+  jsonObj.currentValue = nextValue;
+  jsonObj.currentGlobal = nextGlobal;
+  fs.writeFileSync(path.join(__dirname, "..", "newOrgVars.json"), JSON.stringify(jsonObj));
 
-      // Get the directory where the Bash script resides.
-      const scriptDirectory = path.dirname(bashScriptPath);
+  const scriptArguments = ['ACD', orgName, '15051', '15052', '15054', '10084', nextValue + '051', nextValue + '052', nextValue + '054', nextValue + '084', nextGlobal + '', '5'];
 
-      // Define the arguments to pass to the Bash script.
-      const jsonStr = fs.readFileSync(path.join(__dirname, "..", "newOrgVars.json"));
-      const jsonObj = JSON.parse(jsonStr);
+  // Create a command string that includes the Bash script path and its arguments.
+  const command = `bash ${bashScriptPath} ${scriptArguments.join(' ')}`;
 
-      const nextValue = jsonObj.currentValue + 2;
-      const nextGlobal = jsonObj.currentGlobal + 1;
+  // Run the Bash script using exec with the CWD option set to the script's directory.
+  let orgAddnSuccess = true;
+  try {
+    execSync(command, { cwd: scriptDirectory });
 
-      const scriptArguments = ['ACD', orgName, '15051', '15052', '15054', '10084', nextValue + '051', nextValue + '052', nextValue + '054', nextValue + '084', nextGlobal + '', '5'];
-
-      // Create a command string that includes the Bash script path and its arguments.
-      const command = `bash ${bashScriptPath} ${scriptArguments.join(' ')}`;
-
-      // Run the Bash script using exec with the CWD option set to the script's directory.
-      exec(command, { cwd: scriptDirectory }, (error, stdout, stderr) => {
-        console.log(`Bash script output: ${stdout}`);
-        console.error(`Bash script errors: ${stderr}`);
-        if (error) {
-          console.error(`Error executing Bash script: ${error}`);
-          throw new Error(error);
-        }
-        console.log(`Bash script output: ${stdout}`);
-        console.error(`Bash script errors: ${stderr}`);
-        jsonObj.currentValue = nextValue;
-        jsonObj.currentGlobal = nextGlobal;
-        fs.writeFileSync(path.join(__dirname, "..", "newOrgVars.json"), JSON.stringify(jsonObj));
-        // res.status(200).send('Organization added succesfully');
-
-        //saving connection details and enrolling users for future request settlement tx's.
-        saveConnectionDetails(req.body.merchantID);
-        console.log("Merchant ID is: ", req.body.merchantID);
-        // enrollAdmin(req.body.merchantID);
-        // registerUser(req.body.merchantID);
-        registerAndEnrollFunc(req.body.merchantID);
-      });
-    } catch (error) {
-      console.log("Error while adding organization to network (orgAddition): ", error);
-      throw new Error(error);
-    }
-  } else {
-    throw new Error("Orgnaization name not found!");
+    //Saving connection details for new merchant organization.
+    saveConnectionDetails(orgName);
+    //Enrolling users for future request settlement tx's.
+    registerAndEnrollFunc(orgName);
+  } catch (error) {
+    console.log("Error executing generate script to add new merchant organization", error)
+    orgAddnSuccess = false;
   }
+  // exec(command, { cwd: scriptDirectory }, (error, stdout, stderr) => {
+  //   console.log(`Bash script output: ${stdout}`);
+  //   console.error(`Bash script errors: ${stderr}`);
+  //   if (error) {
+  //     orgAddnSuccess = false;
+  //     console.error(`Error executing Bash script: ${error}`);
+  //   }
+  //   jsonObj.currentValue = nextValue;
+  //   jsonObj.currentGlobal = nextGlobal;
+  //   fs.writeFileSync(path.join(__dirname, "..", "newOrgVars.json"), JSON.stringify(jsonObj));
+  //   //saving connection details and enrolling users for future request settlement tx's.
+  //   saveConnectionDetails(orgName);
+  //   registerAndEnrollFunc(orgName);
+  // });
+
+  return { orgAddnError: orgAddnSuccess ? null : `There was an error adding organization ${orgName} to the network` }
+
 };
 
 exports.verifySubmitTx = async function (req, res) {
@@ -553,7 +579,7 @@ exports.verifySubmitTx = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -649,7 +675,7 @@ exports.verifyAuthorizeTx = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -746,7 +772,7 @@ exports.verifyBalanceTx = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.
@@ -842,7 +868,7 @@ exports.verifyClearTx = async function (req, res) {
         "does not exist in the wallet"
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      return res.status(400).json({ success: false, message: `Unable to find user wallet for the organization ${org}` });
     }
 
     // Create a new gateway for connecting to our peer node.

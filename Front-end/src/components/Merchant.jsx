@@ -7,8 +7,9 @@ import Footer from "./Footer";
 import SubmitTx from "./Submit_Tx/SubmitTx";
 import ISO8583Component from "./Merchant-Submit-Deails/ISO8583Component";
 import ISO8583Decoded from "./Merchant-Submit-Deails/ISO8583Decoded";
+import UploadISO8583File from "./Merchant-Submit-Deails/UploadISO8583File";
 
-const Merchant = ({ roleId, IP,getRoleFromFile }) => {
+const Merchant = ({ roleId, IP, getRoleFromFile }) => {
   //storing the radio value and rendering & by default it will display the radio1
   const [formFile, setFormFile] = useState("radio1");
   const [updatedRoleId, setUpdatedRoleId] = useState();
@@ -24,17 +25,33 @@ const Merchant = ({ roleId, IP,getRoleFromFile }) => {
     const value = (element.selectedIndex = "1");
     let selectedOption = element.options[value];
     console.log(selectedOption.value);
-    getRoleFromFile(selectedOption.value)
+    getRoleFromFile(selectedOption.value);
     setUpdatedRoleId(selectedOption.value);
+  };
+
+  const renderSubmitForm = () => {
+    switch (formFile) {
+      case "radio1":
+        return <SubmitTx roleId={roleId} IP={IP} />;
+      case "radio2":
+        // return <FileComponent roleId={roleId} IP={IP} />;
+        return <UploadISO8583File roleId={roleId} />;
+      case "radio3":
+        return <ISO8583Component roleId={roleId} IP={IP} />;
+      case "radio4":
+        return <ISO8583Decoded roleId={roleId} IP={IP} />;
+      default:
+        return <></>;
+    }
   };
 
   return (
     <div>
       <div className="container">
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-2 row-cols-xxl-2 mt-2">
-          <div className="col">
-          <label style={{ fontWeight: "500" }}>I want to*</label> <br />
-          <input
+        <h5 style={{ fontWeight: "500" }}>I want to*</h5> <br />
+        <div className="row">
+          <div className="col-sm-4">
+            <input
               className="form-check-input"
               type={"radio"}
               value="radio1"
@@ -42,18 +59,16 @@ const Merchant = ({ roleId, IP,getRoleFromFile }) => {
               checked={formFile === "radio1"}
               name="radioBtn"
               onChange={handelOnchange}
-            /> <span
-            htmlFor="submit"
-            className="form-check-label"
-            style={{ marginLeft: "10px", fontSize: "16px" }}
-          >
-            Initiate a Single Sales/Return transaction
-          </span>
-          {/* <h6 className="headItem">(Merchant - Direct Mode)</h6> */}
+            />{" "}
+            <label
+              htmlFor="radio1"
+              style={{ marginLeft: "5px", fontSize: "14px", display: "inline" }}
+            >
+              Initiate a single merchant settlement request
+            </label>
           </div>
-          <div className="col">
-            <br />
-          <input
+          <div className="col-sm-4">
+            <input
               className="form-check-input"
               type={"radio"}
               value="radio2"
@@ -61,19 +76,17 @@ const Merchant = ({ roleId, IP,getRoleFromFile }) => {
               name="radioBtn"
               id="radio2"
               onChange={handelOnchange}
-              onClick={onCilckFileCOmponent}
-            /><span
-            htmlFor="file"
-            className="form-check-label"
-            style={{ marginLeft: "10px", fontSize: "16px" }}
-          >
-            Upload a file with multiple Sales/Return transactions
-          </span>
-          <h6 className="headItem">(Aggregator Mode)</h6>
+              // onClick={onCilckFileCOmponent}
+            />
+            <label
+              htmlFor="radio2"
+              style={{ marginLeft: "5px", fontSize: "14px", display: "inline" }}
+            >
+              Upload merchant settlement request(s) CSV file
+            </label>
           </div>
-          <div className="col">
-            <br />
-          <input
+          <div className="col-sm-4">
+            <input
               className="form-check-input"
               type={"radio"}
               value="radio3"
@@ -81,19 +94,18 @@ const Merchant = ({ roleId, IP,getRoleFromFile }) => {
               name="radioBtn"
               id="radio3"
               onChange={handelOnchange}
-              onClick={onCilckFileCOmponent}
-            /><span
-            htmlFor="file"
-            className="form-check-label"
-            style={{ marginLeft: "10px", fontSize: "16px" }}
-          >
-            Submit ISO 8583 message
-          </span>
-          {/* <h6 className="headItem">(Aggregator Mode)</h6> */}
+              // onClick={onCilckFileCOmponent}
+            />
+            <label
+              htmlFor="radio3"
+              style={{ marginLeft: "5px", fontSize: "14px", display: "inline" }}
+            >
+              Submit a merchant settlment request (ISO 8583)
+            </label>
           </div>
-          <div className="col">
+          {/* <div className="col-sm-4">
             <br />
-          <input
+            <input
               className="form-check-input"
               type={"radio"}
               value="radio4"
@@ -102,48 +114,25 @@ const Merchant = ({ roleId, IP,getRoleFromFile }) => {
               id="radio4"
               onChange={handelOnchange}
               onClick={onCilckFileCOmponent}
-            /><span
-            htmlFor="file"
-            className="form-check-label"
-            style={{ marginLeft: "10px", fontSize: "16px" }}
-          >
-            Submit Decoded ISO 8583 message
-          </span>
-          {/* <h6 className="headItem">(Aggregator Mode)</h6> */}
-          </div>
+            />
+            <span
+              htmlFor="file"
+              
+              style={{ marginLeft: "10px", fontSize: "16px" }}
+            >
+              Submit Decoded ISO 8583 message
+            </span>
+          </div> */}
         </div>
       </div>
       <div style={{ marginLeft: "230px", marginTop: "20px" }}>
-       
         <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
-          <div className="mb-1">
-            
-           
-          </div>
-          <div className="mb-1" style={{ marginLeft: "100px" }}>
-            
-            
-          </div>
+          <div className="mb-1"></div>
+          <div className="mb-1" style={{ marginLeft: "100px" }}></div>
         </div>
-        <div className="placeHeads">
-          
-         
-        </div>
+        <div className="placeHeads"></div>
       </div>
-      {/* Submit form */}
-      {formFile === "radio1" && (
-        <SubmitTx roleId={roleId}  IP={IP} />
-      )}
-      {/* File Input*/}
-      {formFile === "radio2" && (
-        <FileComponent roleId={roleId} IP={IP} />
-      )}
-      {formFile === "radio3" && (
-        <ISO8583Component roleId={roleId} IP={IP} />
-      )}
-      {formFile === "radio4" && (
-        <ISO8583Decoded roleId={roleId} IP={IP} />
-      )}
+      {renderSubmitForm()}
       <Footer />
     </div>
   );
