@@ -99,12 +99,12 @@ class AuthorizeSettlementTxCC extends Contract {
   async authorizeTxByAOD(ctx, txIn) {
     var isAuthorized = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
-    const hasTxsystemTraceAuditNumber = "systemTraceAuditNumber" in txIn;
+    const hasTxsystemTraceAuditNumber = "systemsTraceAuditNumber" in txIn;
     if (hasTxsystemTraceAuditNumber) {
-      if (txIn.systemTraceAuditNumber === "" || txIn.systemTraceAuditNumber.length == 0) {
+      if (txIn.systemsTraceAuditNumber === "" || txIn.systemsTraceAuditNumber.length == 0) {
         isAuthorized = false;
         console.log(
-          "Validation by AOD... systemTraceAuditNumber not valid: ",
+          "Validation by AOD... systemsTraceAuditNumber not valid: ",
           isAuthorized
         );
         return isAuthorized;

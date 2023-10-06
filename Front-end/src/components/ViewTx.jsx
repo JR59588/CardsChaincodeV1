@@ -6,6 +6,7 @@ import Footer from "./Footer";
 import "./ViewTx.css";
 import axios from "axios";
 import Alert from "./Alert";
+import { NotificationManager } from "react-notifications";
 let UNAUTHORIZED = "Unauthorized";
 
 //let showVerifyDefault=true;
@@ -68,9 +69,6 @@ const ViewTx = (props) => {
   //alert
   const [alertState, setAlertState] = useState(false);
 
-  //sorting order
-  const [sortingOrder, setSortingOrder] = useState(false);
-
   //loading customer
   const [loadCustomer, setLoadCustomer] = useState(false);
 
@@ -84,15 +82,9 @@ const ViewTx = (props) => {
     const socket = socketIOClient(ENDPOINT);
     socket.on("status-change", (response) => {
       setTransactionsData((transactionsData) => {
-        // console.log(
-        //   "inside use effect status change - viewtx.js",
-        //   response,
-        //   response.data.join("-")
-        // );
-        // console.log("Data mixed: ", transactionsData);
         const key = response.data.join("-");
         const newDataMixed = transactionsData.map((item) => {
-          if (item.Key == key) {
+          if (item.Key === key) {
             item.Record.TxStatus = response.status;
           }
           return item;
@@ -100,6 +92,11 @@ const ViewTx = (props) => {
 
         return newDataMixed;
       });
+      NotificationManager.success(
+        response.status + "\n" + response.message,
+        "Status Changed",
+        3000
+      );
     });
 
     return () => {
@@ -154,47 +151,23 @@ const ViewTx = (props) => {
   //Onclick Of viewmore for merchantId
   const onClickMerchantId = async (id) => {
     setMrId(id);
-    //demo purpose
-    if (updatedRoleId === "CAcct") {
-      try {
-        const res1 = await axios.get(
-          `${retrieveOBMerchantData_URL}/${id}/CAcct`
-        );
-        const res2 = transactionsData.find(
-          (item) => item.Record.MerchantId === id
-        );
-        //setting the combined response in data for Main table.
-        setAuthorization(true);
-        console.log("res1 data 137-", res1);
-        console.log("res2 data 138-", res2);
-        setMergedMerchantData({ ...res1.data.response, ...res2.Record });
-      } catch (error) {
-        console.log("error for pvMerchant 116", error);
-        if (error?.response.status === 401) {
-          setAuthorization(false);
-          console.log("Unauthorized - PvMerchant");
-        }
-      }
-      //demo purpose end
-    } else {
-      try {
-        const res1 = await axios.get(
-          `${retrieveOBMerchantData_URL}/${id}/${updatedRoleId}`
-        );
-        const res2 = transactionsData.find(
-          (item) => item.Record.MerchantId === id
-        );
-        //setting the combined response in data for Main table.
-        setAuthorization(true);
-        console.log("res1 data 186-", res1);
-        console.log("res2 data 187-", res2);
-        setMergedMerchantData({ ...res1.data.response, ...res2.Record });
-      } catch (error) {
-        console.log("error for pvMerchant 116", error);
-        if (error?.response.status === 401) {
-          setAuthorization(false);
-          console.log("Unauthorized - PvMerchant");
-        }
+    try {
+      const res1 = await axios.get(
+        `${retrieveOBMerchantData_URL}/${id}/${updatedRoleId}`
+      );
+      const res2 = transactionsData.find(
+        (item) => item.Record.MerchantId === id
+      );
+      //setting the combined response in data for Main table.
+      setAuthorization(true);
+      console.log("res1 data 186-", res1);
+      console.log("res2 data 187-", res2);
+      setMergedMerchantData({ ...res1.data.response, ...res2.Record });
+    } catch (error) {
+      console.log("error for pvMerchant 116", error);
+      if (error?.response.status === 401) {
+        setAuthorization(false);
+        console.log("Unauthorized - PvMerchant");
       }
     }
   };

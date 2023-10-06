@@ -8,10 +8,11 @@ import Header from './components/Header'
 import Merchant from './components/Merchant'
 import { Route } from 'react-router-dom'
 import Dashboard from './components/Dashboard'
-import ViewOnboardingStatic from './components/ViewOnboardingStatic/ViewOnboardingStatic'
 import Onboard from './components/Onboarding/Onboard'
 import SubmitTx from './components/Submit_Tx/SubmitTx'
 import NewViewOnboardingStatic from './components/ViewOnboardingStatic/NewViewOnboardingStatic'
+import 'react-notifications/lib/notifications.css';
+import { NotificationContainer } from 'react-notifications'
 import ViewTx from './components/ViewTx'
 import socketIOClient from 'socket.io-client';
 import axios from 'axios'
@@ -48,6 +49,7 @@ function App() {
   return (
     <div>
       <Header roleId={roleId} setRoleId={setRoleId} orgOptions={orgOptions} />
+      <NotificationContainer />
       <Routes>
         <Route
           path="/Merchant"
