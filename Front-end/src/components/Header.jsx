@@ -11,7 +11,7 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
       className="navbar navbar-expand-lg"
       style={{
         height: "70px",
-        backgroundColor: "rgb(7, 78, 125)",
+        backgroundColor: "#10005d",
         color: "white",
       }}
     >
@@ -116,7 +116,7 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
               <select
                 style={{
                   width: "210px",
-                  backgroundColor: "#1fa1f8",
+                  backgroundColor: "#10005d",
                   height: "36px",
                   color: "white",
                 }}

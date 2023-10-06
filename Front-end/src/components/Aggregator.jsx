@@ -564,7 +564,7 @@ console.log(modal);
             ) : (
               <button
                 type="button"
-                className="btn btn-outline-success bt1"
+                className="buttonbt2"
                 onClick={submitForm}
               >
                 Save

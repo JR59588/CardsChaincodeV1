@@ -70,6 +70,18 @@
     font-size: 18px;
     color:#FFDB58;
 }
+.buttonbt2{
+
+    background-color: #10005d;
+    border-radius: 5px;
+    border-color:#10005d ;
+    color:white;
+    font-size: medium;
+  
+  
+  
+  }
+ 
 .notValid{
     color: red !important;
 }

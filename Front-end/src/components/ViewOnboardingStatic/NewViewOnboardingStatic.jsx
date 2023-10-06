@@ -248,7 +248,7 @@ const NewViewOnboardingStatic = (props) => {
               <div style={{ marginTop: "5px" }}>
                 <button
                   style={{ width: "100px" }}
-                  className="btn btn-success"
+                  className="buttonbt2"
                   onClick={lookUpMerchantId}
                 >
                   Lookup

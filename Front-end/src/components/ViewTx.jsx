@@ -379,7 +379,7 @@ const ViewTx = (props) => {
     >
       <td
         style={{
-          color: "green",
+          color: "#10005d",
           border: "none",
           backgroundColor: "transparent",
         }}
@@ -712,7 +712,7 @@ const ViewTx = (props) => {
                       </tr>
                     ) : (
                       <div style={{ display: "flex" }}>
-                        <h5 className="p-2" style={{ color: "green" }}>
+                        <h5 className="p-2" style={{ color: "#10005d" }}>
                           Loading...
                         </h5>
                         <div className="loader"></div>

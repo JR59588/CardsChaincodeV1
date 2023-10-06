@@ -8,7 +8,7 @@ const NewViewOnboarding = (props) => {
       <div className="container">
         <div className="cols2">
           <h4 style={{ textAlign: "center" }} className="mt-4 mb-4">
-            View Onboarded Merchant (Representative**)
+            View Onboarded Merchant 
           </h4>
         </div>
         <div
@@ -373,7 +373,7 @@ const NewViewOnboarding = (props) => {
           </div>
         </div>
         <p>
-          **Representative - attributes shown are examples for this POC and
+          Note : attributes shown are examples for this POC and
           would be chosen as per business need.
         </p>
       </div>
