@@ -19,7 +19,7 @@ const Loader = ({ merchantID }) => {
           <circle className="front" cx="17" cy="17" r="14"></circle>
         </svg>
         <div className="text" data-text="Loading" style={{ fontWeight:'bold', textTransform: "capitalize",position:'relative',left:'60px' ,top:'60px'}}>
-          <span style={{fontWeight:'bold',color:'#008555',width:'200px' }} >&nbsp;{merchantID}</span>
+          <span style={{fontWeight:'bold',color:'#10005d',width:'200px' }} >&nbsp;{merchantID}</span>
         </div>
       </div>
     </div>
@@ -29,3 +29,4 @@ const Loader = ({ merchantID }) => {
 export default Loader;
 
 // style={{ position: "relative", left: "500px", top: "100px" }}
+

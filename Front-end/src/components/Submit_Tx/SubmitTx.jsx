@@ -122,7 +122,7 @@ const SubmitTx = (props) => {
       <div className="container">
         <div className="cols2">
           <h4 style={{ textAlign: "center" }} className="mb-4">
-            Submit Settlement Tx (Representative**)
+            Submit Settlement Tx 
           </h4>
         </div>
         <div
@@ -457,7 +457,8 @@ const SubmitTx = (props) => {
           props.roleId === "SA" ? (
             <button
               type="button"
-              className="btn btn-outline-success bt1"
+              
+              className={`${styles.buttonbt2} bt2`}
               disabled
             >
               Submit

@@ -306,6 +306,29 @@
   .tool:focus::after {
     transition: all 0.65s cubic-bezier(0.84, -0.18, 0.31, 1.26);
   }
+  .buttonbt2{
+
+    background-color: white;
+    border-radius: 5px;
+    border-color:#10005d ;
+    color:#10005d;
+    font-size: medium;
+    height: 38px;
+  
+  
+  
+  }
+  .buttonbt2:hover{
+  
+    background-color: #10005d;
+    border-radius: 5px;
+    border-color:#10005d ;
+    color:white;
+    font-size: medium;
+  
+  
+  
+  }
   
   @media (max-width: 760px) {
     .tool::after {

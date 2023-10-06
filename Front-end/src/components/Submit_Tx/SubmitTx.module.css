@@ -85,8 +85,31 @@
   top: -34px;
   left: 15px;
 }
+
 .btPlacing{
   
+}
+.buttonbt2{
+
+  background-color: white;
+  border-radius: 5px;
+  border-color:#10005d ;
+  color:#10005d;
+  font-size: medium;
+
+
+
+}
+.buttonbt2:hover{
+
+  background-color: #10005d;
+  border-radius: 5px;
+  border-color:#10005d ;
+  color:white;
+  font-size: medium;
+
+
+
 }
 
 @media screen and (max-width: 1000px) {

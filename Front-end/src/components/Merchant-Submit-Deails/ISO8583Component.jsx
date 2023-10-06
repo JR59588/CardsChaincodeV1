@@ -103,7 +103,7 @@ const ISO8583Component = (props) => {
               className="mt-3"
               style={{ textAlign: "center", fontWeight: "500" }}
             >
-              Submit ISO8583 Message (Representative**)
+              Submit ISO8583 Message 
             </h5>
           </div>
           <div className="col-md-3"></div>
@@ -208,7 +208,7 @@ const ISO8583Component = (props) => {
         <div className="row">
           <div className="col-md-12">
             <p>
-              **Representative - attributes shown are examples for this POC and
+              Note : attributes shown are examples for this POC and
               would be chosen as per business need.
             </p>
           </div>
@@ -221,7 +221,7 @@ const ISO8583Component = (props) => {
           ) : (
             <button
               type="button"
-              className="btn btn-outline-success bt1"
+              className="buttonbt2"
               onClick={SubmitISO8583}
             >
               Submit

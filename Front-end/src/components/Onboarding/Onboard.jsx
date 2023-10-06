@@ -5,7 +5,8 @@ import axios from "axios";
 import { useEffect } from "react";
 import SuccessModal from "../SuccessModal/SuccessModal";
 import { BsInfoCircle } from "react-icons/bs";
-
+import Loader from "../ViewOnboardingStatic/Loader/Loader";
+import Spinner from 'react-bootstrap/Spinner';
 const message = (
   <h6>
     Response 200: Successfully Endorsed by Customer Department , Operations
@@ -21,6 +22,10 @@ const Onboard = (props) => {
   //setting role message
   const [roleMsg, setRoleMsg] = useState(false);
 
+  //loader state
+  const [loader, setLoader] = useState(false);
+//loader message
+  const[loadermessage,setLoadermessage] = useState("please wait when the merchant is getting onboarded");
   //summary state
   const [summaryState, setSummaryState] = useState(false);
 
@@ -76,13 +81,25 @@ const Onboard = (props) => {
       [e.target.name]: e.target.value,
     });
   };
+
   const onClickContinue = () => {
+   
     // api call
     setSummaryState(false);
+    setLoader(true);
+
+
     if (props.roleId.length !== 0) {
       onboardingFormData.customerID = "C" + onboardingFormData.merchantID;
       setRoleMsg(false);
+
       console.log(onboardingFormData);
+      
+     
+
+setTimeout(()=>{setLoadermessage("it is taking longer time than expected please wait")},5000)
+
+
       axios
         .post(
           `http://${IP}:3001/api/v1/saveOBMerchantSummary`,
@@ -92,34 +109,53 @@ const Onboard = (props) => {
           }
         )
         .then((response) => {
+          setLoadermessage("Success")
           console.log(response);
-          setLoading(false);
+          setTimeout(() => {
+            
+            setLoading(false);
+            setLoader(false);
+          }, 1000);
           props.fetchOrganizationData();
           setModal(true);
+
         })
 
         .catch((err) => {
-          setLoading(false);
+          setLoadermessage("Failed")
+          setTimeout(() => {
+            
+            setLoader(false)
+            setLoading(false);
+          }, 1000);
           console.log(err);
           if (!err?.response) {
             console.log("No Server Response");
             console.log("No Server Response");
             failureHead = "No Service";
             failureMsg = `No Server Response`;
-            setFailureModal(true);
+            setTimeout(() => {
+              
+              setFailureModal(true);
+            }, 1000);
           } else if (err.response?.status === 400) {
             console.log(err.message);
             console.log(err.message);
             failureHead = "Transaction Failed";
             failureMsg = `Response 400:Transaction Failed ${err.message}`;
-            setFailureModal(true);
+            setTimeout(() => {
+              
+              setFailureModal(true);
+            }, 1000);
           } else if (err.response?.status === 401) {
             console.log("Unauthorized");
             failureHead = "Transaction Failed";
             failureMsg = !err.response.data.message
               ? "Something went wrong please try again"
               : err.response.data.message;
+           setTimeout(() => {
             setFailureModal(true);
+           }, 1000);
           } else {
             console.log("error");
           }
@@ -150,7 +186,7 @@ const Onboard = (props) => {
       <div className="container">
         <div className="cols2">
           <h4 style={{ textAlign: "center" }} className="mt-4 mb-4">
-            Merchant Onboarding (Representative**)
+            Merchant Onboarding 
           </h4>
         </div>
         <div
@@ -592,14 +628,14 @@ const Onboard = (props) => {
         </div>
         <br />
         <p>
-          **Representative - attributes shown are examples for this POC and
+          Note : attributes shown are examples for this POC and
           would be chosen as per business need.
         </p>
         <div className="col-md-12 mt-4 d-flex justify-content-center align-items-center">
           {props.roleId === "Agg2" ||
-          props.roleId === "CAcct" ||
-          props.roleId === "EDI" ||
-          props.roleId === "AP" ? (
+            props.roleId === "CAcct" ||
+            props.roleId === "EDI" ||
+            props.roleId === "AP" ? (
             <button
               type="button"
               className="btn btn-outline-success bt1"
@@ -612,7 +648,8 @@ const Onboard = (props) => {
           ) : (
             <button
               type="button"
-              className="btn btn-outline-success bt1"
+            
+              className={`${styles.buttonbt2} bt2`}
               onClick={submitForm}
             >
               Save
@@ -664,6 +701,10 @@ const Onboard = (props) => {
               <button onClick={onClickContinue} className="btn btn-primary">
                 Confirm
               </button>
+
+
+
+
               <button
                 onClick={onClickClose}
                 style={{ marginRight: "10px" }}
@@ -671,10 +712,46 @@ const Onboard = (props) => {
               >
                 Close
               </button>
+
             </div>
           </div>
         </div>
       )}
+
+      {loader && <div className="blur">
+        {/* <Spinner animation="border" role="status">
+        </Spinner>
+          <span>Loading...</span> */
+          }
+           <div  style={{
+            display:'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            flexDirection:'column',
+            marginTop:'40px'
+           }}>
+      <div id="wifi-loader">
+        <svg className="circle-outer" viewBox="0 0 86 86">
+          <circle className="back" cx="43" cy="43" r="40"></circle>
+          <circle className="front" cx="43" cy="43" r="40"></circle>
+          <circle className="new" cx="43" cy="43" r="40"></circle>
+        </svg>
+        <svg className="circle-middle" viewBox="0 0 60 60">
+          <circle className="back" cx="30" cy="30" r="27"></circle>
+          <circle className="front" cx="30" cy="30" r="27"></circle>
+        </svg>
+        <svg className="circle-inner" viewBox="0 0 34 34">
+          <circle className="back" cx="17" cy="17" r="14"></circle>
+          <circle className="front" cx="17" cy="17" r="14"></circle>
+        </svg>
+        {/* <div className="text" style={{ fontWeight:'bold', textTransform: "capitalize",position:'relative' ,top:'120px', width:'300px'}}>
+      
+        </div> */}
+      </div>
+      <p style={{ fontWeight:'bold', textTransform: "capitalize",marginTop:'20px'}}> {loadermessage}</p>
+    </div>
+
+      </div>}
       <Footer />
     </div>
   );
