@@ -92,10 +92,18 @@ const ViewTx = (props) => {
 
         return newDataMixed;
       });
+      const message = response.verifications
+        .map(
+          (verification, index) =>
+            index + ". " + verification.org + ": " + verification.attribute
+        )
+        .join("\n");
       NotificationManager.success(
-        response.status + "\n" + response.message,
-        "Status Changed",
-        3000
+        `Status: ${response.status} 
+        Verifications:
+        ${message}`,
+        "Status Updated",
+        500000
       );
     });
 
