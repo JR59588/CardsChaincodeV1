@@ -468,7 +468,7 @@ const SubmitTx = (props) => {
           ) : (
             <button
               type="button"
-              className="btn btn-outline-success bt1"
+              className="buttonbt3"
               onClick={SubmitMerchant}
             >
               Submit

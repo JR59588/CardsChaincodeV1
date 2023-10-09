@@ -6,6 +6,9 @@ import Form from "react-bootstrap/Form";
 
 const UploadISO8583File = ({ roleId }) => {
   const [file, setFile] = useState(null);
+  //loader state
+  const [loader, setLoader] = useState(false);
+
   const [popup, setPopup] = useState({
     open: false,
     message: "",
@@ -18,8 +21,10 @@ const UploadISO8583File = ({ roleId }) => {
   const handleUpload = async (event) => {
     event.preventDefault();
     if (!file) {
+      setLoader(false);
       console.log("No file selected");
       alert("Choose a file to proceed");
+      
     } else {
       try {
         const formData = new FormData();
@@ -36,15 +41,19 @@ const UploadISO8583File = ({ roleId }) => {
           message: response.data.message,
           heading: "File upload successful",
           reason: "",
+          
         });
+        setLoader(false);
       } catch (error) {
         console.log(`Error uploading file: ${error}`);
+
         setPopup({
           open: true,
           message: error.response.data.message,
           heading: "File upload failure",
           reason: error.response.data.reason,
         });
+        setLoader(false);
       }
     }
   };
@@ -96,15 +105,44 @@ const UploadISO8583File = ({ roleId }) => {
           onChange={(event) => setFile(event.target.files[0])}
         />
         <Button
-          className="ms-3"
+          className="buttonbt3"
           onClick={(event) => {
             handleUpload(event);
+            setLoader(true);
           }}
         >
           Submit
         </Button>
       </div>
       <div>{renderPopup()}</div>
+      {loader && <div className="blur">
+       
+           <div  style={{
+            display:'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            flexDirection:'column',
+            marginTop:'40px'
+           }}>
+      <div id="wifi-loader">
+        <svg className="circle-outer" viewBox="0 0 86 86">
+          <circle className="back" cx="43" cy="43" r="40"></circle>
+          <circle className="front" cx="43" cy="43" r="40"></circle>
+          <circle className="new" cx="43" cy="43" r="40"></circle>
+        </svg>
+        <svg className="circle-middle" viewBox="0 0 60 60">
+          <circle className="back" cx="30" cy="30" r="27"></circle>
+          <circle className="front" cx="30" cy="30" r="27"></circle>
+        </svg>
+        <svg className="circle-inner" viewBox="0 0 34 34">
+          <circle className="back" cx="17" cy="17" r="14"></circle>
+          <circle className="front" cx="17" cy="17" r="14"></circle>
+        </svg>
+       
+      </div>
+     </div>
+
+      </div>}
     </div>
   );
 };

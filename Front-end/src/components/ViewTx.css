@@ -15,12 +15,12 @@ tr {
   color: red;
 }
 select {
-  background-color: #008555;
+  background-color: #10005d;
   color: white;
   height: 30px;
   width: 150px;
   border-radius: 5px;
-  border: 0 solid #008555;
+  border: 0 solid #10005d;
   cursor: pointer;
 }
 .msgLoader {
@@ -29,7 +29,7 @@ select {
 .loader {
   width: 25px;
   height: 25px;
-  border: 10px solid #008555;
+  border: 10px solid #10005d;
   border-bottom-color: transparent;
   border-radius: 50%;
   animation: rotation 1s linear infinite;
@@ -52,7 +52,7 @@ select {
 /* button for SA Verified */
 .verifyButton {
   border: 1px solid white;
-  background-color: #008555;
+  background-color: #10005d;
   color: white;
   border-radius: 5px;
 }

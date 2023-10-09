@@ -33,6 +33,31 @@
   
   
   }
+  .buttonbt3{
+
+    background-color: white;
+    border-radius: 5px;
+    border-color:#10005d ;
+    color:#10005d;
+    font-size: medium;
+    height: 38px;
+    width: 145px;
+    margin-left: 20px;
+    
+  
+  
+  }
+  .buttonbt3:hover{
+  
+    background-color: #10005d;
+    border-radius: 5px;
+    border-color:#10005d ;
+    color:white;
+    font-size: medium;
+  
+  
+  
+  }
 .placingCustomer{
     background-color: white;
     color:black;
@@ -108,7 +133,7 @@ div>input{
 .loaderSubmit{
     width: 25px;
     height: 25px;
-    border: 5px solid #008555;
+    border: 5px solid #10005d;
     border-bottom-color: transparent;
     border-radius: 50%;
     animation: rotationSubmit 1s linear infinite;
