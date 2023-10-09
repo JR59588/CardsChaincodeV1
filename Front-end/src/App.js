@@ -12,7 +12,8 @@ import Onboard from './components/Onboarding/Onboard'
 import SubmitTx from './components/Submit_Tx/SubmitTx'
 import NewViewOnboardingStatic from './components/ViewOnboardingStatic/NewViewOnboardingStatic'
 import 'react-notifications/lib/notifications.css';
-import { NotificationContainer } from 'react-notifications'
+import { NotificationContainer } from 'react-notifications';
+import { ReactNotifications } from 'react-notifications-component';
 import ViewTx from './components/ViewTx'
 import socketIOClient from 'socket.io-client';
 import axios from 'axios'
