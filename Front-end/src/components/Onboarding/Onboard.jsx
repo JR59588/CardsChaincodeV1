@@ -23,12 +23,13 @@ const Onboard = (props) => {
 
   //loader state
   const [loader, setLoader] = useState(false);
-//loader message
-  const[loadermessage,setLoadermessage] = useState("please wait when the merchant is getting onboarded");
+  //loader message
+  const [loadermessage, setLoadermessage] = useState(
+    "please wait when the merchant is getting onboarded"
+  );
   const [popupMessage, setPopupMessage] = useState("");
   const [popupHeading, setPopupHeading] = useState("");
   const [popupReason, setPopupReason] = useState("");
-
 
   //summary state
   const [summaryState, setSummaryState] = useState(false);
@@ -87,7 +88,6 @@ const Onboard = (props) => {
   };
 
   const onClickContinue = () => {
-   
     // api call
     setSummaryState(false);
     setLoader(true);
@@ -96,11 +96,10 @@ const Onboard = (props) => {
       setRoleMsg(false);
 
       console.log(onboardingFormData);
-      
-     
 
-setTimeout(()=>{setLoadermessage("it is taking longer time than expected please wait")},5000)
-
+      setTimeout(() => {
+        setLoadermessage("it is taking longer time than expected please wait");
+      }, 5000);
 
       axios
         .post(
@@ -111,15 +110,15 @@ setTimeout(()=>{setLoadermessage("it is taking longer time than expected please 
           }
         )
         .then((response) => {
-          setLoadermessage("Success")
+          setLoadermessage("Success");
           console.log(response);
           setLoading(false);
           setLoader(false);
           props.fetchOrganizationData();
           setPopupHeading("Merchant Onboarding Successful");
           setPopupMessage(response.data.message);
+          setPopupReason("");
           setModal(true);
-
         })
 
         .catch((err) => {
@@ -158,7 +157,7 @@ setTimeout(()=>{setLoadermessage("it is taking longer time than expected please 
       <div className="container">
         <div className="cols2">
           <h4 style={{ textAlign: "center" }} className="mt-4 mb-4">
-            Merchant Onboarding 
+            Merchant Onboarding
           </h4>
         </div>
         <div
@@ -600,14 +599,14 @@ setTimeout(()=>{setLoadermessage("it is taking longer time than expected please 
         </div>
         <br />
         <p>
-          Note : attributes shown are examples for this POC and
-          would be chosen as per business need.
+          Note : attributes shown are examples for this POC and would be chosen
+          as per business need.
         </p>
         <div className="col-md-12 mt-4 d-flex justify-content-center align-items-center">
           {props.roleId === "Agg2" ||
-            props.roleId === "CAcct" ||
-            props.roleId === "EDI" ||
-            props.roleId === "AP" ? (
+          props.roleId === "CAcct" ||
+          props.roleId === "EDI" ||
+          props.roleId === "AP" ? (
             <button
               type="button"
               className="btn btn-outline-success bt1"
@@ -620,7 +619,6 @@ setTimeout(()=>{setLoadermessage("it is taking longer time than expected please 
           ) : (
             <button
               type="button"
-            
               className={`${styles.buttonbt2} bt2`}
               onClick={submitForm}
             >
@@ -680,9 +678,6 @@ setTimeout(()=>{setLoadermessage("it is taking longer time than expected please 
                 Confirm
               </button>
 
-
-
-
               <button
                 onClick={onClickClose}
                 style={{ marginRight: "10px" }}
@@ -690,46 +685,56 @@ setTimeout(()=>{setLoadermessage("it is taking longer time than expected please 
               >
                 Close
               </button>
-
             </div>
           </div>
         </div>
       )}
 
-      {loader && <div className="blur">
-        {/* <Spinner animation="border" role="status">
+      {loader && (
+        <div className="blur">
+          {/* <Spinner animation="border" role="status">
         </Spinner>
-          <span>Loading...</span> */
-          }
-           <div  style={{
-            display:'flex',
-            justifyContent:'center',
-            alignItems:'center',
-            flexDirection:'column',
-            marginTop:'40px'
-           }}>
-      <div id="wifi-loader">
-        <svg className="circle-outer" viewBox="0 0 86 86">
-          <circle className="back" cx="43" cy="43" r="40"></circle>
-          <circle className="front" cx="43" cy="43" r="40"></circle>
-          <circle className="new" cx="43" cy="43" r="40"></circle>
-        </svg>
-        <svg className="circle-middle" viewBox="0 0 60 60">
-          <circle className="back" cx="30" cy="30" r="27"></circle>
-          <circle className="front" cx="30" cy="30" r="27"></circle>
-        </svg>
-        <svg className="circle-inner" viewBox="0 0 34 34">
-          <circle className="back" cx="17" cy="17" r="14"></circle>
-          <circle className="front" cx="17" cy="17" r="14"></circle>
-        </svg>
-        {/* <div className="text" style={{ fontWeight:'bold', textTransform: "capitalize",position:'relative' ,top:'120px', width:'300px'}}>
+          <span>Loading...</span> */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              marginTop: "40px",
+            }}
+          >
+            <div id="wifi-loader">
+              <svg className="circle-outer" viewBox="0 0 86 86">
+                <circle className="back" cx="43" cy="43" r="40"></circle>
+                <circle className="front" cx="43" cy="43" r="40"></circle>
+                <circle className="new" cx="43" cy="43" r="40"></circle>
+              </svg>
+              <svg className="circle-middle" viewBox="0 0 60 60">
+                <circle className="back" cx="30" cy="30" r="27"></circle>
+                <circle className="front" cx="30" cy="30" r="27"></circle>
+              </svg>
+              <svg className="circle-inner" viewBox="0 0 34 34">
+                <circle className="back" cx="17" cy="17" r="14"></circle>
+                <circle className="front" cx="17" cy="17" r="14"></circle>
+              </svg>
+              {/* <div className="text" style={{ fontWeight:'bold', textTransform: "capitalize",position:'relative' ,top:'120px', width:'300px'}}>
       
         </div> */}
-      </div>
-      <p style={{ fontWeight:'bold', textTransform: "capitalize",marginTop:'20px'}}> {loadermessage}</p>
-    </div>
-
-      </div>}
+            </div>
+            <p
+              style={{
+                fontWeight: "bold",
+                textTransform: "capitalize",
+                marginTop: "20px",
+              }}
+            >
+              {" "}
+              {loadermessage}
+            </p>
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );
