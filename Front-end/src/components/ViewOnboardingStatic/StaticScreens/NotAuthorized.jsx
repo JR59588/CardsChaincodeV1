@@ -57,7 +57,7 @@ const NotAuthorized = () => {
                     </label>
                   </div>
                   <div className="mb-1">
-                    <label className="col-form-label">Bank Code:</label>
+                    <label className="col-form-label">Bank Identifier:</label>
                   </div>
                   <div className="mb-1">
                     <label className="col-form-label"> IFSC:</label>

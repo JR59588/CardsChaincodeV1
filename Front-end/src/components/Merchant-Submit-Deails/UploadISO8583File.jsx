@@ -45,15 +45,16 @@ const UploadISO8583File = ({ roleId }) => {
         });
         setLoader(false);
       } catch (error) {
-        console.log(`Error uploading file: ${error}`);
 
+        console.log(`Error uploading file: ${error}`);
+        setLoader(false);
         setPopup({
           open: true,
           message: error.response.data.message,
           heading: "File upload failure",
           reason: error.response.data.reason,
         });
-        setLoader(false);
+       
       }
     }
   };
@@ -103,12 +104,13 @@ const UploadISO8583File = ({ roleId }) => {
           type="file"
           style={{ width: "500px" }}
           onChange={(event) => setFile(event.target.files[0])}
+          
         />
         <Button
           className="buttonbt3"
           onClick={(event) => {
             handleUpload(event);
-            setLoader(true);
+            // setLoader(true);
           }}
         >
           Submit

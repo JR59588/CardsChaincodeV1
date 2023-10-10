@@ -8,6 +8,8 @@ import Header from './components/Header'
 import Merchant from './components/Merchant'
 import { Route } from 'react-router-dom'
 import Dashboard from './components/Dashboard'
+import About from "./components/About";
+import DashboardSummary from "./components/DashboardSummary";
 import Onboard from './components/Onboarding/Onboard'
 import SubmitTx from './components/Submit_Tx/SubmitTx'
 import NewViewOnboardingStatic from './components/ViewOnboardingStatic/NewViewOnboardingStatic'
@@ -79,6 +81,8 @@ function App() {
           path="/View-Onboarding-Static"
           element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}
         />
+        <Route path="/About" element={<About />} />
+        <Route path="/DashboardSummary" element={<DashboardSummary />} />
         <Route path="*" element={<h1>Not found....</h1>} />
 
         {/* testing routes */}

@@ -87,7 +87,7 @@
 .loaderSubmit{
     width: 25px;
     height: 25px;
-    border: 5px solid #008555;
+    border: 5px solid #10005d;
     border-bottom-color: transparent;
     border-radius: 50%;
     animation: rotationSubmit 1s linear infinite;
@@ -274,7 +274,7 @@
   .tool::before {
     border-style: solid;
     border-width: 1em 0.75em 0 0.75em;
-    border-color: #008555 transparent transparent transparent;
+    border-color: #10005d transparent transparent transparent;
     bottom: 100%;
     content: "";
     margin-left: -0.5em;
@@ -290,7 +290,7 @@
   
   /*== speech bubble ==*/
   .tool::after {
-    background: #008555;
+    background: #10005d;
     border-radius: 0.25em;
     bottom: 180%;
     color: #edeff0;

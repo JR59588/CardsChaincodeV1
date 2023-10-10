@@ -262,7 +262,7 @@ const NewViewOnboarding = (props) => {
               <div className="row">
                 <div className="col">
                   <label htmlFor="name" className="col-form-label">
-                    Bank Code:
+                    Bank Identifier:
                   </label>
                 </div>
                 <div className="col">
@@ -270,7 +270,7 @@ const NewViewOnboarding = (props) => {
                     disabled
                     type="text"
                     className="form-control"
-                    placeholder="Bank Code"
+                    placeholder="Bank Identifier"
                     aria-label="Last name"
                     name="merchantBankCode"
                     value={props.data.merchantBankCode}
@@ -285,7 +285,7 @@ const NewViewOnboarding = (props) => {
               <div className="row">
                 <div className="col">
                   <label htmlFor="name" className="col-form-label">
-                    Number of POS Terminals Required:
+                    Number of POS Terminals :
                   </label>
                 </div>
                 <div className="col">
@@ -293,7 +293,7 @@ const NewViewOnboarding = (props) => {
                     disabled
                     type="text"
                     className="form-control"
-                    placeholder="No of POS Terminals Required"
+                    placeholder="No of POS Terminals"
                     aria-label="Last name"
                     name="numberOfPOSTerminalsRequired"
                     value={props.data.numberOfPOSTerminalsRequired}

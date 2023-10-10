@@ -98,7 +98,7 @@ const Onboard = (props) => {
       console.log(onboardingFormData);
 
       setTimeout(() => {
-        setLoadermessage("it is taking longer time than expected please wait");
+        setLoadermessage("This will take a few moments the operation is being processed");
       }, 5000);
 
       axios
@@ -435,29 +435,20 @@ const Onboard = (props) => {
               <div className="row">
                 <div className="col">
                   <label htmlFor="name" className="col-form-label">
-                    Bank Code:
+                    Bank Identifier:
                   </label>
                 </div>
                 <div className="col">
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Bank code"
+                    placeholder="Bank Identifier"
                     aria-label="Last name"
                     name="merchantBankCode"
                     value={onboardingFormData.merchantBankCode}
                     onChange={onChangeHandel}
                   />
-                  {/* <span
-                    className={styles.tool}
-                    data-tip="Bank code should start with B e.g. B2010003."
-                    tabIndex="1"
-                  >
-                    <span className={styles.hoverMsg}>
-                      {' '}
-                      <BsInfoCircle />{' '}
-                    </span>
-                  </span> */}
+                  
                 </div>
               </div>
             </div>
@@ -471,7 +462,7 @@ const Onboard = (props) => {
                 </span>
                 <div className="col">
                   <label htmlFor="name" className="col-form-label">
-                    Number of POS Terminals Required:
+                    Number of POS Terminals :
                   </label>
                 </div>
                 <div className={`col ${styles.placingMsgHover}`}>
@@ -535,7 +526,7 @@ const Onboard = (props) => {
                   />
                   <span
                     className={styles.tool}
-                    data-tip="Number of deposits should start a number e.g. 12."
+                    data-tip="Number of deposits should start with a number e.g. 12."
                     tabIndex="1"
                   >
                     <span className={styles.hoverMsg}>

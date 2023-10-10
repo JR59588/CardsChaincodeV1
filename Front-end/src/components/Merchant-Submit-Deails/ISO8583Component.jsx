@@ -222,9 +222,10 @@ const ISO8583Component = (props) => {
             <button
               type="button"
               className="buttonbt3"
+           
               onClick={SubmitISO8583}
             >
-              Submit
+           Submit
             </button>
           )}
           <button type="button" className="btn btn-outline-danger bt2">

@@ -17,7 +17,7 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
     >
       <div className="container-fluid" style={{ color: "white" }}>
         <a className="navbar-brand" href="#" style={{ color: "white" }}>
-          HLF-CARDS Proof-of-Concept
+          HLF-CARDS MVP
         </a>
         <button
           className="navbar-toggler"
@@ -34,10 +34,10 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <NavLink to="/About" className="ani">
-                {/* About{" "}
+                About{" "}
                 <span style={{ color: "white" }} className="gapLine">
                   |
-                </span> */}
+                </span>
               </NavLink>{" "}
             </li>
             <li className="nav-item">
@@ -101,6 +101,15 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
             <li className="nav-item">
               <NavLink to="/ViewTx" className="ani">
                 View Sales/Return Requests{" "}
+                <span style={{ color: "white" }} className="gapLine">
+                  |
+                </span>
+              </NavLink>{" "}
+            </li>
+            <li className="nav-item">
+              <NavLink to="/DashboardSummary" className="ani">
+                Dashboard{" "}
+               
               </NavLink>{" "}
             </li>
           </ul>
