@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 // Setting for Hyperledger Fabric
 const { Wallets, Gateway } = require("fabric-network");
 const registerAndEnrollFunc = require("../../registerAndEnroll");
-const { transactionVerification } = require("./utils");
+const { evaluateTransaction } = require("./utils");
 const channelName = "channel1";
 const contractName = "onboardingMerchantC";
 
@@ -929,7 +929,7 @@ exports.verifySubmitTxUtils = async function (req, res) {
       message: `Ensure to provide valid request parameters for verifying submit tx`
     });
   }
-  const { error, result } = await transactionVerification(roleId, channelName, "SubmitSettlementTxCC", "submitSettlementTx", [merchantId, customerId, loanReferenceNumber]);
+  const { error, result } = await evaluateTransaction(roleId, channelName, "SubmitSettlementTxCC", "submitSettlementTx", [merchantId, customerId, loanReferenceNumber]);
 
   if (error) {
     console.log(`verify submit tx error: ${error}`)
@@ -955,7 +955,7 @@ exports.verifyAuthorizeTxUtils = async function (req, res) {
       message: `Ensure to provide valid request parameters for verifying authorize tx`
     });
   }
-  const { error, result } = await transactionVerification(roleId, channelName, "AuthorizeSettlementTxCC", "authorizeSettlementTx", [merchantId, customerId, loanReferenceNumber]);
+  const { error, result } = await evaluateTransaction(roleId, channelName, "AuthorizeSettlementTxCC", "authorizeSettlementTx", [merchantId, customerId, loanReferenceNumber]);
 
   if (error) {
     console.log(`verify authorize tx error: ${error}`)
@@ -981,7 +981,7 @@ exports.verifyBalanceTxUtils = async function (req, res) {
       message: `Ensure to provide valid request parameters for verifying balance tx`
     });
   }
-  const { error, result } = await transactionVerification(roleId, channelName, "BalanceSettlementTxCC", "balanceSettlementTx", [merchantId, customerId, loanReferenceNumber]);
+  const { error, result } = await evaluateTransaction(roleId, channelName, "BalanceSettlementTxCC", "balanceSettlementTx", [merchantId, customerId, loanReferenceNumber]);
 
   if (error) {
     console.log(`verify balance tx error: ${error}`)
@@ -1007,7 +1007,7 @@ exports.verifyClearTxUtils = async function (req, res) {
       message: `Ensure to provide valid request parameters for verifying clear tx`
     });
   }
-  const { error, result } = await transactionVerification(roleId, channelName, "ClearSettlementTxCC", "clearSettlementTx", [merchantId, customerId, loanReferenceNumber]);
+  const { error, result } = await evaluateTransaction(roleId, channelName, "ClearSettlementTxCC", "clearSettlementTx", [merchantId, customerId, loanReferenceNumber]);
 
   if (error) {
     console.log(`verify clear tx error: ${error}`)

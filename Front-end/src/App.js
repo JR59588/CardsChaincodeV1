@@ -83,7 +83,7 @@ function App() {
           element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}
         />
         <Route path="/About" element={<About />} />
-        <Route path="/DashboardSummary" element={<DashboardSummary />} />
+        <Route path="/DashboardSummary" element={<DashboardSummary roleId={roleId} />} />
         <Route path="*" element={<h1>Not found....</h1>} />
 
         {/* testing routes */}

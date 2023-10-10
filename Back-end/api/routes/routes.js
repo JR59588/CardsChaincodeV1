@@ -3,7 +3,7 @@
 const viewTxcontroller = require("../controllers/viewTx");
 const controller = require("../controllers/controller");
 const merchantController = require("../controllers/merchantOnboarding");
-
+const dashboardController = require('../controllers/dashboard');
 
 module.exports = function (app) {
 
@@ -114,5 +114,11 @@ module.exports = function (app) {
   // .route("/api/v1/testOrgAddition")
 
   // .post(merchantController.testOrgAddition);
+
+  app
+
+    .route("/api/v1/dashboard/stats/:roleId")
+
+    .get(dashboardController.getTransactionStats);
 
 };

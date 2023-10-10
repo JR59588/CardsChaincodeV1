@@ -15,7 +15,7 @@ const saveToJSONFile = (path, jsonObj) => {
 }
 
 // utility function to verify settlement request object
-const transactionVerification = async (orgName, channelName, contractName, functionName, args) => {
+const evaluateTransaction = async (orgName, channelName, contractName, functionName, args) => {
 
     try {
         const data = parseJSONFile(path.join(__dirname, "data.json"));
@@ -65,4 +65,4 @@ const transactionVerification = async (orgName, channelName, contractName, funct
 
 }
 
-module.exports = { parseJSONFile, saveToJSONFile, transactionVerification };
+module.exports = { parseJSONFile, saveToJSONFile, evaluateTransaction };

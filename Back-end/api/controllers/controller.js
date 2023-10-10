@@ -9,7 +9,7 @@ const path = require("path");
 const ISO8583 = require("../iso8583");
 const multer = require('multer');
 const csv = require('csv-parser');
-const { transactionVerification } = require("./utils");
+const { evaluateTransaction } = require("./utils");
 
 const app = express();
 
@@ -205,7 +205,7 @@ exports.processISO8583CSV = async function (req, res) {
               const { merchantID, customerID, loanReferenceNumber, ISO8583Message } = results[i];
               const settlementTxObject = makeTxObj(merchantID, customerID, loanReferenceNumber, ISO8583Message);
               console.log("Settlement Tx Object: ", settlementTxObject)
-              const { error, result } = await transactionVerification(req.body.roleId, 'channel1', 'PYMTUtilsCC', 'requestTx',
+              const { error, result } = await evaluateTransaction(req.body.roleId, 'channel1', 'PYMTUtilsCC', 'requestTx',
                 [settlementTxObject.MerchantId,
                 settlementTxObject.CustomerId,
                 settlementTxObject.LoanReferenceNumber,
