@@ -92,18 +92,17 @@ const ViewTx = (props) => {
 
         return newDataMixed;
       });
-      const message = response.verifications
-        .map(
-          (verification, index) =>
-            index + ". " + verification.org + ": " + verification.attribute
-        )
-        .join("\n");
+      const messages = response.verifications.map((verification, index) => (
+        <div key={"verification" + index}>
+          <p>
+            <b>{verification.org}</b>: <i>{verification.attribute}</i>
+          </p>
+        </div>
+      ));
       NotificationManager.success(
-        `Status: ${response.status} 
-        Verifications:
-        ${message}`,
+        <div>{messages}</div>,
         "Status Updated",
-        500000
+        5000
       );
     });
 
@@ -848,7 +847,7 @@ const ViewTx = (props) => {
                       </tr>
                     ) : (
                       <div style={{ display: "flex" }}>
-                        <h5 className="p-2" style={{ color:"#10005d" }}>
+                        <h5 className="p-2" style={{ color: "#10005d" }}>
                           Loading...
                         </h5>
                         <div className="loader"></div>

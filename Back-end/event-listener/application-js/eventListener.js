@@ -19,13 +19,13 @@ const io = socketIo(server, {
 const channelName = 'channel1';
 
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser16';
+const OrgACDUserId = 'appOrgACDUser17';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser16';
+const OrgAADUserId = 'appOrgAADUser17';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser16';
+const OrgAODUserId = 'appOrgAODUser17';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';
