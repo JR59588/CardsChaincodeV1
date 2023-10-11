@@ -38,7 +38,7 @@ exports.getTransactionStats = async (req, res) => {
                     totalTransactions: transactions.length,
                     transactionsToday: transactions.filter(
                         ({ Record }) => {
-                            console.log(new Date(Record.txTimestamp).toDateString(), new Date().toDateString())
+                            // console.log(new Date(Record.txTimestamp).toDateString(), new Date().toDateString())
                             return new Date(Record.txTimestamp).toDateString() ===
                                 new Date().toDateString()
 

@@ -136,7 +136,10 @@ const DashboardSummary = ({ roleId }) => {
     }, []);
 
     return (
-      <div className="d-flex justify-content-center">
+      <div
+        className="d-flex justify-content-center col-md-6"
+        style={{ background: "#ebeaf2" }}
+      >
         <div style={{ width: "300px" }}>
           <canvas ref={chartRef} />
         </div>
@@ -146,7 +149,7 @@ const DashboardSummary = ({ roleId }) => {
 
   const StatsTableComponent = (props) => {
     return (
-      <div className="d-flex table-responsive-md mt-3">
+      <div className="d-flex table-responsive-md mt-3 col-md-6">
         <table className="table table-sm table-striped table-hover table-bordered">
           <thead>
             <tr>
@@ -234,14 +237,12 @@ const DashboardSummary = ({ roleId }) => {
   return (
     <div className="ps-3 pe-3 mt-3">
       <div className="row">
-        <div className="col-md-6">
-          <h5 style={{ textAlign: "center" }}>Transaction Statistics</h5>
-          <TransactionStatsComponent />
-        </div>
-        <div className="col-md-6">
-          <h5 style={{ textAlign: "center" }}>Transactions</h5>
-          <TransactionsComponent />
-        </div>
+        <h5 style={{ textAlign: "center" }}>Transaction Statistics</h5>
+        <TransactionStatsComponent />
+      </div>
+      <div className="row">
+        <h5 style={{ textAlign: "center" }}>Transactions</h5>
+        <TransactionsComponent />
       </div>
     </div>
   );
