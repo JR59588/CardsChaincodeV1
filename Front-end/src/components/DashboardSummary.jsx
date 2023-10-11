@@ -15,6 +15,10 @@ const DashboardSummary = ({ roleId }) => {
 
   const LoadingComponent = () => <div>Loading transaction data...</div>;
 
+  const LoadingStatsComponent = () => (
+    <div>Loading transaction stats data...</div>
+  );
+
   const NoTransactionsComponent = () => (
     <div>No transactions data found...</div>
   );
@@ -136,10 +140,14 @@ const DashboardSummary = ({ roleId }) => {
     }, []);
 
     return (
+<<<<<<< Updated upstream
       <div
         className="d-flex justify-content-center col-md-6"
         style={{ background: "#ebeaf2" }}
       >
+=======
+      <div className="d-flex justify-content-center col-md-6 p-2">
+>>>>>>> Stashed changes
         <div style={{ width: "300px" }}>
           <canvas ref={chartRef} />
         </div>
@@ -201,7 +209,7 @@ const DashboardSummary = ({ roleId }) => {
       fetchTransactionStats();
     }, []);
     if (loading) {
-      return <LoadingComponent />;
+      return <LoadingStatsComponent />;
     } else if (Object.keys(transactionStatsData).length == 0) {
       return <NoStatsComponent />;
     } else {
@@ -236,11 +244,19 @@ const DashboardSummary = ({ roleId }) => {
 
   return (
     <div className="ps-3 pe-3 mt-3">
+<<<<<<< Updated upstream
       <div className="row">
         <h5 style={{ textAlign: "center" }}>Transaction Statistics</h5>
         <TransactionStatsComponent />
       </div>
       <div className="row">
+=======
+      <div className="row" style={{ background: "#ebeaf2" }}>
+        <h5 style={{ textAlign: "center" }}>Transaction Statistics</h5>
+        <TransactionStatsComponent />
+      </div>
+      <div className="row pt-3">
+>>>>>>> Stashed changes
         <h5 style={{ textAlign: "center" }}>Transactions</h5>
         <TransactionsComponent />
       </div>
