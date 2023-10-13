@@ -23,7 +23,7 @@ const About = () => {
           <br /> */}
           <div
             style={{
-              height: "80vh",
+              height: "85vh",
               // backgroundImage: `url(./assets/images/merchantOnboarding.svg)`,
               // backgroundRepeat: "no-repeat",
               // backgroundSize: "auto",
@@ -40,7 +40,7 @@ const About = () => {
         </div>
         <div className="carousel-item">
           {/* <div
-            style={{ height: "80vh" }}
+            style={{ height: "85vh" }}
             className="d-flex align-items-center justify-content-center"
           >
             <img src={updatedStateDiagram} alt="No salesReturn Image" />
@@ -48,7 +48,7 @@ const About = () => {
 
           <div
             style={{
-              height: "80vh",
+              height: "85vh",
               backgroundImage: `url(./assets/images/cardsPocStateDiagram.png)`,
               backgroundRepeat: "no-repeat",
               backgroundSize: "contain",
@@ -61,7 +61,7 @@ const About = () => {
         <div className="carousel-item ">
           <div
             style={{
-              height: "80vh",
+              height: "85vh",
               backgroundImage: `url(./assets/images/cardsPocImg.png)`,
               backgroundRepeat: "no-repeat",
               backgroundSize: "auto",
