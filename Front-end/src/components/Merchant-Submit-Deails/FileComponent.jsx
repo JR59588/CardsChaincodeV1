@@ -49,7 +49,7 @@ const FileComponent = (props) => {
     <div className="container">
       <br></br>
       <div className="fileHead">
-        Please select the Sales/Return transactions file to be uploaded
+        Please select the Settlement transactions file to be uploaded
       </div>
       <br></br>
       <div className="row">

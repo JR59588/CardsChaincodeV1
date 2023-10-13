@@ -98,7 +98,8 @@ const Onboard = (props) => {
       console.log(onboardingFormData);
 
       setTimeout(() => {
-        setLoadermessage("This will take a few moments the operation is being processed");
+        setLoadermessage(`This will take a few moments... 
+        The operation is being processed.`);
       }, 5000);
 
       axios
@@ -448,7 +449,6 @@ const Onboard = (props) => {
                     value={onboardingFormData.merchantBankCode}
                     onChange={onChangeHandel}
                   />
-                  
                 </div>
               </div>
             </div>
@@ -659,8 +659,8 @@ const Onboard = (props) => {
             <hr />
             <div className="modalBody">
               <h5>
-                By confirming this details you are about to add a new
-                organisation to the network.
+                By confirming these details, you are about to add the merchant{" "}
+                {onboardingFormData.merchantName} to the network.
               </h5>
             </div>
             <hr />

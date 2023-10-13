@@ -449,7 +449,7 @@ exports.saveOBMerchantSummary = async function (req, res) {
     if (orgAddnError) {
       return res.status(400).json({
         success: false,
-        message: "Unable to add the merchant organization"
+        message: `Failed to onboard the merchant: ${req.body.merchantName}`
       });
     }
 
@@ -464,14 +464,14 @@ exports.saveOBMerchantSummary = async function (req, res) {
 
     return res.status(200).json({
       success: true,
-      message: "Merchant onboarded successfully",
+      message: `Successfully onboarded the merchant: ${req.body.merchantName}`,
     });
   } catch (error) {
-    console.log(`Failed to onboard new merchant: ${error}`);
+    console.log(`Failed to onboard new merchant: ${req.body.merchantName}, ${req.body.merchantID} ${error}`);
     // console.error(`Failed to submit transaction: ${error}`);
     return res.status(400).json({
       success: false,
-      message: "Merchant onboarding failure",
+      message: `Failed to onboard the merchant: ${req.body.merchantName}`,
       reason: error.message,
     });
   }

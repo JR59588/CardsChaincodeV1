@@ -78,29 +78,15 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
               {/* {roleId === 'Agg' || roleId === 'Agg2' ? (
                 <> */}
               <NavLink to="/Merchant" className="ani">
-                Sales/Return Request{" "}
+                Settlement Request{" "}
                 <span className="gapLine" style={{ color: "white" }}>
                   |
                 </span>
               </NavLink>
-              {/* </>
-              ) : (
-                <>
-                  <div
-                    className="ani"
-                    style={{ cursor: 'not-allowed', color: 'lightgrey' }}
-                  >
-                    Sales/Return Request{' '}
-                    <span className="gapLine" style={{ color: 'white' }}>
-                      |
-                    </span>
-                  </div>
-                </>
-              )} */}
             </li>
             <li className="nav-item">
               <NavLink to="/ViewTx" className="ani">
-                View Sales/Return Requests{" "}
+                View Settlement Requests{" "}
                 <span style={{ color: "white" }} className="gapLine">
                   |
                 </span>
@@ -109,7 +95,6 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
             <li className="nav-item">
               <NavLink to="/DashboardSummary" className="ani">
                 Dashboard{" "}
-               
               </NavLink>{" "}
             </li>
           </ul>

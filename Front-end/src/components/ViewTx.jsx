@@ -415,7 +415,7 @@ const ViewTx = (props) => {
                   Account Details
                 </th>
                 <th scope="col" className="fontSize">
-                  Loan Ref Number
+                  Transaction Ref Number
                 </th>
                 <th scope="col" className="fontSize">
                   Submission Date

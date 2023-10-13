@@ -2,8 +2,37 @@ const { evaluateTransaction } = require("./utils");
 
 const channelName = "channel1";
 
+const rejectedStatuses = ['TxNotAuthorized', 'TxNotBalanced', 'TxNotCleared'];
+
+const getTransactionsToday = (transactions) => {
+    return transactions.filter(
+        ({ Record }) => {
+            return new Date(Record.txTimestamp).toDateString() ===
+                new Date().toDateString()
+        }
+    );
+}
+
+const getTransactionStatusToday = (transactions) => {
+
+    let rejectedTxns = 0,
+        pendingTxns = 0,
+        txns = transactions.length;
+
+    transactions.forEach((txn) => {
+        if (rejectedStatuses.includes(txn.Record.TxStatus)) {
+            rejectedTxns++;
+        } else if (txn.Record.TxStatus != 'TxCleared') {
+            pendingTxns++;
+        }
+    })
+
+    return { rejectedTxns, pendingTxns, txns }
+}
+
 exports.getTransactionStats = async (req, res) => {
     try {
+
         const { error, result } = await evaluateTransaction(
             req.params.roleId,
             channelName,
@@ -11,10 +40,11 @@ exports.getTransactionStats = async (req, res) => {
             "GetTxByRange",
             ["", ""]
         );
-        const transactions = JSON.parse(result);
-        // console.log("Transactions are: ", transactions)
-        // console.log("Number of transactions: ", transactions.length);
-        const statusData = transactions.reduce((acc, curr) => {
+
+        const transactionsToday = getTransactionsToday(JSON.parse(result));
+
+
+        const statusData = transactionsToday.reduce((acc, curr) => {
             const status = curr.Record.TxStatus;
             if (!acc[status]) {
                 acc[status] = 1;
@@ -23,6 +53,9 @@ exports.getTransactionStats = async (req, res) => {
             }
             return acc;
         }, {});
+
+        const transactionStatuses = getTransactionStatusToday(transactionsToday);
+
         if (error) {
             console.log(`Error fetching transaction stats: ${error}`);
             return res.status(400).json({
@@ -35,16 +68,9 @@ exports.getTransactionStats = async (req, res) => {
                 success: true,
                 stats: {
                     statusData,
-                    totalTransactions: transactions.length,
-                    transactionsToday: transactions.filter(
-                        ({ Record }) => {
-                            // console.log(new Date(Record.txTimestamp).toDateString(), new Date().toDateString())
-                            return new Date(Record.txTimestamp).toDateString() ===
-                                new Date().toDateString()
-
-                        }
-                    ).length,
-                    pendingTransactions: transactions.filter(({ Record }) => Record.TxStatus !== 'TxCleared').length
+                    transactionsToday: transactionStatuses.txns,
+                    pendingTransactionsToday: transactionStatuses.pendingTxns,
+                    rejectedTransactionsToday: transactionStatuses.rejectedTxns
                 },
                 message: `Successfully fetched transaction stats`,
             });

@@ -16,7 +16,11 @@ const DashboardSummary = ({ roleId }) => {
   const LoadingComponent = () => <div>Loading transaction data...</div>;
 
   const LoadingStatsComponent = () => (
-    <div>Loading transaction stats data...</div>
+    <div className="text-center">
+      <div className="spinner-border" role="status">
+        {/* <span className="sr-only">Loading...</span> */}
+      </div>
+    </div>
   );
 
   const NoTransactionsComponent = () => (
@@ -115,7 +119,8 @@ const DashboardSummary = ({ roleId }) => {
       const myChartRef = chartRef.current.getContext("2d");
 
       chartInstance.current = new Chart(myChartRef, {
-        type: "pie",
+        type: "doughnut",
+
         data: {
           labels: props.labels,
           datasets: [
@@ -130,6 +135,16 @@ const DashboardSummary = ({ roleId }) => {
               ],
             },
           ],
+        },
+        options: {
+          responsive: true,
+
+          plugins: {
+            title: { display: true, text: "Settlement Requests Breakdown" },
+            legend: {
+              position: "bottom",
+            },
+          },
         },
       });
       return () => {
@@ -154,21 +169,21 @@ const DashboardSummary = ({ roleId }) => {
         <table className="table table-sm table-striped table-hover table-bordered">
           <thead>
             <tr>
-              <th colSpan={2}>Transaction Summary</th>
+              <th colSpan={2}>Settlement Requests Summary</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Total No. of Transactions</td>
-              <td>{props.totalTransactions}</td>
-            </tr>
-            <tr>
-              <td>Total No. of Transactions Today</td>
+              <td>Number of Settlement Requests Today</td>
               <td>{props.transactionsToday}</td>
             </tr>
             <tr>
-              <td>Pending Transactions</td>
+              <td>Number of Pending Settlement Requests Today</td>
               <td>{props.pendingTransactions}</td>
+            </tr>
+            <tr>
+              <td>Number of Rejected Settlement Requests Today</td>
+              <td>{props.rejectedTransactions}</td>
             </tr>
           </tbody>
         </table>
@@ -209,6 +224,13 @@ const DashboardSummary = ({ roleId }) => {
       const StatusData = transactionStatsData.statusData;
       return (
         <>
+          <StatsTableComponent
+            transactionsToday={transactionStatsData.transactionsToday}
+            pendingTransactions={transactionStatsData.pendingTransactionsToday}
+            rejectedTransactions={
+              transactionStatsData.rejectedTransactionsToday
+            }
+          />
           <ChartComponent
             data={[
               StatusData.TxRequested || 0,
@@ -225,11 +247,6 @@ const DashboardSummary = ({ roleId }) => {
               "Cleared",
             ]}
           />
-          <StatsTableComponent
-            totalTransactions={transactionStatsData.totalTransactions}
-            transactionsToday={transactionStatsData.transactionsToday}
-            pendingTransactions={transactionStatsData.pendingTransactions}
-          />
         </>
       );
     }
@@ -237,14 +254,17 @@ const DashboardSummary = ({ roleId }) => {
 
   return (
     <div className="ps-3 pe-3 mt-3">
-      <div className="row" style={{ background: "#ebeaf2" }}>
-        <h5 style={{ textAlign: "center" }}>Transaction Statistics</h5>
+      <div
+        className="row"
+        style={{ background: "rgb(235, 234, 242)", minHeight: "400px" }}
+      >
+        <h5 className="text-center">Settlement Requests Stats</h5>
         <TransactionStatsComponent />
       </div>
-      <div className="row pt-3">
+      {/* <div className="row pt-3">
         <h5 style={{ textAlign: "center" }}>Transactions</h5>
         <TransactionsComponent />
-      </div>
+      </div> */}
     </div>
   );
 };
