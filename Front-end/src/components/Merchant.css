@@ -58,6 +58,31 @@
   
   
   }
+  .buttonbt4{
+
+    background-color: white;
+    border-radius: 5px;
+    border-color:#10005d ;
+    color:#10005d;
+    font-size: medium;
+    height: 45px;
+    width: 45px;
+    margin-top: 20px;
+    
+  
+  
+  }
+  .buttonbt4:hover{
+  
+    background-color: #10005d;
+    border-radius: 5px;
+    border-color:#10005d ;
+    color:white;
+    font-size: medium;
+  
+  
+  
+  }
 .placingCustomer{
     background-color: white;
     color:black;
