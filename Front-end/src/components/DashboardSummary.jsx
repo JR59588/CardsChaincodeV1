@@ -115,9 +115,7 @@ const StatsTableComponent = (props) => {
           <Modal.Title>Transactions</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <TransactionsComponent
-            transactions={props.transactionStatsData.transactions}
-          />
+          <TransactionsComponent transactions={props.transactions} />
         </Modal.Body>
       </Modal>
     </div>
@@ -138,6 +136,7 @@ const TransactionStatsComponent = ({
           transactionStatsData.rejectedTransactionsToday
         }
         toggleTransactionPopup={toggleTransactionPopup}
+        transactions={transactionStatsData.transactions}
       />
       <ChartComponent
         data={[
