@@ -18,7 +18,7 @@ async function verifyClientOrgMatchesPeerOrgForAOD(ctx) {
     console.log("clientmsp", ClientMSPID);
     throw new Error("Failed getting the client's MSPID.");
   }
-  
+
   if (ClientMSPID !== AODMSPID) {
     throw new Error(`Client from org ${ClientMSPID} is not authorized ..`);
   }
@@ -36,7 +36,7 @@ async function verifyClientOrgMatchesPeerOrgForAAD(ctx) {
     console.log("clientmsp", ClientMSPID);
     throw new Error("Failed getting the client's MSPID.");
   }
-  
+
   if (ClientMSPID !== AADMSPID) {
     throw new Error(`Client from org ${ClientMSPID} is not authorized ..`);
   }
@@ -48,7 +48,7 @@ class MerchantOnboardingPDC extends Contract {
 
     const transientMap = await ctx.stub.getTransient();
 
-    const pv_IndividualCollectionName= "PDC1"
+    const pv_IndividualCollectionName = "PDC1"
 
     // Asset properties are private, therefore they get passed in transient field, instead of func args
     const transientAssetJSON = transientMap.get("merchant_properties");
@@ -71,18 +71,12 @@ class MerchantOnboardingPDC extends Contract {
       );
     }
 
-    if (!merchantInput.POSID && merchantInput.POSID === "") {
-      throw new Error(
-        "POS ID field is required, it must be a non-empty string"
-      );
-    }
-
     if (!merchantInput.numberOfPOSTerminalsRequired && merchantInput.numberOfPOSTerminalsRequired === "") {
       throw new Error(
         "Number Of POS Terminals Required field is required, it must be a non-empty string"
       );
     }
-   
+
     // Check if merchant already exists
     const merchantAsBytes = await ctx.stub.getPrivateData(
       pv_IndividualCollectionName,
@@ -95,7 +89,7 @@ class MerchantOnboardingPDC extends Contract {
     }
     console.log("merchantAsBytes");
 
-   //TODO: if require then uncomment below check
+    //TODO: if require then uncomment below check
     //await verifyClientOrgMatchesPeerOrg(ctx);
 
     console.log("verifyClientOrgMatchesPeerOrgForAOD");
@@ -105,7 +99,6 @@ class MerchantOnboardingPDC extends Contract {
     const merchant = {
       product: merchantInput.product,
       numberOfPOSTerminalsRequired: merchantInput.numberOfPOSTerminalsRequired,
-      POSID: merchantInput.POSID,
     };
 
     console.log(
@@ -118,7 +111,7 @@ class MerchantOnboardingPDC extends Contract {
         merchantInput.merchantID,
         Buffer.from(stringify(merchant))
       );
-    } 
+    }
     catch (error) {
       throw Error("Failed to put merchant into private data collecton.");
     }
@@ -140,7 +133,7 @@ class MerchantOnboardingPDC extends Contract {
     }
 
     let merchantInput = JSON.parse(transientAssetJSON);
- 
+
     console.log("merchantInput", merchantInput);
 
     if (!merchantInput.merchantID && merchantInput.merchantID === "") {
@@ -170,10 +163,10 @@ class MerchantOnboardingPDC extends Contract {
     if (merchantInput.isContractSigned === "No" || !merchantInput.isContractSigned) {
       throw new Error(
         "Is Contract Signed field is No, please provide valid input."
-        );
+      );
     }
-      
-      const merchantAsBytes = await ctx.stub.getPrivateData(
+
+    const merchantAsBytes = await ctx.stub.getPrivateData(
       pv_CollectionName,
       merchantInput.merchantID
     );
@@ -185,7 +178,7 @@ class MerchantOnboardingPDC extends Contract {
         `This merchant (${merchantInput.merchantID}) already exists`
       );
     }
-   
+
     console.log("merchant inputs :", merchantInput);
 
     const merchant = {
@@ -197,10 +190,10 @@ class MerchantOnboardingPDC extends Contract {
       isContractSigned: merchantInput.isContractSigned,
       kycStatus: merchantInput.kycStatus,
 
-       };
+    };
 
     console.log("merchant", merchant);
-   
+
     console.log(
       `CreateAsset Put: collection ${pv_CollectionName}, ID ${merchantInput.merchantID} , merchant ${merchant}`
     );
@@ -211,139 +204,139 @@ class MerchantOnboardingPDC extends Contract {
         merchantInput.merchantID,
         Buffer.from(stringify(merchant))
       );
-    } 
+    }
     catch (error) {
       console.log("Failed to put merchant into private data collecton", error);
       throw Error("Failed to put merchant into private data collecton.");
     }
-  } 
+  }
   //End of saveOBMerchantSummary
 
   async retrieveOBMerchantData(ctx, merchantID) {
 
     const merchantJSON = await ctx.stub.getPrivateData(
-        pv_CollectionName,
-        merchantID
-      );
+      pv_CollectionName,
+      merchantID
+    );
 
-      const merchant = merchantJSON.toString();
-  
-      //No Asset found, return empty response
-      if (!merchant) {
-        throw new Error(
-          `${merchantID} does not exist in collection ${pv_CollectionName}.`
-        );
-      }
-      return merchant;
+    const merchant = merchantJSON.toString();
+
+    //No Asset found, return empty response
+    if (!merchant) {
+      throw new Error(
+        `${merchantID} does not exist in collection ${pv_CollectionName}.`
+      );
+    }
+    return merchant;
   }
   //retrieveOBMerchantData
 
-    async retrievePvAODMetaData(ctx, merchantID) {
+  async retrievePvAODMetaData(ctx, merchantID) {
 
-      const pv_IndividualCollectionName= "PDC1"
+    const pv_IndividualCollectionName = "PDC1"
 
-       const merchantJSON = await ctx.stub.getPrivateData(
-         pv_IndividualCollectionName,
-         merchantID
-       );
+    const merchantJSON = await ctx.stub.getPrivateData(
+      pv_IndividualCollectionName,
+      merchantID
+    );
 
-       const merchant = merchantJSON.toString();
-   
-       //No Asset found, return empty response
-       if (!merchant) {
-         throw new Error(
-           `${merchantID} does not exist in collection ${pv_IndividualCollectionName}.`
-         );
-       }
-      return merchant;
+    const merchant = merchantJSON.toString();
+
+    //No Asset found, return empty response
+    if (!merchant) {
+      throw new Error(
+        `${merchantID} does not exist in collection ${pv_IndividualCollectionName}.`
+      );
     }
-    //retrievePvAODMetaData
+    return merchant;
+  }
+  //retrievePvAODMetaData
 
-    async savePvAADAODMetaData(ctx) {
+  async savePvAADAODMetaData(ctx) {
 
-      const transientMap = await ctx.stub.getTransient();
-  
-      const pv_IndividualCollectionName= "PDC3"
-  
-      // Asset properties are private, therefore they get passed in transient field, instead of func args
-      const transientAssetJSON = transientMap.get("merchant_properties");
-  
-      if (!transientAssetJSON) {
-        throw new Error("The merchant was not found in the transient map input.");
-      }
-  
-      let merchantInput = JSON.parse(transientAssetJSON);
-  
-      if (!merchantInput.merchantID && merchantInput.merchantID === "") {
-        throw new Error(
-          "merchantID field is required, it must be a non-empty string"
-        );
-      }
-  
-      // Check if merchant already exists
-      const merchantAsBytes = await ctx.stub.getPrivateData(
+    const transientMap = await ctx.stub.getTransient();
+
+    const pv_IndividualCollectionName = "PDC3"
+
+    // Asset properties are private, therefore they get passed in transient field, instead of func args
+    const transientAssetJSON = transientMap.get("merchant_properties");
+
+    if (!transientAssetJSON) {
+      throw new Error("The merchant was not found in the transient map input.");
+    }
+
+    let merchantInput = JSON.parse(transientAssetJSON);
+
+    if (!merchantInput.merchantID && merchantInput.merchantID === "") {
+      throw new Error(
+        "merchantID field is required, it must be a non-empty string"
+      );
+    }
+
+    // Check if merchant already exists
+    const merchantAsBytes = await ctx.stub.getPrivateData(
+      pv_IndividualCollectionName,
+      merchantInput.merchantID
+    );
+    if (merchantAsBytes != "") {
+      throw new Error(
+        `This merchant (${merchantInput.merchantID}) already exists`
+      );
+    }
+    console.log("merchantAsBytes");
+
+    //TODO: if require then uncomment below check
+    //await verifyClientOrgMatchesPeerOrg(ctx);
+
+    console.log("verifyClientOrgMatchesPeerOrgForAOD");
+
+    console.log("merchant inputs :", merchantInput);
+
+    const merchant = {
+      txcMaxTxPerDay: merchantInput.txcMaxTxPerDay,
+      txcMinTxAmount: merchantInput.txcMinTxAmount,
+      txcMaxTxAmount: merchantInput.txcMaxTxAmount,
+      txcTxCurrency: merchantInput.txcTxCurrency,
+      txcNegotiatedMDR: merchantInput.txcNegotiatedMDR,
+      promoCode: merchantInput.promoCode,
+    };
+
+    console.log(
+      `CreateAsset Put: collection ${pv_IndividualCollectionName}, ID ${merchantInput.merchantID} , merchant ${merchant}`
+    );
+
+    try {
+      await ctx.stub.putPrivateData(
         pv_IndividualCollectionName,
-        merchantInput.merchantID
+        merchantInput.merchantID,
+        Buffer.from(stringify(merchant))
       );
-      if (merchantAsBytes != "") {
-        throw new Error(
-          `This merchant (${merchantInput.merchantID}) already exists`
-        );
-      }
-      console.log("merchantAsBytes");
-  
-     //TODO: if require then uncomment below check
-      //await verifyClientOrgMatchesPeerOrg(ctx);
-  
-      console.log("verifyClientOrgMatchesPeerOrgForAOD");
-  
-      console.log("merchant inputs :", merchantInput);
-  
-      const merchant = {
-        txcMaxTxPerDay: merchantInput.txcMaxTxPerDay,
-        txcMinTxAmount: merchantInput.txcMinTxAmount,
-        txcMaxTxAmount: merchantInput.txcMaxTxAmount,
-        txcTxCurrency: merchantInput.txcTxCurrency,
-        txcNegotiatedMDR: merchantInput.txcNegotiatedMDR,
-        promoCode: merchantInput.promoCode ,
-      };
-  
-      console.log(
-        `CreateAsset Put: collection ${pv_IndividualCollectionName}, ID ${merchantInput.merchantID} , merchant ${merchant}`
+    }
+    catch (error) {
+      throw Error("Failed to put merchant into private data collecton.");
+    }
+  }
+  //savePvAADAODMetaData
+
+  async retrievePvAADAODMetaData(ctx, merchantID) {
+
+    const pv_IndividualCollectionName = "PDC3"
+
+    const merchantJSON = await ctx.stub.getPrivateData(
+      pv_IndividualCollectionName,
+      merchantID
+    );
+
+    const merchant = merchantJSON.toString();
+
+    //No Asset found, return empty response
+    if (!merchant) {
+      throw new Error(
+        `${merchantID} does not exist in collection ${pv_IndividualCollectionName}.`
       );
-  
-      try {
-        await ctx.stub.putPrivateData(
-          pv_IndividualCollectionName,
-          merchantInput.merchantID,
-          Buffer.from(stringify(merchant))
-        );
-      } 
-      catch (error) {
-        throw Error("Failed to put merchant into private data collecton.");
-      }
     }
-    //savePvAADAODMetaData
-    
-    async retrievePvAADAODMetaData(ctx, merchantID) {
-
-      const pv_IndividualCollectionName= "PDC3"
-
-       const merchantJSON = await ctx.stub.getPrivateData(
-         pv_IndividualCollectionName,
-         merchantID
-       );
-
-       const merchant = merchantJSON.toString();
-   
-       //No Asset found, return empty response
-       if (!merchant) {
-         throw new Error(
-           `${merchantID} does not exist in collection ${pv_IndividualCollectionName}.`
-         );
-       }
-      return merchant;
-    }
-    //retrievePvAADMetaData
+    return merchant;
+  }
+  //retrievePvAADMetaData
 }
 module.exports = MerchantOnboardingPDC;

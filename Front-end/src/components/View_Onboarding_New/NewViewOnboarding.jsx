@@ -8,7 +8,7 @@ const NewViewOnboarding = (props) => {
       <div className="container">
         <div className="cols2">
           <h4 style={{ textAlign: "center" }} className="mt-4 mb-4">
-            View Onboarded Merchant 
+            View Onboarded Merchant
           </h4>
         </div>
         <div
@@ -303,24 +303,6 @@ const NewViewOnboarding = (props) => {
               <div className="row">
                 <div className="col">
                   <label htmlFor="name" className="col-form-label">
-                    POS ID:
-                  </label>
-                </div>
-                <div className="col">
-                  <input
-                    disabled
-                    type="text"
-                    className="form-control"
-                    placeholder="POS ID"
-                    aria-label="Last name"
-                    name="POSID"
-                    value={props.data.POSID}
-                  />
-                </div>
-              </div>
-              <div className="row">
-                <div className="col">
-                  <label htmlFor="name" className="col-form-label">
                     Security Deposits:
                   </label>
                 </div>
@@ -373,8 +355,8 @@ const NewViewOnboarding = (props) => {
           </div>
         </div>
         <p>
-          Note : attributes shown are examples for this POC and
-          would be chosen as per business need.
+          Note : attributes shown are examples for this POC and would be chosen
+          as per business need.
         </p>
       </div>
     </>

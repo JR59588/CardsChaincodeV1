@@ -488,27 +488,6 @@ const Onboard = (props) => {
                 </div>
               </div>
               <div className="row">
-                <span style={{ fontSize: "14px", fontWeight: "bold" }}>
-                  {/* Merchant's Bank Details: */}
-                </span>
-                <div className="col">
-                  <label htmlFor="name" className="col-form-label">
-                    POS ID:
-                  </label>
-                </div>
-                <div className={`col ${styles.placingMsgHover}`}>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="POS ID"
-                    aria-label="POS ID"
-                    name="POSID"
-                    onChange={onChangeHandel}
-                    value={onboardingFormData.POSID}
-                  />
-                </div>
-              </div>
-              <div className="row">
                 <div className="col">
                   <label htmlFor="name" className="col-form-label">
                     Security Deposits:

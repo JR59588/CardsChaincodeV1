@@ -930,7 +930,8 @@ exports.verifySubmitTxUtils = async function (req, res) {
     });
   }
   const { error, result } = await evaluateTransaction(roleId, channelName, "SubmitSettlementTxCC", "submitSettlementTx", [merchantId, customerId, loanReferenceNumber]);
-
+  console.log("Error in submit tx: ", error);
+  console.log("Result in submit tx: ", result);
   if (error) {
     console.log(`verify submit tx error: ${error}`)
     res.status(400).json({

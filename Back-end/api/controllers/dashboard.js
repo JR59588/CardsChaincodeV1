@@ -15,19 +15,22 @@ const getTransactionsToday = (transactions) => {
 
 const getTransactionStatusToday = (transactions) => {
 
-    let rejectedTxns = 0,
-        pendingTxns = 0,
-        txns = transactions.length;
+    let rejectedTxnsCount = 0,
+        pendingTxnsCount = 0,
+        txnsCount = transactions.length;
 
+    let rejectedTxns = [], pendingTxns = [], txns = transactions;
     transactions.forEach((txn) => {
         if (rejectedStatuses.includes(txn.Record.TxStatus)) {
-            rejectedTxns++;
+            rejectedTxnsCount++;
+            rejectedTxns.push(txn);
         } else if (txn.Record.TxStatus != 'TxCleared') {
-            pendingTxns++;
+            pendingTxnsCount++;
+            pendingTxns.push(txn);
         }
     })
 
-    return { rejectedTxns, pendingTxns, txns }
+    return { rejectedTxnsCount, pendingTxnsCount, txnsCount, txns, rejectedTxns, pendingTxns }
 }
 
 exports.getTransactionStats = async (req, res) => {
@@ -68,9 +71,12 @@ exports.getTransactionStats = async (req, res) => {
                 success: true,
                 stats: {
                     statusData,
-                    transactionsToday: transactionStatuses.txns,
-                    pendingTransactionsToday: transactionStatuses.pendingTxns,
-                    rejectedTransactionsToday: transactionStatuses.rejectedTxns
+                    transactionsToday: transactionStatuses.txnsCount,
+                    pendingTransactionsToday: transactionStatuses.pendingTxnsCount,
+                    rejectedTransactionsToday: transactionStatuses.rejectedTxnsCount,
+                    transactions: transactionStatuses.txns,
+                    pendingTransactions: transactionStatuses.pendingTxns,
+                    rejectedTransactions: transactionStatuses.rejectedTxns,
                 },
                 message: `Successfully fetched transaction stats`,
             });

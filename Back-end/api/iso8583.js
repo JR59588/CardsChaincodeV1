@@ -13,11 +13,11 @@ function ISO8583(message, additionLength) {
 		"11": ["n", 6, "systemsTraceAuditNumber", false, false],
 		"12": ["n", 6, "timeLocalTransactionHHMMSS", false, false],
 		"13": ["n", 4, "dateLocalTransactionMMDD", false, false],
-		"14": ["n", 4, "date, expiration", false, false],
+		"14": ["n", 4, "expirationDate", false, false],
 		"15": ["n", 4, "dateSettlement", false, false],
 		"16": ["n", 4, "dateConversion", false, false],
 		"17": ["n", 4, "dateCapture", false, false],
-		"18": ["n", 4, "merchantType", false, false],
+		"18": ["n", 4, "merchantCategoryCode", false, false],
 		"19": ["n", 3, "acquiringInstitutionCountryCode", false, false],
 		"20": ["n", 3, "panExtendedCountryCode", false, false],
 		"21": ["n", 3, "forwardingInstitutionCountryCode", false, false],
@@ -42,17 +42,17 @@ function ISO8583(message, additionLength) {
 		"40": ["an", 3, "serviceRestrictionCode", false, false],
 		"41": ["ans", 8, "cardAcceptorTerminalIdentification", false, false],
 		"42": ["ans", 15, "cardAcceptorIdentificationCode", false, false],
-		"43": ["ans", 40, "cardAcceptorNameLocation", false, false],
+		"43": ["ans", 40, "cardAcceptorNameAndLocation", false, false],
 		"44": ["an", 25, "additionalResponseData", true, false],
 		"45": ["an", 76, "track1data", true, false],
 		"46": ["an", 999, "additionalDataISO", true, false],
 		"47": ["an", 999, "additionalDataNational", true, false],
 		"48": ["an", 999, "additionalDataPrivate", true, false],
-		"49": ["a", 3, "currencyCodeTransaction", false, false],
+		"49": ["an", 3, "currencyCode", false, false],
 		"50": ["an", 3, "currencyCodeSettlement", false, false],
-		"51": ["a", 3, "currencyCodeCardholderBilling", false, false],
-		"52": ["b", 16, "personalIdentificationNumberData", false, false],
-		"53": ["b", 18, "securityRelatedControlInformation", false, false],
+		"51": ["an", 3, "currencyCodeCardholderBilling", false, false],
+		"52": ["b", 64, "personalIdentificationNumber", false, false],
+		"53": ["n", 16, "securityRelatedControlInformation", false, false],
 		"54": ["an", 120, "additionalAmounts", true, false],
 		"55": ["ans", 999, "reservedISO", true, false],
 		"56": ["ans", 999, "reservedISO", true, false],
@@ -217,7 +217,7 @@ function ISO8583(message, additionLength) {
 			fieldMaxLength = fobj[1];
 
 			if (fieldType == 'b') {
-				fieldLength = parseInt(fobj[1] / 8);
+				fieldLength = parseInt(fobj[1] / 4);
 			}
 			else {
 				fieldLength = fobj[1];

@@ -68,7 +68,6 @@ class PYMTUtilsCC extends Contract {
     currencyCode,
     personalIdentificationNumber,
     additionalData,
-    posData
   ) {
     // acl
 
@@ -142,7 +141,6 @@ class PYMTUtilsCC extends Contract {
       currencyCode: currencyCode,
       personalIdentificationNumber: personalIdentificationNumber,
       additionalData: additionalData,
-      posData: posData,
     };
 
     let { initiateSettlementTxFN } = await pymtutils.hlfconstants();
@@ -233,7 +231,6 @@ class PYMTUtilsCC extends Contract {
     currencyCode,
     personalIdentificationNumber,
     additionalData,
-    posData
   ) {
     // acl
 
@@ -299,7 +296,6 @@ class PYMTUtilsCC extends Contract {
       currencyCode: currencyCode,
       personalIdentificationNumber: personalIdentificationNumber,
       additionalData: additionalData,
-      posData: posData,
     };
 
     let { requestSettlementTxFN } = await pymtutils.hlfconstants();
