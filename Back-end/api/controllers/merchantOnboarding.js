@@ -396,8 +396,26 @@ exports.saveOBMerchantSummary = async function (req, res) {
       return res.status(400).send(`There's already a merchant with the ID: ${req.body.merchantID}`);
     }
 
+    // adding merchant organization to the network
+    const { orgAddnError } = addOrganization(req.body.merchantID);
 
-    // Submit the specified transaction.
+    if (orgAddnError) {
+      return res.status(400).json({
+        success: false,
+        message: `Failed to onboard the merchant: ${req.body.merchantName}`
+      });
+    }
+
+    const { error } = addOrgToDatabase(req.body.merchantID, req.body.merchantName);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Error adding organization to the database"
+      });
+    }
+
+    // Invoke Onboarding PDC chaincode functions to store private data about the Merchant that's onboarded.
 
     const merchantID = req.body.merchantID;
     const merchantName = req.body.merchantName;
@@ -436,7 +454,6 @@ exports.saveOBMerchantSummary = async function (req, res) {
     console.log(" result", result.toString());
 
     // Disconnect from the gateway.
-    await gateway.disconnect();
 
     console.log("Transaction has been submitted by saveOBMerchantSummary");
 
@@ -444,23 +461,9 @@ exports.saveOBMerchantSummary = async function (req, res) {
     await savePvAADAODMetaData(req, res);
     await savePvAODMetaData(req, res);
 
-    const { orgAddnError } = addOrganization(req.body.merchantID);
+    await gateway.disconnect();
 
-    if (orgAddnError) {
-      return res.status(400).json({
-        success: false,
-        message: `Failed to onboard the merchant: ${req.body.merchantName}`
-      });
-    }
 
-    const { error } = addOrgToDatabase(req.body.merchantID, req.body.merchantName);
-
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: "Error adding organization to the database"
-      });
-    }
 
     return res.status(200).json({
       success: true,

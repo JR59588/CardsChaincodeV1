@@ -96,9 +96,16 @@ class MerchantOnboardingPDC extends Contract {
 
     console.log("merchant inputs :", merchantInput);
 
+    const posTerminalIDs = [];
+
+    for (let i = 1; i <= merchantInput.numberOfPOSTerminalsRequired; i++) {
+      posTerminalIDs.push(merchantInput.merchantID + "-" + i);
+    }
+
     const merchant = {
       product: merchantInput.product,
       numberOfPOSTerminalsRequired: merchantInput.numberOfPOSTerminalsRequired,
+      posTerminalIDs
     };
 
     console.log(

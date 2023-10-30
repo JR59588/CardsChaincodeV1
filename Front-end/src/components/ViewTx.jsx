@@ -472,20 +472,6 @@ const ViewTx = (props) => {
                         </span>
                       </td>
                       {/* <td>{value.aggId}</td> */}
-                      <td>
-                        <strong>{value.Record["CustomerId"]}</strong> <br />
-                        <span
-                          style={{ color: "blue", cursor: "pointer" }}
-                          href="#"
-                          data-bs-toggle="modal"
-                          data-bs-target="#myModalCD"
-                          onClick={() =>
-                            onClickCustomerId(value.Record["CustomerId"])
-                          }
-                        >
-                          <u>View More</u>
-                        </span>
-                      </td>
                       <td>{value.Record["LoanReferenceNumber"]}</td>
                       <td>
                         {value.Record["SubmissionDate"] === "" ||
