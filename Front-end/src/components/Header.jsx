@@ -31,43 +31,18 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarText">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul
+            style={{ display: "flex", alignItems: "center" }}
+            className="navbar-nav me-auto mb-2 mb-lg-0"
+          >
             <li className="nav-item">
               <NavLink to="/About" className="ani">
-                About{" "}
-                <span style={{ color: "white" }} className="gapLine">
-                  |
-                </span>
-              </NavLink>{" "}
+                About
+              </NavLink>
             </li>
-            <li className="nav-item">
-              {/* {roleId === 'Agg' || roleId === 'Agg2' ? (
-                <> */}
+            {/* <li className="nav-item">
               <NavLink to="/Aggregator" className="ani">
                 New Onboarding{" "}
-                <span className="gapLine" style={{ color: "white" }}>
-                  |
-                </span>
-              </NavLink>
-              {/* </>
-              ) : (
-                <>
-                  <div
-                    className="ani"
-                    style={{ cursor: 'not-allowed', color: 'lightgrey' }}
-                  >
-                    New Onboarding{' '}
-                    <span className="gapLine" style={{ color: 'white' }}>
-                      |
-                    </span>
-                  </div>
-                </>
-              ) 
-              }*/}
-            </li>
-            <li className="nav-item">
-              <NavLink to="/View-Onboarding-Static" className="ani">
-                View Onboarding{" "}
                 <span className="gapLine" style={{ color: "white" }}>
                   |
                 </span>
@@ -75,23 +50,67 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
             </li>
 
             <li className="nav-item">
-              {/* {roleId === 'Agg' || roleId === 'Agg2' ? (
-                <> */}
-              <NavLink to="/Merchant" className="ani">
-                Settlement Request{" "}
+              <NavLink to="/View-Onboarding-Static" className="ani">
+                View Onboarding{" "}
                 <span className="gapLine" style={{ color: "white" }}>
                   |
                 </span>
+              </NavLink>
+            </li> */}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                style={{ color: "white" }}
+              >
+                Onboarding
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <NavLink className="dropdown-item" to="/Aggregator">
+                  Add new merchant
+                </NavLink>
+                <NavLink className="dropdown-item" to="/View-Onboarding-Static">
+                  View onboarded merchant
+                </NavLink>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                style={{ color: "white" }}
+              >
+                Settlements
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <NavLink className="dropdown-item" to="/Merchant">
+                  Submit new request
+                </NavLink>
+                <NavLink className="dropdown-item" to="/ViewTx">
+                  View submitted request
+                </NavLink>
+              </div>
+            </li>
+            {/* <li className="nav-item">
+              <NavLink to="/Merchant" className="ani">
+                Settlement Request{" "}
               </NavLink>
             </li>
             <li className="nav-item">
               <NavLink to="/ViewTx" className="ani">
                 View Settlement Requests{" "}
-                <span style={{ color: "white" }} className="gapLine">
-                  |
-                </span>
               </NavLink>{" "}
-            </li>
+            </li> */}
             <li className="nav-item">
               <NavLink to="/DashboardSummary" className="ani">
                 Dashboard{" "}

@@ -49,11 +49,11 @@ a {
 .bg {
   background-color: #10005d;
 }
-.active {
+/* .active {
   color: #ffdb58 !important;
   font-size: 20px;
   line-height: 20px;
-}
+} */
 
 /* for dropdown in header */
 #dropdown {
