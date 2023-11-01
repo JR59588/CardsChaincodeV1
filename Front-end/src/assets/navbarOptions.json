@@ -1,0 +1,44 @@
+[
+    {
+        "name": "About",
+        "id": "12",
+        "url": "/About"
+    },
+    {
+        "name": "Onboarding",
+        "id": "13",
+        "children": [
+            {
+                "name": "Add New Merchant",
+                "id": "21",
+                "url": "/Aggregator"
+            },
+            {
+                "name": "View Onboarded Merchant",
+                "id": "22",
+                "url": "/View-Onboarding-Static"
+            }
+        ]
+    },
+    {
+        "name": "Settlements",
+        "id": "14",
+        "children": [
+            {
+                "name": "Submit New Request",
+                "id": "31",
+                "url": "/Merchant"
+            },
+            {
+                "name": "View Submitted Request",
+                "id": "32",
+                "url": "/ViewTx"
+            }
+        ]
+    },
+    {
+        "name": "Dashboard",
+        "id": "15",
+        "url": "/DashboardSummary"
+    }
+]
