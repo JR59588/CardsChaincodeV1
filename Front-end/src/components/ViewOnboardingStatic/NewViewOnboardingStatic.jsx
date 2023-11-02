@@ -67,9 +67,6 @@ const NewViewOnboardingStatic = (props) => {
     // demo purpose start
     if (updatedRoleId === "CAcct") {
       try {
-        const resEDI = await axios.get(
-          `http://${props.IP}:3001/api/v1/retrieveEDIPvMerchantMetaData/${merchantId}/CAcct`
-        );
         const resMerchant = await axios.get(
           `http://${props.IP}:3001/api/v1/retrievePvMerchantMetaData/${merchantId}/CAcct`
         );
@@ -79,12 +76,11 @@ const NewViewOnboardingStatic = (props) => {
         const resOB = await axios.get(
           `http://${props.IP}:3001/api/v1/retrieveOBMerchantData/${merchantId}/CAcct`
         );
-        console.log("resEDI", resEDI.data.response);
+
         console.log("resMerchant", resMerchant.data.response);
         console.log("resCAcct", JSON.parse(resCAcct.data.response));
         console.log("resOB", resOB.data.responseData);
         let mixedObject = {
-          ...resEDI.data.response,
           ...resMerchant.data.response,
           ...JSON.parse(resCAcct.data.response),
           ...resOB.data.response,
@@ -120,12 +116,9 @@ const NewViewOnboardingStatic = (props) => {
           customerName: mixedObject.customerName,
           product: mixedObject.product,
           POSID: mixedObject.POSID,
+          posTerminalIDs: mixedObject.posTerminalIDs,
         });
-        if (
-          resEDI.status === 200 &&
-          resMerchant.status === 200 &&
-          resCAcct.status === 200
-        ) {
+        if (resMerchant.status === 200 && resCAcct.status === 200) {
           setTimeout(() => {
             setLoad(true);
             setLoadingAnimatio(false);
@@ -189,6 +182,7 @@ const NewViewOnboardingStatic = (props) => {
           securityDeposits: responseData.securityDeposits,
           isContractSigned: responseData.isContractSigned,
           kycStatus: responseData.kycStatus,
+          posTerminalIDs: responseData.posTerminalIDs,
         });
         if (response.status === 200) {
           setTimeout(() => {

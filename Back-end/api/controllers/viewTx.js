@@ -470,6 +470,7 @@ exports.lookUpMerchantMetaData = async function (req, res) {
     let defaultValueAODPDC = {
       "product": UNAUTHORIZED,
       "numberOfPOSTerminalsRequired": UNAUTHORIZED,
+      "posTerminalIDs": UNAUTHORIZED,
       "POSID": UNAUTHORIZED,
     }
 

@@ -89,21 +89,21 @@ const ViewTx = (props) => {
           }
           return item;
         });
-
+        console.log("new data mixed: ", newDataMixed);
         return newDataMixed;
       });
-      const messages = response.verifications.map((verification, index) => (
-        <div key={"verification" + index}>
-          <p>
-            <b>{verification.org}</b>: <i>{verification.attribute}</i>
-          </p>
-        </div>
-      ));
-      NotificationManager.success(
-        <div>{messages}</div>,
-        "Status Updated",
-        5000
-      );
+      // const messages = response.verifications.map((verification, index) => (
+      //   <div key={"verification" + index}>
+      //     <p>
+      //       <b>{verification.org}</b>: <i>{verification.attribute}</i>
+      //     </p>
+      //   </div>
+      // ));
+      // NotificationManager.success(
+      //   <div>{messages}</div>,
+      //   "Status Updated",
+      //   5000
+      // );
     });
 
     return () => {
@@ -291,14 +291,15 @@ const ViewTx = (props) => {
     } else if (txStages[status] === txStages[expectedStatus]) {
       return "Endorsed " + txStageEndorsers[expectedStatus];
     } else if (txStages[status] === txStages[expectedStatus] - 1) {
-      return (
-        <button
-          className="verifyButton"
-          onClick={() => onClickVerify(key, status)}
-        >
-          Execute
-        </button>
-      );
+      return null;
+      // return (
+      //   <button
+      //     className="verifyButton"
+      //     onClick={() => onClickVerify(key, status)}
+      //   >
+      //     Execute
+      //   </button>
+      // );
     } else {
       return "-";
     }
@@ -459,7 +460,7 @@ const ViewTx = (props) => {
                       <td>
                         {value.Record["MerchantId"]}
                         <br />
-                        <span
+                        {/* <span
                           style={{ color: "blue", cursor: "pointer" }}
                           href="#"
                           data-bs-toggle="modal"
@@ -469,9 +470,10 @@ const ViewTx = (props) => {
                           }}
                         >
                           <u>View More</u>
-                        </span>
+                        </span> */}
                       </td>
                       {/* <td>{value.aggId}</td> */}
+                      <td>{value.Record["CustomerId"]}</td>
                       <td>{value.Record["LoanReferenceNumber"]}</td>
                       <td>
                         {value.Record["SubmissionDate"] === "" ||

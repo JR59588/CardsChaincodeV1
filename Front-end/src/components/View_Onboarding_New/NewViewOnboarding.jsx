@@ -289,15 +289,35 @@ const NewViewOnboarding = (props) => {
                   </label>
                 </div>
                 <div className="col">
-                  <input
-                    disabled
-                    type="text"
-                    className="form-control"
-                    placeholder="No of POS Terminals"
-                    aria-label="Last name"
-                    name="numberOfPOSTerminalsRequired"
-                    value={props.data.numberOfPOSTerminalsRequired}
-                  />
+                  {props.data.numberOfPOSTerminalsRequired ===
+                  "Not Authorized" ? (
+                    <input
+                      disabled
+                      type="text"
+                      className="form-control"
+                      placeholder="No of POS Terminals"
+                      aria-label="Last name"
+                      name="numberOfPOSTerminalsRequired"
+                      value={props.data.numberOfPOSTerminalsRequired}
+                    />
+                  ) : (
+                    <select
+                      className="form-select"
+                      style={{ height: "auto" }}
+                      placeholder="No of POS Terminals"
+                      aria-label="No of POS terminals required"
+                      name="numberOfPOSTerminalsRequired"
+                    >
+                      <option value={props.data.numberOfPOSTerminalsRequired}>
+                        {props.data.numberOfPOSTerminalsRequired}
+                      </option>
+                      {props.data.posTerminalIDs.map((terminalID) => (
+                        <option key={terminalID} value={terminalID} disabled>
+                          {terminalID}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
               <div className="row">

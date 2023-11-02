@@ -18,14 +18,20 @@ const io = socketIo(server, {
 
 const channelName = 'channel1';
 
+const org1MSP = 'Org1MSP';
+const Org1UserId = 'appOrg1User21';
+
+const orgPSPMSP = 'PSPMSP';
+const OrgPSPUserId = 'appOrgPSPUser21';
+
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser20';
+const OrgACDUserId = 'appOrgACDUser21';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser20';
+const OrgAADUserId = 'appOrgAADUser21';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser20';
+const OrgAODUserId = 'appOrgAODUser21';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';
@@ -69,7 +75,7 @@ async function initGatewayForOrg(useCommitEvents, pathStr, caHostName, walletPat
 	}
 }
 
-let contractSubmitSettlementTxCCOrgACD,
+let contractPYMTUTILSCCOrg1, contractSubmitSettlementTxCCOrgPSP, contractSubmitSettlementTxCCOrgACD,
 	contractAuthorizeSettlementTxCCOrgACD,
 	contractAuthorizeSettlementTxCCOrgAAD,
 	contractBalanceSettlementTxCCOrgAAD,
@@ -79,15 +85,20 @@ let contractSubmitSettlementTxCCOrgACD,
 
 const initialize = async (callback) => {
 	try {
+		const gateway1Org1 = await initGatewayForOrg(true, path.resolve(__dirname, '../../connection-org1.json'), 'ca_org1', path.join(__dirname, 'wallet', 'org1'), org1MSP, Org1UserId, 'org1.department1');
+		const gateway1OrgPSP = await initGatewayForOrg(true, path.resolve(__dirname, '../../connection-PSP.json'), 'ca_PSP', path.join(__dirname, 'wallet', 'orgPSP'), orgPSPMSP, OrgPSPUserId, 'orgPSP.department1');
 		const gateway1OrgACD = await initGatewayForOrg(true, path.resolve(__dirname, '../../connection-ACD.json'), 'ca_ACD', path.join(__dirname, 'wallet', 'orgACD'), orgACDMSP, OrgACDUserId, 'orgACD.department1');
 		const gateway1OrgAAD = await initGatewayForOrg(true, path.resolve(__dirname, '../../connection-AAD.json'), 'ca_AAD', path.join(__dirname, 'wallet', 'orgAAD'), orgAADMSP, OrgAADUserId, 'orgAAD.department1');
 		const gateway1OrgAOD = await initGatewayForOrg(true, path.resolve(__dirname, '../../connection-AOD.json'), 'ca_AOD', path.join(__dirname, 'wallet', 'orgAOD'), orgAODMSP, OrgAODUserId, 'orgAOD.department1');
 
+		const network1Org1 = await gateway1Org1.getNetwork(channelName);
+		const network1OrgPSP = await gateway1OrgPSP.getNetwork(channelName);
 		const network1OrgACD = await gateway1OrgACD.getNetwork(channelName);
 		const network1OrgAAD = await gateway1OrgAAD.getNetwork(channelName);
 		const network1OrgAOD = await gateway1OrgAOD.getNetwork(channelName);
 
-
+		contractPYMTUTILSCCOrg1 = network1Org1.getContract("PYMTUtilsCC");
+		contractSubmitSettlementTxCCOrgPSP = network1OrgPSP.getContract("SubmitSettlementTxCC");
 		contractSubmitSettlementTxCCOrgACD = network1OrgACD.getContract("SubmitSettlementTxCC");
 		contractAuthorizeSettlementTxCCOrgACD = network1OrgACD.getContract("AuthorizeSettlementTxCC");
 		contractAuthorizeSettlementTxCCOrgAAD = network1OrgAAD.getContract("AuthorizeSettlementTxCC");
@@ -119,6 +130,30 @@ const startServer = () => {
 
 
 			try {
+
+				let listenerOrg1 = async (event) => {
+					const stateObj = JSON.parse(event.payload.toString());
+					console.log(`${stateObj.channelName}, ${stateObj.key}`);
+					console.log(`${GREEN}<-- Contract Event Received: ${event.eventName} - ${stateObj} - ${JSON.stringify(stateObj)}${RESET}`);
+					console.log(`*** Event: ${event.eventName}`);
+					try {
+						if (event.eventName == 'EMT-RT') {
+							console.log(`${GREEN}--> Submit SubmitSettlementTxCC Transaction submitSettlementTx, ${stateObj.key}`);
+							transaction = contractSubmitSettlementTxCCOrgPSP.createTransaction('submitSettlementTx');
+							const splitKey = [...stateObj.key.split("-")];
+							socket.emit('status-change', { status: 'requested', data: splitKey });
+							console.log("Emitted status-change for requested - ", splitKey);
+							await transaction.submit(...splitKey);
+							console.log(`${GREEN}<-- Submit SubmitSettlementTxCC submitSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
+						}
+					} catch (error) {
+						console.log(`${RED}<-- Submit Failed: SubmitSettlementTxCC verifyAndChangeStatus - ${createError}${RESET}`);
+					}
+				};
+				// now start the client side event service and register the listener
+				console.log(`${GREEN}--> Start contract event stream to peer in Org1${RESET}`);
+				await contractPYMTUTILSCCOrg1.addContractListener(listenerOrg1);
+
 
 				let listenerOrgACD = async (event) => {
 					const stateObj = JSON.parse(event.payload.toString());
