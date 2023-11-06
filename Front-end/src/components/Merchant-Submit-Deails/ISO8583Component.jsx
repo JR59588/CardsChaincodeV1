@@ -89,10 +89,33 @@ const ISO8583Component = (props) => {
     } else {
       setRoleMsg(true);
     }
+    if (selectedOption === '') {
+      setError('Please select a demo mode');
+      setLoading(false);
+  } 
+  
   };
   const getState = (state) => {
     setModal(state);
     setFailureModal(state);
+  };
+  const [selectedOption, setSelectedOption] = useState('');
+  const [error, setError] = useState('');
+
+  const handleOptionChange = (event) => {
+      setSelectedOption(event.target.value);
+      setError('');
+  };
+
+  const handleSubmit = (event) => {
+      event.preventDefault();
+
+      if (selectedOption === '') {
+          setError('Please select a demo mode');
+      } else {
+          alert('')
+          // Perform further actions with the selected option
+      }
   };
   return (
     <div>
@@ -212,6 +235,47 @@ const ISO8583Component = (props) => {
               would be chosen as per business need.
             </p>
           </div>
+          <div className="container">
+        <h5 style={{ fontWeight: "500" }}>DEMO MODE</h5> <br />
+        <div className="column">
+          <div className="col-sm-4">
+            <input
+              className="form-check-input"
+              type={"radio"}
+              value="option1"
+              id="option1"
+              checked={selectedOption === 'option1'}
+              onChange={handleOptionChange}
+            />{" "}
+            <label
+              htmlFor="option1"
+              style={{ marginLeft: "5px", fontSize: "14px", display: "inline" }}
+            >
+              Auto Mode
+            </label><br/>
+          </div>
+          <div className="col-sm-4">
+            <input
+              className="form-check-input"
+              type={"radio"}
+              value="option2"
+              name="radioBtn"
+              id="option2"
+              checked={selectedOption === 'option2'}
+              onChange={handleOptionChange}
+            />
+            <label
+              htmlFor="option2"
+              style={{ marginLeft: "5px", fontSize: "14px", display: "inline" }}
+            >
+              Manual Mode
+            </label>
+          </div>
+          {error && <div style={{ color: 'red' }}>{error}</div>}
+          
+
+        </div>
+      </div>
         </div>
       </div>
       <div className="col-md-12 btAlign">
