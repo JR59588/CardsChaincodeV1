@@ -125,13 +125,6 @@ const Merchant = ({ roleId, IP, getRoleFromFile }) => {
           </div> */}
         </div>
       </div>
-      <div style={{ marginLeft: "230px", marginTop: "20px" }}>
-        <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
-          <div className="mb-1"></div>
-          <div className="mb-1" style={{ marginLeft: "100px" }}></div>
-        </div>
-        <div className="placeHeads"></div>
-      </div>
       {renderSubmitForm()}
       <Footer />
     </div>

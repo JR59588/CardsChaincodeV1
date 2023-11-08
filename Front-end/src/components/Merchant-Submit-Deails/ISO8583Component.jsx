@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Footer from "../Footer";
-import "../Merchant.css";
+import "./ISO8583Component.css";
 import { useState } from "react";
 import axios from "axios";
 import SuccessModal from "../SuccessModal/SuccessModal";
@@ -11,7 +11,6 @@ let failureMsg = "Invalid";
 let failureHead = "Invalid";
 const ISO8583Component = (props) => {
   const settlementRequest_URL = `http://${props.IP}:3001/api/v1/merchantTx`;
-  const [formFile, setFormFile] = useState("radio1");
 
   //setting role message
   const [roleMsg, setRoleMsg] = useState(false);
@@ -35,7 +34,7 @@ const ISO8583Component = (props) => {
   });
 
   //Handeling the onchange values.
-  const onChangeHandel = (e) => {
+  const handleChange = (e) => {
     setTxFormData({ ...txFormData, [e.target.name]: e.target.value });
   };
 
@@ -55,9 +54,13 @@ const ISO8583Component = (props) => {
       console.log(txFormData);
       setRoleMsg(false);
       axios
-        .post(settlementRequest_URL, {...txFormData, roleId: "Org1"}, {
-          header: { "Content-Type": "application/json" },
-        })
+        .post(
+          settlementRequest_URL,
+          { ...txFormData, roleId: "Org1" },
+          {
+            header: { "Content-Type": "application/json" },
+          }
+        )
         .then((response) => {
           console.log(response);
           setLoading(false);
@@ -89,68 +92,54 @@ const ISO8583Component = (props) => {
     } else {
       setRoleMsg(true);
     }
-    if (selectedOption === '') {
-      setError('Please select a demo mode');
+    if (selectedOption === "") {
+      setError("Please select a demo mode");
       setLoading(false);
-  } 
-  
+    }
   };
   const getState = (state) => {
     setModal(state);
     setFailureModal(state);
   };
-  const [selectedOption, setSelectedOption] = useState('');
-  const [error, setError] = useState('');
+  const [selectedOption, setSelectedOption] = useState("");
+  const [error, setError] = useState("");
 
   const handleOptionChange = (event) => {
-      setSelectedOption(event.target.value);
-      setError('');
+    setSelectedOption(event.target.value);
+    setError("");
   };
 
   const handleSubmit = (event) => {
-      event.preventDefault();
+    event.preventDefault();
 
-      if (selectedOption === '') {
-          setError('Please select a demo mode');
-      } else {
-          alert('')
-          // Perform further actions with the selected option
-      }
+    if (selectedOption === "") {
+      setError("Please select a demo mode");
+    } else {
+      alert("");
+      // Perform further actions with the selected option
+    }
   };
   return (
     <div>
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12">
-            <h5
-              className="mt-3"
-              style={{ textAlign: "center", fontWeight: "500" }}
-            >
-              Submit ISO8583 Message 
-            </h5>
-          </div>
-          <div className="col-md-3"></div>
-          <div
-            className="col-md-6 mt-3"
-            style={{
-              borderStyle: "solid",
-              borderWidth: "1px",
-              borderRadius: "40px",
-            }}
-          >
-            <div className="placing">a. Settlement Request:</div>
-            <div className="container p-3" style={{ marginTop: "-20px" }}>
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="mb-1">
-                    <label className="col-form-label">ISO8583 Message:</label>
+      <h5 className="mt-3" style={{ textAlign: "center", fontWeight: "500" }}>
+        Submit ISO8583 Message
+      </h5>
+      <div className="form-container container">
+        <div className="row row-cols-1 row-cols-lg-2 justify-content-center">
+          <div className="col p-3">
+            <div className="form-section  p-3 border border-1 rounded">
+              <h6>ISO8583 Details</h6>
+              <div>
+                <div className="row form-field">
+                  <div className="col">
+                    <label htmlFor="name" className="col-form-label">
+                      ISO8583 message
+                    </label>
                   </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="mb-1">
+                  <div className="col">
                     <input
                       value={txFormData.ISO8583Message}
-                      onChange={onChangeHandel}
+                      onChange={handleChange}
                       required
                       type="text"
                       className="form-control"
@@ -159,18 +148,16 @@ const ISO8583Component = (props) => {
                     />
                   </div>
                 </div>
-              </div>
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="mb-1">
-                    <label className="col-form-label">Merchant ID:</label>
+                <div className="row form-field">
+                  <div className="col">
+                    <label htmlFor="name" className="col-form-label">
+                      Merchant Id
+                    </label>
                   </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="mb-1">
+                  <div className="col">
                     <input
                       value={txFormData.merchantID}
-                      onChange={onChangeHandel}
+                      onChange={handleChange}
                       required
                       type="text"
                       className="form-control"
@@ -179,18 +166,16 @@ const ISO8583Component = (props) => {
                     />
                   </div>
                 </div>
-              </div>
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="mb-1">
-                    <label className="col-form-label">Customer ID:</label>
+                <div className="row form-field">
+                  <div className="col">
+                    <label htmlFor="name" className="col-form-label">
+                      Customer Id
+                    </label>
                   </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="mb-1">
+                  <div className="col">
                     <input
                       value={txFormData.customerID}
-                      onChange={onChangeHandel}
+                      onChange={handleChange}
                       required
                       type="text"
                       className="form-control"
@@ -199,20 +184,16 @@ const ISO8583Component = (props) => {
                     />
                   </div>
                 </div>
-              </div>
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="mb-1">
-                    <label className="col-form-label">
-                      Loan Reference Number:
+                <div className="row form-field">
+                  <div className="col">
+                    <label htmlFor="name" className="col-form-label">
+                      Loan Reference Number
                     </label>
                   </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="mb-1">
+                  <div className="col">
                     <input
                       value={txFormData.loanReferenceNumber}
-                      onChange={onChangeHandel}
+                      onChange={handleChange}
                       required
                       type="text"
                       className="form-control"
@@ -225,71 +206,56 @@ const ISO8583Component = (props) => {
             </div>
           </div>
         </div>
+        <div className="row row-cols-1 row-cols-lg-2 justify-content-center">
+          <div className="col p-3">
+            <div className="form-section p-3 border border-1 rounded">
+              <div>
+                <h6>Demo mode</h6>
+                <div className="row form-field">
+                  <div className="col">
+                    <input
+                      className="form-check-input me-2"
+                      type={"radio"}
+                      value="auto"
+                      id="demoModeOption1"
+                      name="executionMode"
+                      checked={txFormData.executionMode === "auto"}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="demoModeOption1">Auto</label>
+                  </div>
+                  <div className="col">
+                    <input
+                      className="form-check-input me-2"
+                      type={"radio"}
+                      value="manual"
+                      name="executionMode"
+                      id="demoModeOption2"
+                      checked={txFormData.executionMode === "manual"}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="demoModeOption2">Manual</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <br />
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12">
-            <p>
-              Note : attributes shown are examples for this POC and
-              would be chosen as per business need.
-            </p>
-          </div>
-          <div className="container">
-        <h5 style={{ fontWeight: "500" }}>DEMO MODE</h5> <br />
-        <div className="column">
-          <div className="col-sm-4">
-            <input
-              className="form-check-input"
-              type={"radio"}
-              value="option1"
-              id="option1"
-              checked={selectedOption === 'option1'}
-              onChange={handleOptionChange}
-            />{" "}
-            <label
-              htmlFor="option1"
-              style={{ marginLeft: "5px", fontSize: "14px", display: "inline" }}
-            >
-              Auto Mode
-            </label><br/>
-          </div>
-          <div className="col-sm-4">
-            <input
-              className="form-check-input"
-              type={"radio"}
-              value="option2"
-              name="radioBtn"
-              id="option2"
-              checked={selectedOption === 'option2'}
-              onChange={handleOptionChange}
-            />
-            <label
-              htmlFor="option2"
-              style={{ marginLeft: "5px", fontSize: "14px", display: "inline" }}
-            >
-              Manual Mode
-            </label>
-          </div>
-          {error && <div style={{ color: 'red' }}>{error}</div>}
-          
 
-        </div>
-      </div>
-        </div>
-      </div>
+      <p className="text-center">
+        <i>
+          Note : Attributes shown are examples for this POC and would be chosen
+          as per business need.
+        </i>
+      </p>
       <div className="col-md-12 btAlign">
         <div className="mt-4">
           {loading ? (
             <button className="loaderSubmit"></button>
           ) : (
-            <button
-              type="button"
-              className="buttonbt3"
-           
-              onClick={SubmitISO8583}
-            >
-           Submit
+            <button type="button" className="buttonbt3" onClick={SubmitISO8583}>
+              Submit
             </button>
           )}
           <button type="button" className="btn btn-outline-danger bt2">

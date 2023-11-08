@@ -283,23 +283,31 @@ const ViewTx = (props) => {
       });
   };
 
-  const getStageDisplayComponent = (key, status, expectedStatus) => {
+  const getStageDisplayComponent = (
+    key,
+    status,
+    expectedStatus,
+    manualExecution
+  ) => {
     if (Math.abs(txStages[status]) > txStages[expectedStatus]) {
       return "Endorsed " + txStageEndorsers[expectedStatus];
     } else if (txStages[status] + txStages[expectedStatus] == 0) {
       return "Not Endorsed " + txStageEndorsers[expectedStatus];
     } else if (txStages[status] === txStages[expectedStatus]) {
       return "Endorsed " + txStageEndorsers[expectedStatus];
-    } else if (txStages[status] === txStages[expectedStatus] - 1) {
-      return null;
-      // return (
-      //   <button
-      //     className="verifyButton"
-      //     onClick={() => onClickVerify(key, status)}
-      //   >
-      //     Execute
-      //   </button>
-      // );
+    } else if (
+      txStages[status] === txStages[expectedStatus] - 1 &&
+      manualExecution
+    ) {
+      // return null;
+      return (
+        <button
+          className="verifyButton"
+          onClick={() => onClickVerify(key, status)}
+        >
+          Execute
+        </button>
+      );
     } else {
       return "-";
     }
@@ -488,7 +496,8 @@ const ViewTx = (props) => {
                         {getStageDisplayComponent(
                           value.Key,
                           value.Record.TxStatus,
-                          "TxSubmitted"
+                          "TxSubmitted",
+                          value.Record.executionMode === "manual"
                         )}
                       </td>
                       <td>

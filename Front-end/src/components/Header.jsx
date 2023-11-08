@@ -43,9 +43,9 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
               }
 
               return (
-                <li key={el.id} class="nav-item dropdown">
+                <li key={el.id} className="nav-item dropdown">
                   <a
-                    class="nav-link dropdown-toggle"
+                    className="nav-link dropdown-toggle"
                     href="#"
                     id="navbarDropdown"
                     role="button"
@@ -56,9 +56,16 @@ const Header = ({ roleId, setRoleId, orgOptions }) => {
                   >
                     {el.name}
                   </a>
-                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <div
+                    className="dropdown-menu"
+                    aria-labelledby="navbarDropdown"
+                  >
                     {el.children.map((ele) => (
-                      <NavLink className="dropdown-item" to={ele.url}>
+                      <NavLink
+                        className="dropdown-item"
+                        to={ele.url}
+                        key={ele.name}
+                      >
                         {ele.name}
                       </NavLink>
                     ))}

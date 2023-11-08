@@ -68,6 +68,7 @@ class PYMTUtilsCC extends Contract {
     currencyCode,
     personalIdentificationNumber,
     additionalData,
+    executionMode
   ) {
     // acl
 
@@ -141,6 +142,7 @@ class PYMTUtilsCC extends Contract {
       currencyCode: currencyCode,
       personalIdentificationNumber: personalIdentificationNumber,
       additionalData: additionalData,
+      executionMode: executionMode,
     };
 
     let { initiateSettlementTxFN } = await pymtutils.hlfconstants();
@@ -231,6 +233,7 @@ class PYMTUtilsCC extends Contract {
     currencyCode,
     personalIdentificationNumber,
     additionalData,
+    executionMode
   ) {
     // acl
 
@@ -296,6 +299,7 @@ class PYMTUtilsCC extends Contract {
       currencyCode: currencyCode,
       personalIdentificationNumber: personalIdentificationNumber,
       additionalData: additionalData,
+      executionMode: executionMode
     };
 
     let { requestSettlementTxFN } = await pymtutils.hlfconstants();
@@ -383,6 +387,7 @@ class PYMTUtilsCC extends Contract {
       emittingOrgType: "NA",
       evTxId: "99999",
       key: keyIn,
+      executionMode: txIn.executionMode
     };
     const eventPayload = JSON.stringify(evtPayload);
 

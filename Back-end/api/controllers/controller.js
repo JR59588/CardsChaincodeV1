@@ -76,7 +76,7 @@ exports.requestSettlementTx = async function (req, res) {
       res.status(400).send("Error!. Invalid role name");
     }
 
-    let stxObj = makeTxObj(req.body.merchantID, req.body.customerID, req.body.loanReferenceNumber, req.body.ISO8583Message);
+    let stxObj = makeTxObj(req.body.merchantID, req.body.customerID, req.body.loanReferenceNumber, req.body.ISO8583Message, req.body.executionMode ?? "manual");
 
     console.log("stxObj: ", stxObj);
 
@@ -134,10 +134,7 @@ exports.requestSettlementTx = async function (req, res) {
     console.log(
       "trying to add data in requestsetllmentTx for merchantId",
       stxObj.MerchantId,
-      ccFunctionName,
-      contract
-
-    );
+      ccFunctionName);
     console.log("controller line no 108", JSON.stringify(stxObj));
     await contract.submitTransaction(
       ccFunctionName,
@@ -163,6 +160,7 @@ exports.requestSettlementTx = async function (req, res) {
       stxObj.currencyCode,
       stxObj.personalIdentificationNumber,
       stxObj.additionalDataPrivate,
+      stxObj.executionMode
     );
     console.log("inside requestsetllmentTx ,Transaction has been submitted");
 
@@ -193,6 +191,8 @@ exports.processISO8583CSV = async function (req, res) {
           reason: err.message
         });
       } else {
+        console.log("Filer parser: ", req.body.executionMode)
+        const executionMode = req.body.executionMode;
         const results = [];
         const responses = [];
         fs.createReadStream(req.file.path)
@@ -202,7 +202,7 @@ exports.processISO8583CSV = async function (req, res) {
             console.log("Results after reading csv: ", results);
             for (let i = 0; i < results.length; i++) {
               const { merchantID, customerID, loanReferenceNumber, ISO8583Message } = results[i];
-              const settlementTxObject = makeTxObj(merchantID, customerID, loanReferenceNumber, ISO8583Message);
+              const settlementTxObject = makeTxObj(merchantID, customerID, loanReferenceNumber, ISO8583Message, executionMode ?? "manual");
               console.log("Settlement Tx Object: ", settlementTxObject)
               const { error, result } = await evaluateTransaction(req.body.roleId, 'channel1', 'PYMTUtilsCC', 'requestTx',
                 [settlementTxObject.MerchantId,
@@ -226,7 +226,8 @@ exports.processISO8583CSV = async function (req, res) {
                 settlementTxObject.cardAcceptorNameAndLocation,
                 settlementTxObject.currencyCode,
                 settlementTxObject.personalIdentificationNumber,
-                settlementTxObject.additionalDataPrivate]);
+                settlementTxObject.additionalDataPrivate,
+                settlementTxObject.executionMode]);
 
               if (error) {
                 responses.push({ i, success: false, result });
@@ -302,7 +303,7 @@ function getFunctionName(mode, MSPId) {
   return fnName;
 }
 
-function makeTxObj(merchantID, customerID, loanReferenceNumber, iso8583Message) {
+function makeTxObj(merchantID, customerID, loanReferenceNumber, iso8583Message, executionMode) {
   //TODO: change the property values of the object according to the requirements
   if (iso8583Message != undefined) {
     try {
@@ -336,6 +337,7 @@ function makeTxObj(merchantID, customerID, loanReferenceNumber, iso8583Message) 
         currencyCode: iso8583Obj.currencyCode,
         personalIdentificationNumber: iso8583Obj.personalIdentificationNumber,
         additionalDataPrivate: iso8583Obj.additionalDataPrivate,
+        executionMode
       };
       console.log("Constructed tx obj: ", localTxObj);
       return localTxObj;

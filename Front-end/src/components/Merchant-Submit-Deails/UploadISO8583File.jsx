@@ -3,11 +3,15 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-
+import "./UploadISO8583File.css";
 const UploadISO8583File = ({ roleId }) => {
   const [file, setFile] = useState(null);
   //loader state
   const [loader, setLoader] = useState(false);
+
+  const [txFormData, setTxFormData] = useState({
+    executionMode: "",
+  });
 
   const [popup, setPopup] = useState({
     open: false,
@@ -20,9 +24,9 @@ const UploadISO8583File = ({ roleId }) => {
 
   const handleUpload = async (event) => {
     event.preventDefault();
-    if (selectedOption === '') {
-      setError('Please select a demo mode');
-  } 
+    if (selectedOption === "") {
+      setError("Please select a demo mode");
+    }
     if (!file) {
       setLoader(false);
       console.log("No file selected");
@@ -35,6 +39,7 @@ const UploadISO8583File = ({ roleId }) => {
 
         formData.append("file", file);
         formData.append("roleId", roleId);
+        formData.append("executionMode", txFormData.executionMode);
 
         const response = await axios.post(fileUploadUrl, formData, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -58,6 +63,11 @@ const UploadISO8583File = ({ roleId }) => {
         });
       }
     }
+  };
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    setTxFormData({ ...txFormData, [e.target.name]: e.target.value });
   };
 
   const closePopup = () => {
@@ -93,85 +103,60 @@ const UploadISO8583File = ({ roleId }) => {
       );
     }
   };
-  const [selectedOption, setSelectedOption] = useState('');
-  const [error, setError] = useState('');
-
-  const handleOptionChange = (event) => {
-      setSelectedOption(event.target.value);
-      setError('');
-  };
-
-  const handleSubmit = (event) => {
-      event.preventDefault();
-
-      if (selectedOption === '') {
-          setError('Please select a demo mode');
-      } else {
-          alert('')
-          // Perform further actions with the selected option
-      }
-  };
+  const [selectedOption, setSelectedOption] = useState("");
+  const [error, setError] = useState("");
 
   return (
-    <div className="container">
-      <h5 className="text-center">
-        Upload merchant settlement request(s) CSV file
+    <div>
+      <h5 className="mt-3" style={{ textAlign: "center", fontWeight: "500" }}>
+        Upload file
       </h5>
-
-      <div className="d-flex align-items-center justify-content-center mt-3">
-        <Form.Control
-          type="file"
-          style={{ width: "500px" }}
-          onChange={(event) => setFile(event.target.files[0])}
-        />
-        <Button
-          className="buttonbt3"
-          onClick={(event) => {
-            handleUpload(event);
-          }}
-        >
-          Submit
-        </Button>
-      </div>
-      <div className="container">
-        <h5 style={{ fontWeight: "500" }}>DEMO MODE</h5> <br />
-        <div className="column">
-          <div className="col-sm-4">
-            <input
-              className="form-check-input"
-              type={"radio"}
-              value="option1"
-              id="option1"
-              checked={selectedOption === 'option1'}
-              onChange={handleOptionChange}
-            />{" "}
-            <label
-              htmlFor="option1"
-              style={{ marginLeft: "5px", fontSize: "14px", display: "inline" }}
-            >
-              Auto Mode
-            </label>
+      <div className="form-container container">
+        <div className="row row-cols-1 row-cols-lg-2 justify-content-center">
+          <div className="col p-3">
+            <div className="form-section  p-3 border border-1 rounded">
+              <h6>Upload merchant settlement request(s) CSV file</h6>
+              <Form.Control
+                type="file"
+                onChange={(event) => setFile(event.target.files[0])}
+              />
+              <div>
+                <div className="row form-field">
+                  <h6>Demo mode</h6>
+                  <div className="col">
+                    <input
+                      className="form-check-input me-2"
+                      type={"radio"}
+                      value="auto"
+                      id="demoModeOption1"
+                      name="executionMode"
+                      checked={txFormData.executionMode === "auto"}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="demoModeOption1">Auto</label>
+                  </div>
+                  <div className="col">
+                    <input
+                      className="form-check-input me-2"
+                      type={"radio"}
+                      value="manual"
+                      name="executionMode"
+                      id="demoModeOption2"
+                      checked={txFormData.executionMode === "manual"}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="demoModeOption2">Manual</label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="col-sm-4">
-            <input
-              className="form-check-input"
-              type={"radio"}
-              value="option2"
-              name="radioBtn"
-              id="option2"
-              checked={selectedOption === 'option2'}
-              onChange={handleOptionChange}
-            />
-            <label
-              htmlFor="option2"
-              style={{ marginLeft: "5px", fontSize: "14px", display: "inline" }}
-            >
-              Manual Mode
-            </label>
-          </div>
-          {error && <div style={{ color: 'red' }}>{error}</div>}
-          
+        </div>
 
+        <div className={`mt-4 d-flex justify-content-center`}>
+          <Button className="buttonbt3" onClick={handleUpload}>
+            Submit
+          </Button>
         </div>
       </div>
       <div>{renderPopup()}</div>

@@ -19,19 +19,19 @@ const io = socketIo(server, {
 const channelName = 'channel1';
 
 const org1MSP = 'Org1MSP';
-const Org1UserId = 'appOrg1User21';
+const Org1UserId = 'appOrg1User22';
 
 const orgPSPMSP = 'PSPMSP';
-const OrgPSPUserId = 'appOrgPSPUser21';
+const OrgPSPUserId = 'appOrgPSPUser22';
 
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser21';
+const OrgACDUserId = 'appOrgACDUser22';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser21';
+const OrgAADUserId = 'appOrgAADUser22';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser21';
+const OrgAODUserId = 'appOrgAODUser22';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';
@@ -137,7 +137,7 @@ const startServer = () => {
 					console.log(`${GREEN}<-- Contract Event Received: ${event.eventName} - ${stateObj} - ${JSON.stringify(stateObj)}${RESET}`);
 					console.log(`*** Event: ${event.eventName}`);
 					try {
-						if (event.eventName == 'EMT-RT') {
+						if (event.eventName == 'EMT-RT' && stateObj.executionMode == "auto") {
 							console.log(`${GREEN}--> Submit SubmitSettlementTxCC Transaction submitSettlementTx, ${stateObj.key}`);
 							transaction = contractSubmitSettlementTxCCOrgPSP.createTransaction('submitSettlementTx');
 							const splitKey = [...stateObj.key.split("-")];
