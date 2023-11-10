@@ -1,17 +1,21 @@
 import React from "react";
-import '../App.css'
-import image from '../assets/logo3.png'
+import "../App.css";
+import image from "../assets/logo3.png";
 const Footer = () => {
   return (
-    <div className="bg mt-4" style={{ width:'auto', height: "70px", backgroundColor: "#10005d" }}>
-      <h4 style={{ textAlign: "center", lineHeight: "70px" ,color:'white',marginLeft:'185px' }}>
+    <div
+      className="mt-4 d-flex justify-space-between align-items-center"
+      style={{ backgroundColor: "#10005d" }}
+    >
+      <div style={{ width: "120px" }}></div>
+
+      <h4 className="text-center text-white flex-grow-1">
         Developed by Blockchain Labs@Zensar
-        <img style={{width:"120px", height:"70px", float:"right"}}  src={image} alt="no Img"/>
       </h4>
+
+      <img style={{ width: "120px" }} src={image} alt="Zensar Logo" />
     </div>
   );
 };
 
-
 export default Footer;
-
