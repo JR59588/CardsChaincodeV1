@@ -83,6 +83,7 @@ class AuthorizeSettlementTxCC extends Contract {
           AAD_AOD_AT_EVENT,
           AAD_AOD_AT_EVENT.eventID,
           key,
+          currentTxReadState,
           OrgMSPId,
           channelName
         );
@@ -123,6 +124,7 @@ class AuthorizeSettlementTxCC extends Contract {
       emittingOrgType: "NA",
       evTxId: "99999",
       key: keyIn,
+      executionMode: txIn.executionMode,
     };
     const eventPayload = JSON.stringify(evtPayload);
 

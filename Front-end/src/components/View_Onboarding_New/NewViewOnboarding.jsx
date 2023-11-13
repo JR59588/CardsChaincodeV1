@@ -1,6 +1,5 @@
 import React from "react";
 import classes from "../View_Onboarding_New/ViewOnboarding.module.css";
-import Footer from "../Footer";
 
 const NewViewOnboarding = (props) => {
   return (

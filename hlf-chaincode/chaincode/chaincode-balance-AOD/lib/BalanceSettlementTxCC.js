@@ -83,6 +83,7 @@ class BalanceSettlementTxCC extends Contract {
           AOD_ACD_BT_EVENT,
           AOD_ACD_BT_EVENT.eventID,
           key,
+          currentTxReadState,
           OrgMSPId,
           channelName
         );
@@ -123,6 +124,7 @@ class BalanceSettlementTxCC extends Contract {
       emittingOrgType: "NA",
       evTxId: "99999",
       key: keyIn,
+      executionMode: txIn.executionMode,
     };
     const eventPayload = JSON.stringify(evtPayload);
 

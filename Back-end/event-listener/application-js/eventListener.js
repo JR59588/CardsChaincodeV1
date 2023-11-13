@@ -19,19 +19,19 @@ const io = socketIo(server, {
 const channelName = 'channel1';
 
 const org1MSP = 'Org1MSP';
-const Org1UserId = 'appOrg1User23';
+const Org1UserId = 'appOrg1User24';
 
 const orgPSPMSP = 'PSPMSP';
-const OrgPSPUserId = 'appOrgPSPUser23';
+const OrgPSPUserId = 'appOrgPSPUser24';
 
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser23';
+const OrgACDUserId = 'appOrgACDUser24';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser23';
+const OrgAADUserId = 'appOrgAADUser24';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser23';
+const OrgAODUserId = 'appOrgAODUser24';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';
@@ -141,7 +141,11 @@ const startServer = () => {
 							console.log(`${GREEN}--> Submit SubmitSettlementTxCC Transaction submitSettlementTx, ${stateObj.key}`);
 							transaction = contractSubmitSettlementTxCCOrgPSP.createTransaction('submitSettlementTx');
 							const splitKey = [...stateObj.key.split("-")];
-							socket.emit('status-change', { status: 'requested', data: splitKey });
+							if (stateObj.executionMode == "manual") {
+								console.log("manual mode");
+								socket.emit('status-change', { status: 'requested', data: splitKey });
+
+							}
 							console.log("Emitted status-change for requested - ", splitKey);
 							await transaction.submit(...splitKey);
 							console.log(`${GREEN}<-- Submit SubmitSettlementTxCC submitSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
@@ -165,7 +169,10 @@ const startServer = () => {
 							console.log(`${GREEN}--> Submit AuthorizeSettlementTxCC Transaction authorizeSettlementTx, ${stateObj.key}`);
 							transaction = contractAuthorizeSettlementTxCCOrgACD.createTransaction('authorizeSettlementTx');
 							const splitKey = [...stateObj.key.split("-")];
-							socket.emit('status-change', { status: 'TxSubmitted', data: splitKey, verifications: [{ org: 'ACD', attribute: 'Processing Code' }], message: 'ACD has Verified attribute: Processing Code' });
+							if (stateObj.executionMode == "manual") {
+								console.log("manual mode");
+								socket.emit('status-change', { status: 'TxSubmitted', data: splitKey, verifications: [{ org: 'ACD', attribute: 'Processing Code' }], message: 'ACD has Verified attribute: Processing Code' });
+							}
 							console.log("Emitted status-change for TxSubmitted - ", { status: 'TxSubmitted', data: splitKey });
 							await transaction.submit(...splitKey);
 							console.log(`${GREEN}<-- Authorize AuthorizeSettlementTxCC authorizeSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
@@ -189,13 +196,16 @@ const startServer = () => {
 							console.log(`${GREEN}--> Submit BalanceSettlementTxCC Transaction balanceSettlementTx, ${stateObj.key}`);
 							transaction = contractBalanceSettlementTxCCOrgAAD.createTransaction('balanceSettlementTx');
 							const splitKey = [...stateObj.key.split("-")];
-							socket.emit('status-change', {
-								status: 'TxAuthorized', data: splitKey,
-								verifications: [{ org: 'AAD', attribute: 'Transaction Amount' },
-								{ org: 'AOD', attribute: 'System Trace Audit Number' }],
-								message: 'AAD has Verified attribute: Transaction Amount & AOD has verified attribute: System Trace Audit Number'
+							if (stateObj.executionMode == "manual") {
+								console.log("manual mode");
+								socket.emit('status-change', {
+									status: 'TxAuthorized', data: splitKey,
+									verifications: [{ org: 'AAD', attribute: 'Transaction Amount' },
+									{ org: 'AOD', attribute: 'System Trace Audit Number' }],
+									message: 'AAD has Verified attribute: Transaction Amount & AOD has verified attribute: System Trace Audit Number'
+								}
+								);
 							}
-							);
 							console.log("Emitted status-change for TxAuthorized - ", { status: 'TxAuthorized', data: splitKey });
 							await transaction.submit(...splitKey);
 							console.log(`${GREEN}<-- Submit BalanceSettlementTxCC balanceSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
@@ -218,13 +228,15 @@ const startServer = () => {
 							console.log(`${GREEN}--> Submit ClearSettlementTxCC Transaction clearSettlementTx, ${stateObj.key}`);
 							transaction = contractClearSettlementTxCCOrgAOD.createTransaction('clearSettlementTx');
 							const splitKey = [...stateObj.key.split("-")];
-
-							socket.emit('status-change', {
-								status: 'TxBalanced', data: splitKey,
-								verifications: [{ org: 'AOD', attribute: 'Point of Service Entry Mode' },
-								{ org: 'ACD', attribute: 'Merchant Category Code' }],
-								message: 'AOD has Verified attribute: Point of Service Entry Mode & ACD has verified attribute: Merchant Category Code'
-							});
+							if (stateObj.executionMode == "manual") {
+								console.log("manual mode");
+								socket.emit('status-change', {
+									status: 'TxBalanced', data: splitKey,
+									verifications: [{ org: 'AOD', attribute: 'Point of Service Entry Mode' },
+									{ org: 'ACD', attribute: 'Merchant Category Code' }],
+									message: 'AOD has Verified attribute: Point of Service Entry Mode & ACD has verified attribute: Merchant Category Code'
+								});
+							}
 							console.log("Emitted status-change for TxBalanced - ", { status: 'TxBalanced', data: splitKey });
 							await transaction.submit(...splitKey);
 							console.log(`${GREEN}<-- Submit ClearSettlementTxCC clearSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
@@ -246,12 +258,15 @@ const startServer = () => {
 					try {
 						if (event.eventName == 'EACDAAD-CT') {
 							const splitKey = [...stateObj.key.split("-")];
-							socket.emit('status-change', {
-								status: 'TxCleared', data: splitKey,
-								verifications: [{ org: 'AAD', attribute: 'Acquiring Institution Identification Code' },
-								{ org: 'ACD', attribute: 'Retrieval Reference Number' }],
-								message: 'AAD has Verified attribute: Acquiring Institution Identification Code & ACD has Verified attribute: Retrieval Reference Number'
-							});
+							if (stateObj.executionMode == "manual") {
+								console.log("manual mode");
+								socket.emit('status-change', {
+									status: 'TxCleared', data: splitKey,
+									verifications: [{ org: 'AAD', attribute: 'Acquiring Institution Identification Code' },
+									{ org: 'ACD', attribute: 'Retrieval Reference Number' }],
+									message: 'AAD has Verified attribute: Acquiring Institution Identification Code & ACD has Verified attribute: Retrieval Reference Number'
+								});
+							}
 							console.log("Emitted status-change for TxCleared - ", { status: 'TxCleared', data: splitKey });
 						}
 					} catch (error) {

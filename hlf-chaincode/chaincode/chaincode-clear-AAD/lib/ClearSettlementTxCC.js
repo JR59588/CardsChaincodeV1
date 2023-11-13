@@ -84,6 +84,7 @@ class ClearSettlementTxCC extends Contract {
           ACD_AAD_CT_EVENT,
           ACD_AAD_CT_EVENT.eventID,
           key,
+          currentTxReadState,
           OrgMSPId,
           channelName
         );
@@ -124,6 +125,7 @@ class ClearSettlementTxCC extends Contract {
       emittingOrgType: "NA",
       evTxId: "99999",
       key: keyIn,
+      executionMode: txIn.executionMode,
     };
     const eventPayload = JSON.stringify(evtPayload);
 

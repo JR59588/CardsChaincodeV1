@@ -1,7 +1,6 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import Footer from "./Footer";
 //import { message } from "antd";
 import "./ViewTx.css";
 import axios from "axios";
@@ -36,12 +35,7 @@ const ViewTx = (props) => {
     TxCleared: "(ACD, AAD)",
   };
 
-  const IP = props.IP;
-  const socketIOClient = props.socketIOClient;
-  const ENDPOINT = props.ENDPOINT;
-  const GetTxByRange_URL = `http://${IP}:3001/api/v1/GetTxByRange`;
-  const retrieveOBMerchantData_URL = `http://${IP}:3001/api/v1/retrieveOBMerchantData`;
-  const retrievePvCustomerMetaData_URL = `http://${IP}:3001/api/v1/retrievePvCustomerMetaData`;
+  const GetTxByRange_URL = `http://localhost:3001/api/v1/GetTxByRange`;
   //storing the combined response of getTxByRange & retrivePvMerchantData(only aggId) from response.
   const [transactionsData, setTransactionsData] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -79,49 +73,45 @@ const ViewTx = (props) => {
   }, [props.roleId]);
 
   useEffect(() => {
-    const socket = socketIOClient(ENDPOINT);
-    socket.on("status-change", (response) => {
-      setTransactionsData((transactionsData) => {
-        const key = response.data.join("-");
-        const newDataMixed = transactionsData.map((item) => {
-          if (item.Key === key) {
-            item.Record.TxStatus = response.status;
-          }
-          return item;
+    const socket = props.socket;
+    if (socket) {
+      socket.on("status-change", (response) => {
+        console.log("Status change: ", response);
+        setTransactionsData((transactionsData) => {
+          const key = response.data.join("-");
+          const newDataMixed = transactionsData.map((item) => {
+            if (item.Key === key) {
+              item.Record.TxStatus = response.status;
+            }
+            return item;
+          });
+          console.log("new data mixed: ", newDataMixed);
+          return newDataMixed;
         });
-        console.log("new data mixed: ", newDataMixed);
-        return newDataMixed;
+        const messages = response.verifications.map((verification, index) => (
+          <div key={"verification" + index}>
+            <p>
+              <b>{verification.org}</b>: <i>{verification.attribute}</i>
+            </p>
+          </div>
+        ));
+        NotificationManager.success(
+          <div>{messages}</div>,
+          "Status Updated",
+          5000
+        );
       });
-      // const messages = response.verifications.map((verification, index) => (
-      //   <div key={"verification" + index}>
-      //     <p>
-      //       <b>{verification.org}</b>: <i>{verification.attribute}</i>
-      //     </p>
-      //   </div>
-      // ));
-      // NotificationManager.success(
-      //   <div>{messages}</div>,
-      //   "Status Updated",
-      //   5000
-      // );
-    });
+    }
+  }, [props]);
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  const orderFunc = (timestamp) => {
-    const actualTime = timestamp.substring(0, 10);
-    let datetime = new Date(actualTime * 1000);
-    const timeUT = datetime.toTimeString();
-    let UTC = timeUT.substring(0, 8);
-    localDate = datetime.toDateString();
-    return localDate + " " + UTC;
-  };
   //side Effect for loading and mixing GetTxByRange and Pvdmerchat data
   useEffect(() => {
-    // setRefresh(false);
+    const orderFunc = (timestamp) => {
+      const actualTime = timestamp.substring(0, 10);
+      let datetime = new Date(actualTime * 1000);
+      return datetime.toDateString();
+    };
+
     if (updatedRoleId.length !== 0) {
       const fetchData = async () => {
         try {
@@ -148,89 +138,21 @@ const ViewTx = (props) => {
       };
       fetchData();
     }
-  }, [updatedRoleId]);
+  }, [updatedRoleId, GetTxByRange_URL]);
   //Modifying txId
   const txIdModify = (id) => {
     let modifiedTxId = id.slice(1, 5) + "......" + id.slice(59, 64);
     return modifiedTxId;
   };
 
-  //Onclick Of viewmore for merchantId
-  const onClickMerchantId = async (id) => {
-    setMrId(id);
-    try {
-      const res1 = await axios.get(
-        `${retrieveOBMerchantData_URL}/${id}/${updatedRoleId}`
-      );
-      const res2 = transactionsData.find(
-        (item) => item.Record.MerchantId === id
-      );
-      //setting the combined response in data for Main table.
-      setAuthorization(true);
-      console.log("res1 data 186-", res1);
-      console.log("res2 data 187-", res2);
-      setMergedMerchantData({ ...res1.data.response, ...res2.Record });
-    } catch (error) {
-      console.log("error for pvMerchant 116", error);
-      if (error?.response.status === 401) {
-        setAuthorization(false);
-        console.log("Unauthorized - PvMerchant");
-      }
-    }
-  };
-  //console.log("mergedMerchantData",mergedMerchantData);
-
-  //on Click of CustomerId
-  const onClickCustomerId = async (id) => {
-    setCrId(id);
-    setLoadCustomer(true);
-    try {
-      const customerResponse = await axios.get(
-        `${retrievePvCustomerMetaData_URL}/${id}/${updatedRoleId}`
-      );
-      //console.log(JSON.parse(customerResponse.data.response));
-      const customerParseResponse = JSON.parse(customerResponse.data.response);
-
-      const alldataResponse = transactionsData.find(
-        (item) =>
-          item.Record.MerchantId === customerParseResponse.merchantID &&
-          item.Record.CustomerID === customerParseResponse.customerID
-      );
-      setAuthorization(true);
-      setMergerCustomerData({
-        ...customerParseResponse,
-        ...alldataResponse.Record,
-      });
-      setLoadCustomer(false);
-      console.log("customerParseResponse", customerParseResponse);
-      console.log("alldata", alldataResponse.Record);
-    } catch (error) {
-      console.log(error);
-      if (error?.response.status === 401) {
-        if (props.roleId === "CAcct" || props.roleId === "EDI") {
-          UNAUTHORIZED = "";
-          setAuthorization(false);
-          setLoadCustomer(false);
-        } else {
-          UNAUTHORIZED = "Unauthorized";
-          setAuthorization(false);
-          setLoadCustomer(false);
-        }
-      }
-    }
-  };
-
   //CONVERTING TIMESTAMP TO DATE
-  let localDate;
   const dateFunc = (timestamp) => {
     // const actualTime = timestamp.substring(0, 10);
     let datetime = new Date(Date.parse(timestamp)); //new Date(actualTime * 1000);
-    localDate = datetime.toDateString();
-    return localDate;
+    return datetime.toDateString();
   };
 
   //CONVERTING TIMESTAMP TO TIME
-  let UTC;
   const timeFunc = (timestamp) => {
     // const actualTime = timestamp.substring(0, 10);
     let datetime = new Date(Date.parse(timestamp)); //new Date(actualTime * 1000);
@@ -267,7 +189,7 @@ const ViewTx = (props) => {
     verifyData.merchantName = verificationData.Record.MerchantName;
     axios
       .post(
-        `http://${IP}:3001/api/v1/${txStageVerificationUrls[status]}`,
+        `http://localhost:3001/api/v1/${txStageVerificationUrls[status]}`,
         verifyData,
         {
           header: { "Content-Type": "application/json" },
@@ -291,7 +213,7 @@ const ViewTx = (props) => {
   ) => {
     if (Math.abs(txStages[status]) > txStages[expectedStatus]) {
       return "Endorsed " + txStageEndorsers[expectedStatus];
-    } else if (txStages[status] + txStages[expectedStatus] == 0) {
+    } else if (txStages[status] + txStages[expectedStatus] === 0) {
       return "Not Endorsed " + txStageEndorsers[expectedStatus];
     } else if (txStages[status] === txStages[expectedStatus]) {
       return "Endorsed " + txStageEndorsers[expectedStatus];

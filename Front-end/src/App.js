@@ -13,7 +13,6 @@ import Onboard from './components/Onboarding/Onboard'
 import NewViewOnboardingStatic from './components/ViewOnboardingStatic/NewViewOnboardingStatic'
 import 'react-notifications/lib/notifications.css';
 import { NotificationContainer } from 'react-notifications';
-import { ReactNotifications } from 'react-notifications-component';
 import ViewTx from './components/ViewTx'
 import socketIOClient from 'socket.io-client';
 import axios from 'axios'
@@ -22,12 +21,13 @@ import ISO8583FileFormikComponent from './components/Merchant-Submit-Deails/ISO8
 import Settlement from './components/SettlementRequests/Settlement'
 import Footer from './components/Footer'
 const IP = 'localhost'
-const ENDPOINT = 'http://localhost:3001';
+const socketEndpointUrl = 'http://localhost:3001';
 
 function App() {
   //storing the roleId...
   const [roleId, setRoleId] = useState('Org1')
   const [orgOptions, setOrgOptions] = useState([]);
+  const socket = socketIOClient(socketEndpointUrl);
 
   function fetchOrganizationData() {
     axios
@@ -45,6 +45,15 @@ function App() {
   useEffect(() => {
     fetchOrganizationData();
   }, []);
+
+  useEffect(() => {
+    socket.on("status-change", (response) => {
+      console.log("Status change: ", response);
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
 
   const getRoleFromFile = (roleState) => {
     console.log('app', roleState)
@@ -87,7 +96,7 @@ function App() {
           path="/FileComponent"
           element={<FileComponent roleId={roleId} IP={IP} />}
         />
-        <Route path="/ViewTx" element={<ViewTx roleId={roleId} IP={IP} socketIOClient={socketIOClient} ENDPOINT={ENDPOINT} />} />
+        <Route path="/ViewTx" element={<ViewTx roleId={roleId} IP={IP} socket={socket} />} />
         <Route
           path="/View-Onboarding-Static"
           element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}

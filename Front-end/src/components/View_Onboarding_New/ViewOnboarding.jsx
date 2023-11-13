@@ -1,6 +1,5 @@
 import React from "react";
-import classes from '../View_Onboarding_New/ViewOnboarding.module.css'
-import Footer from "../Footer";
+import classes from "../View_Onboarding_New/ViewOnboarding.module.css";
 
 const ViewOnboarding = (props) => {
   return (
@@ -8,7 +7,7 @@ const ViewOnboarding = (props) => {
       <div className="container">
         <div className="cols2">
           <h4 style={{ textAlign: "center" }} className="mt-4 mb-4">
-          View Onboarded Merchant (Representative**)
+            View Onboarded Merchant (Representative**)
           </h4>
         </div>
         <div
@@ -25,7 +24,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Payment Acceptor Name"
@@ -42,7 +41,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Payment Acceptor Id Code"
@@ -59,7 +58,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <textarea
-                  disabled
+                    disabled
                     rows="3"
                     cols="60"
                     className="form-control"
@@ -77,7 +76,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Merchant Category Code"
@@ -94,7 +93,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Product"
@@ -118,7 +117,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Negotiated"
@@ -136,7 +135,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Promo Code"
@@ -154,7 +153,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Max 6 digits"
@@ -172,7 +171,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Transaction Currency"
@@ -190,7 +189,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Max 6 digits"
@@ -208,7 +207,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Max 6 digits"
@@ -226,7 +225,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Location A, Location B"
@@ -249,7 +248,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Aggregator Name"
@@ -267,7 +266,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Aggregator ID"
@@ -295,7 +294,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Account Number"
@@ -313,7 +312,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="ABA Code"
@@ -331,7 +330,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Clearing Organisation Name:"
@@ -348,7 +347,7 @@ const ViewOnboarding = (props) => {
                 </div>
                 <div className="col">
                   <input
-                  disabled
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="Clearing OrgID:"
@@ -364,8 +363,8 @@ const ViewOnboarding = (props) => {
                   </label>
                 </div>
                 <div className="col">
-                <input
-                  disabled
+                  <input
+                    disabled
                     type="text"
                     className="form-control"
                     placeholder="YES / NO"

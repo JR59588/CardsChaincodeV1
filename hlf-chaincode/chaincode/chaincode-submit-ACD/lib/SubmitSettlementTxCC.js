@@ -82,6 +82,7 @@ class SubmitSettlementTxCC extends Contract {
           ACD_ST_EVENT,
           ACD_ST_EVENT.eventID,
           key,
+          currentTxReadState,
           OrgMSPId,
           channelName
         );
@@ -124,6 +125,7 @@ class SubmitSettlementTxCC extends Contract {
       emittingOrgType: "NA",
       evTxId: "99999",
       key: keyIn,
+      executionMode: txIn.executionMode,
     };
     const eventPayload = JSON.stringify(evtPayload);
 

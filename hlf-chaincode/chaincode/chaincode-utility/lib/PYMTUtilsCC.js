@@ -200,7 +200,8 @@ class PYMTUtilsCC extends Contract {
       MERCHANT_IT_EVENT.eventID,
       key,
       initiateTxObj,
-      OrgMSPID
+      OrgMSPID,
+      channelName
     );
     const txBuffer = Buffer.from(JSON.stringify(initiateTxObj));
     ctx.stub.setEvent("E-TxInitiated", txBuffer);
