@@ -209,13 +209,12 @@
   }
 }
 .placingload {
-  margin-top: 40px;
   display: flex;
+  height: 100px;
   justify-content: center;
   align-items: center;
 }
 .placingloadOnboard {
-  margin-top: 40px;
   display: flex;
   justify-content: center;
   align-items: center;

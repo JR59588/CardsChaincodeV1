@@ -4,7 +4,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { Form, Button, Modal } from "react-bootstrap";
 import axios from "axios";
-import Loader from "../ViewOnboardingStatic/Loader/Loader";
+import Loader from "../Loader/Loader";
 
 const FileRequest = (props) => {
   const iso8583filerequesturl = "http://localhost:3001/api/v1/uploadCSV";

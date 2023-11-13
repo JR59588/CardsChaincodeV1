@@ -4,12 +4,14 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { Form, Button, Modal } from "react-bootstrap";
 import axios from "axios";
+import Loader from "../Loader/Loader";
 
 const FormRequest = (props) => {
   const settlementFormUrl = "http://localhost:3001/api/v1/merchantTx";
 
   const [show, setShow] = useState(false);
   const [popupData, setPopupData] = useState({ header: "", content: "" });
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
   const handleClose = () => setShow(false);
 
@@ -61,6 +63,17 @@ const FormRequest = (props) => {
             Close
           </Button>
         </Modal.Footer>
+      </Modal>
+      <Modal
+        show={isFormSubmitting}
+        backdrop="static"
+        keyboard={false}
+        centered
+        animation={false}
+      >
+        <Modal.Body className="bg-transparent">
+          <Loader message={"Please wait as your form is being submitted"} />
+        </Modal.Body>
       </Modal>
       <div className="container mt-3 mb-3">
         <Formik
@@ -553,7 +566,6 @@ const FormRequest = (props) => {
                       {isSubmitting ? "Please wait..." : "Submit"}
                     </Button>
                   </div>
-                  {isSubmitting && <button className="loaderSubmit"></button>}
                 </div>
               </div>
             </Form>
