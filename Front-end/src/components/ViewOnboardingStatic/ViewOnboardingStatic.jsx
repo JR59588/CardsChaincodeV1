@@ -130,8 +130,8 @@ const ViewOnboardingStatic = (props) => {
         setLoadingAnimatio(false);
         console.log(error.response);
         if (error.response.status === 401) {
-          msg='Merchant not found !'
-          setAlertState(true)
+          msg = "Merchant not found !";
+          setAlertState(true);
         }
       }
       //demo purpose end
@@ -144,9 +144,9 @@ const ViewOnboardingStatic = (props) => {
         const responseData = response.data.response;
         if (response.data.response.merchantID !== merchantId) {
           setLoadingAnimatio(false);
-          msg=`Merchant not found !`
-          setAlertState(true)
-          return 
+          msg = `Merchant not found !`;
+          setAlertState(true);
+          return;
         }
         setData({
           merchantName: responseData.merchantName,
@@ -191,8 +191,8 @@ const ViewOnboardingStatic = (props) => {
           setAlertState(true);
         }
         if (error.response.status === 401) {
-          msg=error.response.data.message
-          setAlertState(true)
+          msg = error.response.data.message;
+          setAlertState(true);
         }
       }
     }
@@ -205,10 +205,10 @@ const ViewOnboardingStatic = (props) => {
   const getAlertState = (state) => {
     setAlertState(state);
   };
-  const onChangeHandler =(event)=>{
-    setLoad(false)
-    setMerchantId(event.target.value)
-  }
+  const onChangeHandler = (event) => {
+    setLoad(false);
+    setMerchantId(event.target.value);
+  };
   return (
     <div style={{ height: "100vh" }}>
       {alertState ? <Alert getAlertState={getAlertState} msg={msg} /> : null}
@@ -262,7 +262,6 @@ const ViewOnboardingStatic = (props) => {
           </div>
         </div>
       </div>
-      {load && updatedRoleId ? <Footer /> : null}
     </div>
   );
 };

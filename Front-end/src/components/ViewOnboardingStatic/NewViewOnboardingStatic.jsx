@@ -270,7 +270,6 @@ const NewViewOnboardingStatic = (props) => {
           </div>
         </div>
       </div>
-      {load && updatedRoleId ? <Footer /> : null}
     </div>
   );
 };

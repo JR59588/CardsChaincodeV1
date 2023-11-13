@@ -6,8 +6,7 @@ import { Form, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 
 const FormRequest = (props) => {
-  const iso8583requesturl = `http://localhost:3001/api/v1/merchantTx`;
-  const { roleId } = props;
+  const settlementFormUrl = "http://localhost:3001/api/v1/merchantTx";
 
   const [show, setShow] = useState(false);
   const [popupData, setPopupData] = useState({ header: "", content: "" });
@@ -15,12 +14,33 @@ const FormRequest = (props) => {
   const handleClose = () => setShow(false);
 
   const ISO8583Schema = Yup.object().shape({
-    ISO8583Message: Yup.string().required("Required"),
-    merchantID: Yup.string().required("Required"),
-    customerID: Yup.string().required("Required"),
-    loanReferenceNumber: Yup.string().required("Required"),
-    roleId: Yup.string().required("Required"),
+    merchantId: Yup.string().required("Required"),
+    merchantName: Yup.string().required("Required"),
+    CustomerName: Yup.string().required("Required"),
+    CustomerID: Yup.string().required("Required"),
+    TransactionCurrency: Yup.string().required("Required"),
+    TransactionAmount: Yup.string().required("Required"),
+    TransactionReferenceNumber: Yup.string().required("Required"),
+    TransactionDate: Yup.date().required("Required"),
+    LoanReferenceNumber: Yup.string().required("Required"),
+    ProductType: Yup.string().required("Required"),
+    DateofLoanApproval: Yup.date().required("Required"),
+    Location: Yup.string().required("Required"),
+    POSEntryMode: Yup.string().required("Required"),
+    LoanDisbursementDate: Yup.string().required("Required"),
+    LoanAmount: Yup.string().required("Required"),
+    LoanTenure: Yup.string().required("Required"),
+    LoanStatus: Yup.string().required("Required"),
+    LoanAccountNumber: Yup.string().required("Required"),
+    LoCapprovedamount: Yup.string().required("Required"),
+    LoCAvailableamount: Yup.string().required("Required"),
+    isContractSigned: Yup.string().required("Required"),
+    SubmittedBy: Yup.string().required("Required"),
+    SubmissionNumberRef: Yup.string().required("Required"),
+    ServiceDate: Yup.date().required("Required"),
+    SubmissionDateTime: Yup.date().required("Required"),
     executionMode: Yup.string().required("Required"),
+    roleId: Yup.string().required("Required"),
   });
 
   return (
@@ -30,6 +50,7 @@ const FormRequest = (props) => {
         onHide={handleClose}
         backdrop="static"
         keyboard={false}
+        centered
       >
         <Modal.Header closeButton>
           <Modal.Title>{popupData.header}</Modal.Title>
@@ -39,7 +60,6 @@ const FormRequest = (props) => {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary">Okay</Button>
         </Modal.Footer>
       </Modal>
       <div className="container mt-3 mb-3">
@@ -70,7 +90,7 @@ const FormRequest = (props) => {
             SubmissionNumberRef: "",
             ServiceDate: "",
             SubmissionDateTime: "",
-            executionMode: "",
+            executionMode: "auto",
             roleId: props.roleId,
           }}
           validationSchema={ISO8583Schema}
@@ -78,7 +98,7 @@ const FormRequest = (props) => {
             console.log("Inside onsubmit");
             try {
               setSubmitting(true);
-              const response = await axios.post(iso8583requesturl, values, {
+              const response = await axios.post(settlementFormUrl, values, {
                 header: { "Content-Type": "application/json" },
               });
               setSubmitting(false);
@@ -114,6 +134,7 @@ const FormRequest = (props) => {
             <Form onSubmit={handleSubmit}>
               <div className="row cols-md-2 justify-content-center">
                 <div className="col m-3 p-5 form-section border border-1 rounded">
+                  <h6 className="mb-3">A. Transaction Details</h6>
                   <Form.Group
                     className="form-group"
                     controlId="TransactionAmount"
@@ -197,7 +218,7 @@ const FormRequest = (props) => {
                   >
                     <Form.Label>Transaction Date :</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="date"
                       name="TransactionDate"
                       placeholder="Transaction Date"
                       onChange={handleChange}
@@ -275,6 +296,7 @@ const FormRequest = (props) => {
                   </Form.Group>
                 </div>
                 <div className="col m-3 p-5 form-section border border-1 rounded">
+                  <h6 className="mb-3">B. Submission Details</h6>
                   <Form.Group className="form-group" controlId="SubmittedBy">
                     <Form.Label>Submitted By :</Form.Label>
                     <Form.Control
@@ -323,7 +345,7 @@ const FormRequest = (props) => {
                   <Form.Group className="form-group" controlId="ServiceDate">
                     <Form.Label>Service Date :</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="date"
                       name="ServiceDate"
                       placeholder="Service Date"
                       onChange={handleChange}
@@ -345,7 +367,7 @@ const FormRequest = (props) => {
                   >
                     <Form.Label>Submission Date and Time :</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="date"
                       name="SubmissionDateTime"
                       placeholder="Submission Date and Time"
                       onChange={handleChange}
@@ -367,6 +389,8 @@ const FormRequest = (props) => {
               </div>
               <div className="row cols-md-2 justify-content-around">
                 <div className="col m-3 p-5 form-section border border-1 rounded">
+                  <h6 className="mb-3">C. Customer Info</h6>
+
                   <Form.Group className="form-group" controlId="CustomerName">
                     <Form.Label>Customer Name :</Form.Label>
                     <Form.Control
@@ -407,6 +431,8 @@ const FormRequest = (props) => {
                   </Form.Group>
                 </div>
                 <div className="col m-3 p-5 form-section border border-1 rounded">
+                  <h6 className="mb-3">D. Line of Credit (LOC) Details</h6>
+
                   <Form.Group
                     className="form-group"
                     controlId="LoanReferenceNumber"
@@ -459,25 +485,25 @@ const FormRequest = (props) => {
                   </Form.Group>
                   <Form.Group
                     className="form-group"
-                    controlId="LoanApprovalDate"
+                    controlId="DateofLoanApproval"
                   >
                     <Form.Label>Loan Approval Date :</Form.Label>
                     <Form.Control
-                      type="text"
-                      name="LoanApprovalDate"
+                      type="date"
+                      name="DateofLoanApproval"
                       placeholder="Loan Approval Date"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.LoanApprovalDate}
+                      value={values.DateofLoanApproval}
                       className={
-                        touched.LoanApprovalDate && errors.LoanApprovalDate
+                        touched.DateofLoanApproval && errors.DateofLoanApproval
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.LoanApprovalDate && errors.LoanApprovalDate ? (
+                    {touched.DateofLoanApproval && errors.DateofLoanApproval ? (
                       <div className="error-message">
-                        {errors.LoanApprovalDate}
+                        {errors.DateofLoanApproval}
                       </div>
                     ) : null}
                   </Form.Group>
@@ -491,7 +517,7 @@ const FormRequest = (props) => {
                     <Form.Check
                       type="radio"
                       name="executionMode"
-                      id="executioModeManual"
+                      id="executionModeManual"
                       onChange={handleChange}
                       onBlur={handleBlur}
                       checked={values.executionMode === "manual"}
@@ -502,7 +528,7 @@ const FormRequest = (props) => {
                     <Form.Check
                       type="radio"
                       name="executionMode"
-                      id="executioModeAuto"
+                      id="executionModeAuto"
                       onChange={handleChange}
                       onBlur={handleBlur}
                       checked={values.executionMode === "auto"}
@@ -527,6 +553,7 @@ const FormRequest = (props) => {
                       {isSubmitting ? "Please wait..." : "Submit"}
                     </Button>
                   </div>
+                  {isSubmitting && <button className="loaderSubmit"></button>}
                 </div>
               </div>
             </Form>

@@ -126,7 +126,6 @@ const Merchant = ({ roleId, IP, getRoleFromFile }) => {
         </div>
       </div>
       {renderSubmitForm()}
-      <Footer />
     </div>
   );
 };

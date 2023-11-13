@@ -4,12 +4,14 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { Form, Button, Modal } from "react-bootstrap";
 import axios from "axios";
+import Loader from "../ViewOnboardingStatic/Loader/Loader";
 
 const SingleRequest = (props) => {
   const iso8583requesturl = `http://localhost:3001/api/v1/merchantTx`;
   const { roleId } = props;
 
   const [show, setShow] = useState(false);
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [popupData, setPopupData] = useState({ header: "", content: "" });
 
   const handleClose = () => setShow(false);
@@ -30,6 +32,7 @@ const SingleRequest = (props) => {
         onHide={handleClose}
         backdrop="static"
         keyboard={false}
+        centered
       >
         <Modal.Header closeButton>
           <Modal.Title>{popupData.header}</Modal.Title>
@@ -39,8 +42,18 @@ const SingleRequest = (props) => {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary">Okay</Button>
         </Modal.Footer>
+      </Modal>
+      <Modal
+        show={isFormSubmitting}
+        backdrop="static"
+        keyboard={false}
+        centered
+        animation={false}
+      >
+        <Modal.Body className="bg-transparent">
+          <Loader message={"Please wait as your form is being submitted"} />
+        </Modal.Body>
       </Modal>
       <div className="container mt-3 mb-3">
         <div className="row cols-1 justify-content-center">
@@ -59,10 +72,10 @@ const SingleRequest = (props) => {
                 console.log("Inside onsubmit");
                 try {
                   setSubmitting(true);
+                  setIsFormSubmitting(true);
                   const response = await axios.post(iso8583requesturl, values, {
                     header: { "Content-Type": "application/json" },
                   });
-                  setSubmitting(false);
                   resetForm();
                   console.log(response);
                   setShow(true);
@@ -79,6 +92,8 @@ const SingleRequest = (props) => {
                     content: "Form submission failed",
                   });
                 }
+                setIsFormSubmitting(false);
+                setSubmitting(false);
               }}
             >
               {({
@@ -186,7 +201,7 @@ const SingleRequest = (props) => {
                     <Form.Check
                       type="radio"
                       name="executionMode"
-                      id="executioModeManual"
+                      id="singleExecutionModeManual"
                       onChange={handleChange}
                       onBlur={handleBlur}
                       checked={values.executionMode === "manual"}
@@ -197,7 +212,7 @@ const SingleRequest = (props) => {
                     <Form.Check
                       type="radio"
                       name="executionMode"
-                      id="executioModeAuto"
+                      id="singleExecutionModeAuto"
                       onChange={handleChange}
                       onBlur={handleBlur}
                       checked={values.executionMode === "auto"}

@@ -543,11 +543,7 @@ const Aggregator = (props) => {
             {loading ? (
               <button className="loaderSubmit"></button>
             ) : (
-              <button
-                type="button"
-                className="buttonbt2"
-                onClick={submitForm}
-              >
+              <button type="button" className="buttonbt2" onClick={submitForm}>
                 Save
               </button>
             )}
@@ -572,7 +568,6 @@ const Aggregator = (props) => {
           header={failureHeading}
         />
       ) : null}
-      <Footer />
     </div>
   );
 };

@@ -27,7 +27,7 @@
             {
                 "name": "Submit New Request",
                 "id": "31",
-                "url": "/Merchant"
+                "url": "/settlement-request"
             },
             {
                 "name": "View Submitted Request",

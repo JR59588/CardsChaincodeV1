@@ -1,11 +1,10 @@
 import React from "react";
-import { Nav, Tab, Tabs } from "react-bootstrap";
-import { Outlet, NavLink } from "react-router-dom";
+import { Tab, Tabs } from "react-bootstrap";
 import FileRequest from "./FileRequest";
 import FormRequest from "./FormRequest";
 import SingleRequest from "./SingleRequest";
 
-const Settlement = () => {
+const Settlement = (props) => {
   return (
     <div>
       <Tabs
@@ -16,13 +15,13 @@ const Settlement = () => {
         variant="underline"
       >
         <Tab eventKey="form" title="Submit a Form">
-          <FormRequest />
+          <FormRequest roleId={props.roleId} />
         </Tab>
         <Tab eventKey="single" title="Submit a Settlement Request">
-          <SingleRequest />
+          <SingleRequest roleId={props.roleId} />
         </Tab>
         <Tab eventKey="file" title="Submit a File">
-          <FileRequest />
+          <FileRequest roleId={props.roleId} />
         </Tab>
       </Tabs>
     </div>

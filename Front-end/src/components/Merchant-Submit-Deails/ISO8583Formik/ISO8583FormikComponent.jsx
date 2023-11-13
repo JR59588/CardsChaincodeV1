@@ -189,7 +189,7 @@ const ISO8583FormikComponent = (props) => {
                     <Form.Check
                       type="radio"
                       name="executionMode"
-                      id="executioModeManual"
+                      id="executionModeManual"
                       onChange={handleChange}
                       onBlur={handleBlur}
                       checked={values.executionMode === "manual"}
@@ -200,7 +200,7 @@ const ISO8583FormikComponent = (props) => {
                     <Form.Check
                       type="radio"
                       name="executionMode"
-                      id="executioModeAuto"
+                      id="executionModeAuto"
                       onChange={handleChange}
                       onBlur={handleBlur}
                       checked={values.executionMode === "auto"}

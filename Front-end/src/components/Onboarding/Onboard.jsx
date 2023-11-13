@@ -705,7 +705,6 @@ const Onboard = (props) => {
           </div>
         </div>
       )}
-      <Footer />
     </div>
   );
 };

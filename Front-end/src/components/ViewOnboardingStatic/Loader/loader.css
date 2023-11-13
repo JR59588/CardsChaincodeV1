@@ -25,7 +25,6 @@
   align-items: center;
 }
 
-
 #wifi-loader svg {
   position: absolute;
   display: flex;
@@ -209,15 +208,14 @@
     clip-path: inset(0 0 0 100%);
   }
 }
-.placingload{
-  margin-top: 40px;
- display: flex;
- justify-content: center;
- align-items: center;
+.placingload {
+  display: flex;
+  height: 100px;
+  justify-content: center;
+  align-items: center;
 }
-.placingloadOnboard{
-  margin-top: 40px;
- display: flex;
- justify-content: center;
- align-items: center;
+.placingloadOnboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
