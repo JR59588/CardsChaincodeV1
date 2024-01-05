@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./FileRequest.css";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { Form, Button, Modal } from "react-bootstrap";
+import { Form, Button, Modal,Row,Col,Dropdown,DropdownButton } from "react-bootstrap";
 import axios from "axios";
 import Loader from "../ViewOnboardingStatic/Loader/Loader";
 
@@ -11,6 +11,9 @@ const FileRequest = (props) => {
   const { roleId } = props;
 
   const [show, setShow] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('');
+  const [executionMode, setExecutionMode] = useState('');
+
   const [popupData, setPopupData] = useState({ header: "", content: "" });
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const handleClose = () => setShow(false);
@@ -112,51 +115,86 @@ const FileRequest = (props) => {
                 getFieldMeta,
               }) => (
                 <Form onSubmit={handleSubmit}>
-                  <Form.Group className="form-group" controlId="file">
-                    <Form.Label>Upload file :</Form.Label>
-                    <Form.Control
-                      type="file"
-                      name="file"
-                      accept=".csv"
-                      onChange={(event) => {
-                        setFieldValue("file", event.target.files[0]);
-                      }}
-                      onBlur={handleBlur}
-                    />
-                    {touched.file && errors.file ? (
-                      <div className="error-message">{errors.file}</div>
-                    ) : null}
-                  </Form.Group>
-                  <Form.Group className="form-group d-flex justify-content-between">
-                    <Form.Label>Execution Mode :</Form.Label>
+                
 
-                    <Form.Check
-                      type="radio"
-                      name="executionMode"
-                      id="fileExecutionModeManual"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      checked={values.executionMode === "manual"}
-                      label="Manual"
-                      value="manual"
-                      inline
-                    />
-                    <Form.Check
-                      type="radio"
-                      name="executionMode"
-                      id="fileExecutionModeAuto"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      checked={values.executionMode === "auto"}
-                      label="Auto"
-                      value="auto"
-                      inline
-                    />
-                  </Form.Group>
-                  <div className="d-flex justify-content-end">
+                  
+                   
+<Row>
+        <Col>
+          <Form.Group controlId="file">
+            <Form.Label>Upload file:</Form.Label>
+            <Form.Control
+              type="file"
+              name="file"
+              accept=".csv"
+              onChange={(event) => {
+                setFieldValue("file", event.target.files[0]);
+              }}
+              onBlur={handleBlur}
+            />
+            {touched.file && errors.file ? (
+              <div className="error-message">{errors.file}</div>
+            ) : null}
+          </Form.Group>
+        </Col>
+        <br/><br/><br/><br/><br/>
+        <Row>
+          <DropdownButton
+            align="end"
+            title={selectedOption || "Select message format"}
+            id="dropdown-menu-align-end"
+            style={{marginLeft:"120px"}}
+            onSelect={(selectedKey) => setSelectedOption(selectedKey)}
+          >
+            <Dropdown.Item eventKey="Authorization message">Authorization message</Dropdown.Item>
+            <Dropdown.Item eventKey="Response message">Response message</Dropdown.Item>
+            <Dropdown.Item eventKey="Settlement message">Settlement message</Dropdown.Item>
+          </DropdownButton>
+        </Row>
+      </Row>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      
+      {selectedOption === 'Settlement message' && (
+        <Form.Group>
+          <div className="d-flex ">
+          <Form.Label>Execution Mode</Form.Label>
+          </div>
+
+  <div className="d-flex ">
+  <div style={{marginRight: '80px'}}>
+    
+      <Form.Check 
+        inline
+        type="radio" 
+        label="Auto" 
+        name="executionMode"
+        value="auto"
+        onChange={e => setExecutionMode(e.target.value)}
+      />
+    </div>
+    <div>
+      <Form.Check 
+        inline
+        type="radio" 
+        label="Manual" 
+        name="executionMode"
+        value="manual"
+        onChange={e => setExecutionMode(e.target.value)}
+      />
+    </div>
+  </div>
+        </Form.Group>
+      )}
+
+
+&nbsp;  &nbsp; &nbsp;
+
+                  <div className="d-flex justify-content-center">
                     <Button
                       variant="primary"
                       type="submit"
+                      
+                      
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? "Please wait..." : "Submit"}

@@ -19,8 +19,8 @@ import socketIOClient from 'socket.io-client';
 import axios from 'axios'
 import ISO8583FormikComponent from './components/Merchant-Submit-Deails/ISO8583Formik/ISO8583FormikComponent'
 import ISO8583FileFormikComponent from './components/Merchant-Submit-Deails/ISO8583FileFormik/ISO8583FileFormikComponent'
-import Settlement from './components/SettlementRequests/Settlement'
 import Footer from './components/Footer'
+import FileRequest from './components/SettlementRequests/FileRequest'
 const IP = 'localhost'
 const ENDPOINT = 'http://localhost:3001';
 
@@ -70,7 +70,7 @@ function App() {
         <Route
           path="/settlement-request"
           element={
-            <Settlement
+            <FileRequest
               roleId={roleId}
             />
           }
