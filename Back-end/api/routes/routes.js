@@ -26,6 +26,12 @@ module.exports = function (app) {
     .post(controller.processISO8583CSV);
 
   app
+
+    .route("/api/v1/uploadCSVWithType")
+
+    .post(controller.processISO8583CSVWithType);
+
+  app
     .route("/api/v1/GetTxByRange/:roleId")
 
     .get(viewTxcontroller.GetTxByRange);

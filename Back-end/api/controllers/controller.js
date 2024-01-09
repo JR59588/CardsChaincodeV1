@@ -64,6 +64,16 @@ const upload = multer({
   }
 }).single('file');
 
+const uploadWithType = multer({
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    if (path.extname(file.originalname) !== '.csv') {
+      return cb(new Error('Only csv files are allowed'))
+    }
+    cb(null, true)
+  }
+}).single('file');
+
 
 exports.requestSettlementTx = async function (req, res) {
   try {
@@ -251,6 +261,49 @@ exports.processISO8583CSV = async function (req, res) {
       success: false,
       message: "Error in processing submitted ISO8583 CSV file",
       reason: "Something went wrong in processing the ISO8583 CSV file"
+    });
+  }
+};
+
+
+exports.processISO8583CSVWithType = async function (req, res) {
+  try {
+
+    let filePath;
+    console.log(req, req.body, req.body.fileType);
+    switch (req.body.fileType) {
+      case 'settlementRequest':
+        filePath = path.join(process.cwd(), "SettlementRequestFiles");
+        break;
+      case 'authorizationRequest':
+        filePath = path.join(process.cwd(), "AuthorizationRequestFiles");
+        break;
+      case 'authorizationResponse':
+        filePath = path.join(process.cwd(), "AuthorizationResponseFiles");
+        break;
+      default:
+        throw new Error('Ensure you are using proper file type when uploading the file');
+    }
+
+    uploadWithType(req, res, function (err) {
+      if (err) {
+        console.log("Error uploading file: ", err);
+        return res.status(400).json({
+          success: false,
+          message: "Error in uploading ISO8583 CSV file with type",
+          reason: err.message
+        });
+      } else {
+        console.log("There is no error in uploading the file with type")
+      }
+
+    });
+
+  } catch (error) {
+    console.log("Error in processing submitted ISO8583 CSV with type", error);
+    return res.status(400).json({
+      success: false,
+      message: "Error in processing submitted ISO8583 CSV file",
     });
   }
 };
