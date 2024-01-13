@@ -18,8 +18,8 @@ const OnboardFormik = (props) => {
   const ISO8583Schema = Yup.object().shape({
     merchantId: Yup.string().required("Required"),
     merchantName: Yup.string().required("Required"),
-    CustomerName: Yup.string().required("Required"),
-    CustomerID: Yup.string().required("Required"),
+    AccountNumber: Yup.string().required("Required"),
+    BankIdentifier: Yup.string().required("Required"),
     PaymentAcceptorIdentificationCode: Yup.string().required("Required"),
     PaymentAcceptorName: Yup.string().required("Required"),
     PaymentAcceptorDescription: Yup.string().required("Required"),
@@ -37,8 +37,8 @@ const OnboardFormik = (props) => {
     LoCapprovedamount: Yup.string().required("Required"),
     LoCAvailableamount: Yup.string().required("Required"),
     isContractSigned: Yup.string().required("Required"),
-    SubmittedBy: Yup.string().required("Required"),
-    SubmissionNumberRef: Yup.string().required("Required"),
+    PromoCode: Yup.string().required("Required"),
+    NumberOfTransactionsAllowedPerDay: Yup.string().required("Required"),
     ServiceDate: Yup.date().required("Required"),
     SubmissionDateTime: Yup.date().required("Required"),
     executionMode: Yup.string().required("Required"),
@@ -76,18 +76,17 @@ const OnboardFormik = (props) => {
         </Modal.Body>
       </Modal>
       <div className="container mt-3 mb-3">
+        <h3 className="text-center">Merchant Onboarding</h3>
         <Formik
           initialValues={{
-            merchantId: "",
-            merchantName: "",
-            CustomerName: "",
-            CustomerID: "",
             PaymentAcceptorIdentificationCode: "",
             PaymentAcceptorName: "",
             PaymentAcceptorDescription: "",
             TransactionDate: "",
             LoanReferenceNumber: "",
             ProductType: "",
+            Product: "",
+            NegotiatedMDR: "",
             DateofLoanApproval: "",
             Location: "",
             POSEntryMode: "",
@@ -99,8 +98,8 @@ const OnboardFormik = (props) => {
             LoCapprovedamount: "",
             LoCAvailableamount: "",
             isContractSigned: "",
-            SubmittedBy: "",
-            SubmissionNumberRef: "",
+            PromoCode: "",
+            NumberOfTransactionsAllowedPerDay: "",
             ServiceDate: "",
             SubmissionDateTime: "",
             executionMode: "auto",
@@ -174,6 +173,7 @@ const OnboardFormik = (props) => {
                       </div>
                     ) : null}
                   </Form.Group>
+
                   <Form.Group
                     className="form-group"
                     controlId="PaymentAcceptorIdentificationCode"
@@ -202,6 +202,7 @@ const OnboardFormik = (props) => {
                       </div>
                     ) : null}
                   </Form.Group>
+
                   <Form.Group
                     className="form-group"
                     controlId="PaymentAcceptorDescription"
@@ -229,176 +230,220 @@ const OnboardFormik = (props) => {
                     ) : null}
                   </Form.Group>
 
-                  <Form.Group
-                    className="form-group"
-                    controlId="TransactionDate"
-                  >
-                    <Form.Label>Transaction Date :</Form.Label>
-                    <Form.Control
-                      type="date"
-                      name="TransactionDate"
-                      placeholder="Transaction Date"
-                      onChange={handleChange}
+                  <Form.Group controlId="fileType" className="mb-3">
+                    <Form.Label>Merchant Category Code:</Form.Label>
+                    <Form.Select
+                      aria-label="Merchant Category Code"
+                      onChange={(event) => {
+                        setFieldValue("fileType", event.target.value);
+                      }}
                       onBlur={handleBlur}
-                      value={values.TransactionDate}
-                      className={
-                        touched.TransactionDate && errors.TransactionDate
-                          ? "has-error"
-                          : null
-                      }
-                    />
-                    {touched.TransactionDate && errors.TransactionDate ? (
-                      <div className="error-message">
-                        {errors.TransactionDate}
-                      </div>
+                      style={{ height: "100%" }}
+                    >
+                      <option value="">Merchant Category Code</option>
+                      <option value="E-Commerce">E-Commerce</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Travel">Travel</option>
+                      <option value="Luxury">Luxury</option>
+                      <option value="OilAndGases">Oil {"&"} Gases</option>
+                    </Form.Select>
+                    {touched.fileType && errors.fileType ? (
+                      <div className="error-message">{errors.fileType}</div>
                     ) : null}
                   </Form.Group>
 
-                  <Form.Group className="form-group" controlId="merchantId">
-                    <Form.Label>Merchant ID :</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="merchantId"
-                      placeholder="Merchant ID"
-                      onChange={handleChange}
+                  <Form.Group controlId="Product" className="mb-3">
+                    <Form.Label>Product:</Form.Label>
+                    <Form.Select
+                      aria-label="Product"
+                      onChange={(event) => {
+                        setFieldValue("Product", event.target.value);
+                      }}
                       onBlur={handleBlur}
-                      value={values.merchantId}
-                      className={
-                        touched.merchantId && errors.merchantId
-                          ? "has-error"
-                          : null
-                      }
-                    />
-                    {touched.merchantId && errors.merchantId ? (
-                      <div className="error-message">{errors.merchantId}</div>
-                    ) : null}
-                  </Form.Group>
-
-                  <Form.Group className="form-group" controlId="Location">
-                    <Form.Label>Location :</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="Location"
-                      placeholder="Location"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.Location}
-                      className={
-                        touched.Location && errors.Location ? "has-error" : null
-                      }
-                    />
-                    {touched.Location && errors.Location ? (
-                      <div className="error-message">{errors.Location}</div>
-                    ) : null}
-                  </Form.Group>
-
-                  <Form.Group className="form-group" controlId="POSEntryMode">
-                    <Form.Label>POS Entry Mode :</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="POSEntryMode"
-                      placeholder="POS Entry Mode"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.POSEntryMode}
-                      className={
-                        touched.POSEntryMode && errors.POSEntryMode
-                          ? "has-error"
-                          : null
-                      }
-                    />
-                    {touched.POSEntryMode && errors.POSEntryMode ? (
-                      <div className="error-message">{errors.POSEntryMode}</div>
+                      style={{ height: "100%" }}
+                    >
+                      <option value="">Select Product Type</option>
+                      <option value="PR1">PR1</option>
+                      <option value="PR2">PR2</option>
+                      <option value="PR3">PR3</option>
+                      <option value="PR4">PR4</option>
+                    </Form.Select>
+                    {touched.Product && errors.Product ? (
+                      <div className="error-message">{errors.Product}</div>
                     ) : null}
                   </Form.Group>
                 </div>
                 <div className="col m-3 p-5 form-section border border-1 rounded">
-                  <h6 className="mb-3">B. Submission Details</h6>
-                  <Form.Group className="form-group" controlId="SubmittedBy">
-                    <Form.Label>Submitted By :</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="SubmittedBy"
-                      placeholder="Submitted By"
-                      onChange={handleChange}
+                  <h6 className="mb-3">C. Transaction criteria/thresholds</h6>
+                  <Form.Group controlId="NegotiatedMDR" className="mb-3">
+                    <Form.Label>NegotiatedMDR:</Form.Label>
+                    <Form.Select
+                      aria-label="NegotiatedMDR"
+                      onChange={(event) => {
+                        setFieldValue("NegotiatedMDR", event.target.value);
+                      }}
                       onBlur={handleBlur}
-                      value={values.SubmittedBy}
-                      className={
-                        touched.SubmittedBy && errors.SubmittedBy
-                          ? "has-error"
-                          : null
-                      }
-                    />
-                    {touched.SubmittedBy && errors.SubmittedBy ? (
-                      <div className="error-message">{errors.SubmittedBy}</div>
-                    ) : null}
-                  </Form.Group>
-                  <Form.Group
-                    className="form-group"
-                    controlId="SubmissionNumberRef"
-                  >
-                    <Form.Label>Submission Number Ref. :</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="SubmissionNumberRef"
-                      placeholder="Submission Number Ref."
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.SubmissionNumberRef}
-                      className={
-                        touched.SubmissionNumberRef &&
-                        errors.SubmissionNumberRef
-                          ? "has-error"
-                          : null
-                      }
-                    />
-                    {touched.SubmissionNumberRef &&
-                    errors.SubmissionNumberRef ? (
+                      style={{ height: "100%" }}
+                    >
+                      <option value="">Select NegotiatedMDR Type</option>
+                      <option value="1.5">1.5</option>
+                      <option value="2.0">2.0</option>
+                      <option value="2.5">2.5</option>
+                    </Form.Select>
+                    {touched.NegotiatedMDR && errors.NegotiatedMDR ? (
                       <div className="error-message">
-                        {errors.SubmissionNumberRef}
+                        {errors.NegotiatedMDR}
                       </div>
                     ) : null}
                   </Form.Group>
-                  <Form.Group className="form-group" controlId="ServiceDate">
-                    <Form.Label>Service Date :</Form.Label>
+                  <Form.Group className="form-group" controlId="PromoCode">
+                    <Form.Label>Promo Code :</Form.Label>
                     <Form.Control
-                      type="date"
-                      name="ServiceDate"
-                      placeholder="Service Date"
+                      type="text"
+                      name="PromoCode"
+                      placeholder="Promo Code"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.ServiceDate}
+                      value={values.PromoCode}
                       className={
-                        touched.ServiceDate && errors.ServiceDate
+                        touched.PromoCode && errors.PromoCode
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.ServiceDate && errors.ServiceDate ? (
-                      <div className="error-message">{errors.ServiceDate}</div>
+                    {touched.PromoCode && errors.PromoCode ? (
+                      <div className="error-message">{errors.PromoCode}</div>
                     ) : null}
                   </Form.Group>
                   <Form.Group
                     className="form-group"
-                    controlId="SubmissionDateTime"
+                    controlId="NumberOfTransactionsAllowedPerDay"
                   >
-                    <Form.Label>Submission Date and Time :</Form.Label>
+                    <Form.Label>
+                      Number of Transactions Allowed Per Day :
+                    </Form.Label>
                     <Form.Control
-                      type="date"
-                      name="SubmissionDateTime"
-                      placeholder="Submission Date and Time"
+                      type="text"
+                      name="NumberOfTransactionsAllowedPerDay"
+                      placeholder="Number of Transactions Allowed Per Day"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.SubmissionDateTime}
+                      value={values.NumberOfTransactionsAllowedPerDay}
                       className={
-                        touched.SubmissionDateTime && errors.SubmissionDateTime
+                        touched.NumberOfTransactionsAllowedPerDay &&
+                        errors.NumberOfTransactionsAllowedPerDay
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.SubmissionDateTime && errors.SubmissionDateTime ? (
+                    {touched.NumberOfTransactionsAllowedPerDay &&
+                    errors.NumberOfTransactionsAllowedPerDay ? (
                       <div className="error-message">
-                        {errors.SubmissionDateTime}
+                        {errors.NumberOfTransactionsAllowedPerDay}
+                      </div>
+                    ) : null}
+                  </Form.Group>
+                  <Form.Group
+                    className="form-group"
+                    controlId="TransactionCurrency"
+                  >
+                    <Form.Label>Transaction Currency :</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="TransactionCurrency"
+                      placeholder="Transaction Currency"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.TransactionCurrency}
+                      className={
+                        touched.TransactionCurrency &&
+                        errors.TransactionCurrency
+                          ? "has-error"
+                          : null
+                      }
+                    />
+                    {touched.TransactionCurrency &&
+                    errors.TransactionCurrency ? (
+                      <div className="error-message">
+                        {errors.TransactionCurrency}
+                      </div>
+                    ) : null}
+                  </Form.Group>
+                  <Form.Group
+                    className="form-group"
+                    controlId="TransactionMinimumAmount"
+                  >
+                    <Form.Label>Transaction Minimum Amount :</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="TransactionMinimumAmount"
+                      placeholder="Transaction Minimum Amount"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.TransactionMinimumAmount}
+                      className={
+                        touched.TransactionMinimumAmount &&
+                        errors.TransactionMinimumAmount
+                          ? "has-error"
+                          : null
+                      }
+                    />
+                    {touched.TransactionMinimumAmount &&
+                    errors.TransactionMinimumAmount ? (
+                      <div className="error-message">
+                        {errors.TransactionMinimumAmount}
+                      </div>
+                    ) : null}
+                  </Form.Group>
+                  <Form.Group
+                    className="form-group"
+                    controlId="TransactionMaximumAmount"
+                  >
+                    <Form.Label>Transaction Maximum Amount :</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="TransactionMaximumAmount"
+                      placeholder="Transaction Maximum Amount"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.TransactionMaximumAmount}
+                      className={
+                        touched.TransactionMaximumAmount &&
+                        errors.TransactionMaximumAmount
+                          ? "has-error"
+                          : null
+                      }
+                    />
+                    {touched.TransactionMaximumAmount &&
+                    errors.TransactionMaximumAmount ? (
+                      <div className="error-message">
+                        {errors.TransactionMaximumAmount}
+                      </div>
+                    ) : null}
+                  </Form.Group>
+                  <Form.Group
+                    className="form-group"
+                    controlId="TransactionGeographiesAllowed"
+                  >
+                    <Form.Label>Transaction Geographies Allowed :</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="TransactionGeographiesAllowed"
+                      placeholder="Transaction Geographies Allowed"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.TransactionGeographiesAllowed}
+                      className={
+                        touched.TransactionGeographiesAllowed &&
+                        errors.TransactionGeographiesAllowed
+                          ? "has-error"
+                          : null
+                      }
+                    />
+                    {touched.TransactionGeographiesAllowed &&
+                    errors.TransactionGeographiesAllowed ? (
+                      <div className="error-message">
+                        {errors.TransactionGeographiesAllowed}
                       </div>
                     ) : null}
                   </Form.Group>
@@ -406,44 +451,48 @@ const OnboardFormik = (props) => {
               </div>
               <div className="row cols-md-2 justify-content-around">
                 <div className="col m-3 p-5 form-section border border-1 rounded">
-                  <h6 className="mb-3">C. Customer Info</h6>
+                  <h6 className="mb-3">B. Merchant Bank Details</h6>
 
-                  <Form.Group className="form-group" controlId="CustomerName">
-                    <Form.Label>Customer Name :</Form.Label>
+                  <Form.Group className="form-group" controlId="AccountNumber">
+                    <Form.Label>Account Number :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="CustomerName"
-                      placeholder="Customer Name"
+                      name="AccountNumber"
+                      placeholder="Account Number"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.CustomerName}
+                      value={values.AccountNumber}
                       className={
-                        touched.CustomerName && errors.CustomerName
+                        touched.AccountNumber && errors.AccountNumber
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.CustomerName && errors.CustomerName ? (
-                      <div className="error-message">{errors.CustomerName}</div>
+                    {touched.AccountNumber && errors.AccountNumber ? (
+                      <div className="error-message">
+                        {errors.AccountNumber}
+                      </div>
                     ) : null}
                   </Form.Group>
-                  <Form.Group className="form-group" controlId="CustomerID">
-                    <Form.Label>Customer ID :</Form.Label>
+                  <Form.Group className="form-group" controlId="BankIdentifier">
+                    <Form.Label>Bank Identifier :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="CustomerID"
-                      placeholder="Customer ID"
+                      name="BankIdentifier"
+                      placeholder="Bank Identifier"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.CustomerID}
+                      value={values.BankIdentifier}
                       className={
-                        touched.CustomerID && errors.CustomerID
+                        touched.BankIdentifier && errors.BankIdentifier
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.CustomerID && errors.CustomerID ? (
-                      <div className="error-message">{errors.CustomerID}</div>
+                    {touched.BankIdentifier && errors.BankIdentifier ? (
+                      <div className="error-message">
+                        {errors.BankIdentifier}
+                      </div>
                     ) : null}
                   </Form.Group>
                 </div>
@@ -526,34 +575,8 @@ const OnboardFormik = (props) => {
                   </Form.Group>
                 </div>
               </div>
-              <div className="row cols-md-1 justify-content-around">
-                <div className="col col-6 m-3 p-5 form-section border border-1 rounded">
-                  <Form.Group className="form-group d-flex justify-content-between">
-                    <Form.Label>Execution Mode :</Form.Label>
-
-                    <Form.Check
-                      type="radio"
-                      name="executionMode"
-                      id="executionModeManual"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      checked={values.executionMode === "manual"}
-                      label="Manual"
-                      value="manual"
-                      inline
-                    />
-                    <Form.Check
-                      type="radio"
-                      name="executionMode"
-                      id="executionModeAuto"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      checked={values.executionMode === "auto"}
-                      label="Auto"
-                      value="auto"
-                      inline
-                    />
-                  </Form.Group>
+              <div className="row justify-content-center">
+                <div className="col col-3">
                   <div className="d-flex justify-content-between">
                     <Button
                       className="bg-light text-primary"
