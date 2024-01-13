@@ -497,55 +497,55 @@ const OnboardFormik = (props) => {
                   </Form.Group>
                 </div>
                 <div className="col m-3 p-5 form-section border border-1 rounded">
-                  <h6 className="mb-3">D. Line of Credit (LOC) Details</h6>
+                  <h6 className="mb-3">D. POS Terminal Details</h6>
 
                   <Form.Group
                     className="form-group"
-                    controlId="LoanReferenceNumber"
+                    controlId="NumberOfPosTerminals"
                   >
-                    <Form.Label>Loan Reference Number :</Form.Label>
+                    <Form.Label>Number of POS Terminals :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="LoanReferenceNumber"
-                      placeholder="Loan Reference Number"
+                      name="NumberOfPosTerminals"
+                      placeholder="Number of POS Terminals"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.LoanReferenceNumber}
+                      value={values.NumberOfPosTerminals}
                       className={
-                        touched.LoanReferenceNumber &&
-                        errors.LoanReferenceNumber
+                        touched.NumberOfPosTerminals &&
+                        errors.NumberOfPosTerminals
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.LoanReferenceNumber &&
-                    errors.LoanReferenceNumber ? (
+                    {touched.NumberOfPosTerminals &&
+                    errors.NumberOfPosTerminals ? (
                       <div className="error-message">
-                        {errors.LoanReferenceNumber}
+                        {errors.NumberOfPosTerminals}
                       </div>
                     ) : null}
                   </Form.Group>
                   <Form.Group
                     className="form-group"
-                    controlId="LoanAccountNumber"
+                    controlId="SecurityDeposits"
                   >
-                    <Form.Label>Loan Account Number :</Form.Label>
+                    <Form.Label>Security Deposits :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="LoanAccountNumber"
-                      placeholder="Loan Account Number"
+                      name="SecurityDeposits"
+                      placeholder="Security Deposits"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.LoanAccountNumber}
+                      value={values.SecurityDeposits}
                       className={
-                        touched.LoanAccountNumber && errors.LoanAccountNumber
+                        touched.SecurityDeposits && errors.SecurityDeposits
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.LoanAccountNumber && errors.LoanAccountNumber ? (
+                    {touched.SecurityDeposits && errors.SecurityDeposits ? (
                       <div className="error-message">
-                        {errors.LoanAccountNumber}
+                        {errors.SecurityDeposits}
                       </div>
                     ) : null}
                   </Form.Group>
