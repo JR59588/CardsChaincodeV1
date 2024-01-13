@@ -549,29 +549,59 @@ const OnboardFormik = (props) => {
                       </div>
                     ) : null}
                   </Form.Group>
-                  <Form.Group
-                    className="form-group"
-                    controlId="DateofLoanApproval"
-                  >
-                    <Form.Label>Loan Approval Date :</Form.Label>
-                    <Form.Control
-                      type="date"
-                      name="DateofLoanApproval"
-                      placeholder="Loan Approval Date"
+
+                  <Form.Group className="form-group d-flex justify-content-between">
+                    <Form.Label>Contract Signed With Merchant :</Form.Label>
+
+                    <Form.Check
+                      type="radio"
+                      name="contractSigned"
+                      id="contractSignedYes"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.DateofLoanApproval}
-                      className={
-                        touched.DateofLoanApproval && errors.DateofLoanApproval
-                          ? "has-error"
-                          : null
-                      }
+                      checked={values.contractSigned === "yes"}
+                      label="Yes"
+                      value="yes"
+                      inline
                     />
-                    {touched.DateofLoanApproval && errors.DateofLoanApproval ? (
-                      <div className="error-message">
-                        {errors.DateofLoanApproval}
-                      </div>
-                    ) : null}
+                    <Form.Check
+                      type="radio"
+                      name="contractSigned"
+                      id="contractSignedNo"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      checked={values.contractSigned === "no"}
+                      label="No"
+                      value="no"
+                      inline
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="form-group d-flex justify-content-between">
+                    <Form.Label>KYC Status :</Form.Label>
+
+                    <Form.Check
+                      type="radio"
+                      name="kycStatus"
+                      id="kycStatusYes"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      checked={values.kycStatus === "yes"}
+                      label="Yes"
+                      value="yes"
+                      inline
+                    />
+                    <Form.Check
+                      type="radio"
+                      name="kycStatus"
+                      id="kycStatusNo"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      checked={values.kycStatus === "no"}
+                      label="No"
+                      value="no"
+                      inline
+                    />
                   </Form.Group>
                 </div>
               </div>
