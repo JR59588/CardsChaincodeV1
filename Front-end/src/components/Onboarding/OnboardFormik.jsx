@@ -7,7 +7,8 @@ import axios from "axios";
 import Loader from "../Loader/Loader";
 
 const OnboardFormik = (props) => {
-  const settlementFormUrl = "http://localhost:3001/api/v1/merchantTx";
+  const settlementFormUrl =
+    "http://localhost:3001/api/v1/saveOBMerchantSummary";
 
   const [show, setShow] = useState(false);
   const [popupData, setPopupData] = useState({ header: "", content: "" });
@@ -15,34 +16,25 @@ const OnboardFormik = (props) => {
 
   const handleClose = () => setShow(false);
 
-  const ISO8583Schema = Yup.object().shape({
-    merchantId: Yup.string().required("Required"),
-    merchantName: Yup.string().required("Required"),
-    AccountNumber: Yup.string().required("Required"),
-    BankIdentifier: Yup.string().required("Required"),
-    PaymentAcceptorIdentificationCode: Yup.string().required("Required"),
-    PaymentAcceptorName: Yup.string().required("Required"),
-    PaymentAcceptorDescription: Yup.string().required("Required"),
-    TransactionDate: Yup.date().required("Required"),
-    LoanReferenceNumber: Yup.string().required("Required"),
-    ProductType: Yup.string().required("Required"),
-    DateofLoanApproval: Yup.date().required("Required"),
-    Location: Yup.string().required("Required"),
-    POSEntryMode: Yup.string().required("Required"),
-    LoanDisbursementDate: Yup.string().required("Required"),
-    LoanAmount: Yup.string().required("Required"),
-    LoanTenure: Yup.string().required("Required"),
-    LoanStatus: Yup.string().required("Required"),
-    LoanAccountNumber: Yup.string().required("Required"),
-    LoCapprovedamount: Yup.string().required("Required"),
-    LoCAvailableamount: Yup.string().required("Required"),
+  const onboardingSchema = Yup.object().shape({
+    kycStatus: Yup.string().required("Required"),
     isContractSigned: Yup.string().required("Required"),
-    PromoCode: Yup.string().required("Required"),
-    NumberOfTransactionsAllowedPerDay: Yup.string().required("Required"),
-    ServiceDate: Yup.date().required("Required"),
-    SubmissionDateTime: Yup.date().required("Required"),
-    executionMode: Yup.string().required("Required"),
-    roleId: Yup.string().required("Required"),
+    securityDeposits: Yup.string().required("Required"),
+    numberOfPOSTerminalsRequired: Yup.string().required("Required"),
+    merchantBankCode: Yup.string().required("Required"),
+    merchantAccountNumber: Yup.string().required("Required"),
+    transactionGeographiesAllowed: Yup.string().required("Required"),
+    txcMaxTxAmount: Yup.string().required("Required"),
+    txcMinTxAmount: Yup.string().required("Required"),
+    txcTxCurrency: Yup.string().required("Required"),
+    txcMaxTxPerDay: Yup.string().required("Required"),
+    promoCode: Yup.string().required("Required"),
+    txcNegotiatedMDR: Yup.string().required("Required"),
+    product: Yup.string().required("Required"),
+    merchantCategoryCode: Yup.string().required("Required"),
+    merchantDescription: Yup.string().required("Required"),
+    merchantID: Yup.string().required("Required"),
+    merchantName: Yup.string().required("Required"),
   });
 
   return (
@@ -57,7 +49,12 @@ const OnboardFormik = (props) => {
         <Modal.Header closeButton>
           <Modal.Title>{popupData.header}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{popupData.content}</Modal.Body>
+        <Modal.Body>
+          <div>
+            <div>{popupData.content}</div>
+            <div>{popupData.reason}</div>
+          </div>
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
@@ -79,57 +76,64 @@ const OnboardFormik = (props) => {
         <h3 className="text-center">Merchant Onboarding</h3>
         <Formik
           initialValues={{
-            PaymentAcceptorIdentificationCode: "",
-            PaymentAcceptorName: "",
-            PaymentAcceptorDescription: "",
-            TransactionDate: "",
-            LoanReferenceNumber: "",
-            ProductType: "",
-            Product: "",
-            NegotiatedMDR: "",
-            DateofLoanApproval: "",
-            Location: "",
-            POSEntryMode: "",
-            LoanDisbursementDate: "",
-            LoanAmount: "",
-            LoanTenure: "",
-            LoanStatus: "",
-            LoanAccountNumber: "",
-            LoCapprovedamount: "",
-            LoCAvailableamount: "",
+            kycStatus: "",
             isContractSigned: "",
-            PromoCode: "",
-            NumberOfTransactionsAllowedPerDay: "",
-            ServiceDate: "",
-            SubmissionDateTime: "",
-            executionMode: "auto",
-            roleId: props.roleId,
+            securityDeposits: "",
+            numberOfPOSTerminalsRequired: "",
+            merchantBankCode: "",
+            merchantAccountNumber: "",
+            transactionGeographiesAllowed: "",
+            txcMaxTxAmount: "",
+            txcMinTxAmount: "",
+            txcTxCurrency: "",
+            txcMaxTxPerDay: "",
+            promoCode: "",
+            txcNegotiatedMDR: "",
+            product: "",
+            merchantCategoryCode: "",
+            merchantDescription: "",
+            merchantCategoryCode: "",
+            merchantName: "",
+            MerchantId: "MID",
+            CustomerId: "CID",
           }}
-          validationSchema={ISO8583Schema}
+          validationSchema={onboardingSchema}
           onSubmit={async (values, { setSubmitting, resetForm }) => {
             console.log("Inside onsubmit");
             try {
               setSubmitting(true);
-              const response = await axios.post(settlementFormUrl, values, {
-                header: { "Content-Type": "application/json" },
-              });
+              setIsFormSubmitting(true);
+              const response = await axios.post(
+                settlementFormUrl,
+                {
+                  ...values,
+                  customerID: "C" + values.merchantID,
+                  roleId: props.roleId,
+                },
+                {
+                  header: { "Content-Type": "application/json" },
+                }
+              );
               setSubmitting(false);
               resetForm();
               console.log(response);
               setShow(true);
               setPopupData({
                 header: "Success",
-                content: "Form submitted successfully",
+                content: `Merchant ${values.merchantName} Onboarded successfully`,
+                reason: "",
               });
             } catch (error) {
               console.log(error);
               setSubmitting(false);
               setShow(true);
               setPopupData({
-                header: "Failed",
+                header: "Sorry",
                 content: "Form submission failed",
+                reason: error.response.data.message,
               });
             }
+            setIsFormSubmitting(false);
           }}
         >
           {({
@@ -147,303 +151,289 @@ const OnboardFormik = (props) => {
               <div className="row cols-md-2 justify-content-center">
                 <div className="col m-3 p-5 form-section border border-1 rounded">
                   <h6 className="mb-3">A. Merchant Profile</h6>
-                  <Form.Group
-                    className="form-group"
-                    controlId="PaymentAcceptorName"
-                  >
+                  <Form.Group className="form-group" controlId="merchantName">
                     <Form.Label>Payment Acceptor Name :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="PaymentAcceptorName"
+                      name="merchantName"
                       placeholder="Payment Acceptor Name"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.PaymentAcceptorName}
+                      value={values.merchantName}
                       className={
-                        touched.PaymentAcceptorName &&
-                        errors.PaymentAcceptorName
+                        touched.merchantName && errors.merchantName
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.PaymentAcceptorName &&
-                    errors.PaymentAcceptorName ? (
-                      <div className="error-message">
-                        {errors.PaymentAcceptorName}
-                      </div>
+                    {touched.merchantName && errors.merchantName ? (
+                      <div className="error-message">{errors.merchantName}</div>
                     ) : null}
                   </Form.Group>
 
-                  <Form.Group
-                    className="form-group"
-                    controlId="PaymentAcceptorIdentificationCode"
-                  >
+                  <Form.Group className="form-group" controlId="merchantID">
                     <Form.Label>
                       Payment Acceptor Identification Code :
                     </Form.Label>
                     <Form.Control
                       type="text"
-                      name="PaymentAcceptorIdentificationCode"
+                      name="merchantID"
                       placeholder="Payment Acceptor Identification Code"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.PaymentAcceptorIdentificationCode}
+                      value={values.merchantID}
                       className={
-                        touched.PaymentAcceptorIdentificationCode &&
-                        errors.PaymentAcceptorIdentificationCode
+                        touched.merchantID && errors.merchantID
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.PaymentAcceptorIdentificationCode &&
-                    errors.PaymentAcceptorIdentificationCode ? (
-                      <div className="error-message">
-                        {errors.PaymentAcceptorIdentificationCode}
-                      </div>
+                    {touched.merchantID && errors.merchantID ? (
+                      <div className="error-message">{errors.merchantID}</div>
                     ) : null}
                   </Form.Group>
 
                   <Form.Group
                     className="form-group"
-                    controlId="PaymentAcceptorDescription"
+                    controlId="merchantDescription"
                   >
                     <Form.Label>Payment Acceptor Description :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="PaymentAcceptorDescription"
+                      name="merchantDescription"
                       placeholder="Payment Acceptor Description"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.PaymentAcceptorDescription}
+                      value={values.merchantDescription}
                       className={
-                        touched.PaymentAcceptorDescription &&
-                        errors.PaymentAcceptorDescription
+                        touched.merchantDescription &&
+                        errors.merchantDescription
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.PaymentAcceptorDescription &&
-                    errors.PaymentAcceptorDescription ? (
+                    {touched.merchantDescription &&
+                    errors.merchantDescription ? (
                       <div className="error-message">
-                        {errors.PaymentAcceptorDescription}
+                        {errors.merchantDescription}
                       </div>
                     ) : null}
                   </Form.Group>
 
-                  <Form.Group controlId="fileType" className="mb-3">
-                    <Form.Label>Merchant Category Code:</Form.Label>
+                  <Form.Group controlId="merchantCategoryCode" className="mb-3">
+                    <Form.Label>Merchant Category Code :</Form.Label>
                     <Form.Select
                       aria-label="Merchant Category Code"
                       onChange={(event) => {
-                        setFieldValue("fileType", event.target.value);
+                        setFieldValue(
+                          "merchantCategoryCode",
+                          event.target.value
+                        );
                       }}
                       onBlur={handleBlur}
                       style={{ height: "100%" }}
+                      className={
+                        touched.merchantCategoryCode &&
+                        errors.merchantCategoryCode
+                          ? "has-error"
+                          : null
+                      }
                     >
-                      <option value="">Merchant Category Code</option>
+                      <option value="">Select Merchant Category Code</option>
                       <option value="E-Commerce">E-Commerce</option>
                       <option value="Electronics">Electronics</option>
                       <option value="Travel">Travel</option>
                       <option value="Luxury">Luxury</option>
                       <option value="OilAndGases">Oil {"&"} Gases</option>
                     </Form.Select>
-                    {touched.fileType && errors.fileType ? (
-                      <div className="error-message">{errors.fileType}</div>
+                    {touched.merchantCategoryCode &&
+                    errors.merchantCategoryCode ? (
+                      <div className="error-message">
+                        {errors.merchantCategoryCode}
+                      </div>
                     ) : null}
                   </Form.Group>
 
-                  <Form.Group controlId="Product" className="mb-3">
-                    <Form.Label>Product:</Form.Label>
+                  <Form.Group controlId="product" className="mb-3">
+                    <Form.Label>product:</Form.Label>
                     <Form.Select
-                      aria-label="Product"
+                      aria-label="product"
                       onChange={(event) => {
-                        setFieldValue("Product", event.target.value);
+                        setFieldValue("product", event.target.value);
                       }}
                       onBlur={handleBlur}
                       style={{ height: "100%" }}
+                      className={
+                        touched.product && errors.product ? "has-error" : null
+                      }
                     >
-                      <option value="">Select Product Type</option>
+                      <option value="">Select product Type</option>
                       <option value="PR1">PR1</option>
                       <option value="PR2">PR2</option>
                       <option value="PR3">PR3</option>
                       <option value="PR4">PR4</option>
                     </Form.Select>
-                    {touched.Product && errors.Product ? (
-                      <div className="error-message">{errors.Product}</div>
+                    {touched.product && errors.product ? (
+                      <div className="error-message">{errors.product}</div>
                     ) : null}
                   </Form.Group>
                 </div>
                 <div className="col m-3 p-5 form-section border border-1 rounded">
                   <h6 className="mb-3">C. Transaction criteria/thresholds</h6>
-                  <Form.Group controlId="NegotiatedMDR" className="mb-3">
-                    <Form.Label>NegotiatedMDR:</Form.Label>
+                  <Form.Group controlId="txcNegotiatedMDR" className="mb-3">
+                    <Form.Label>Negotiated MDR :</Form.Label>
                     <Form.Select
-                      aria-label="NegotiatedMDR"
+                      aria-label="Negotiated MDR"
                       onChange={(event) => {
-                        setFieldValue("NegotiatedMDR", event.target.value);
+                        setFieldValue("txcNegotiatedMDR", event.target.value);
                       }}
                       onBlur={handleBlur}
                       style={{ height: "100%" }}
+                      className={
+                        touched.txcNegotiatedMDR && errors.txcNegotiatedMDR
+                          ? "has-error"
+                          : null
+                      }
                     >
-                      <option value="">Select NegotiatedMDR Type</option>
+                      <option value="">Select Negotiated MDR</option>
                       <option value="1.5">1.5</option>
                       <option value="2.0">2.0</option>
                       <option value="2.5">2.5</option>
                     </Form.Select>
-                    {touched.NegotiatedMDR && errors.NegotiatedMDR ? (
+                    {touched.txcNegotiatedMDR && errors.txcNegotiatedMDR ? (
                       <div className="error-message">
-                        {errors.NegotiatedMDR}
+                        {errors.txcNegotiatedMDR}
                       </div>
                     ) : null}
                   </Form.Group>
-                  <Form.Group className="form-group" controlId="PromoCode">
+                  <Form.Group className="form-group" controlId="promoCode">
                     <Form.Label>Promo Code :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="PromoCode"
+                      name="promoCode"
                       placeholder="Promo Code"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.PromoCode}
+                      value={values.promoCode}
                       className={
-                        touched.PromoCode && errors.PromoCode
+                        touched.promoCode && errors.promoCode
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.PromoCode && errors.PromoCode ? (
-                      <div className="error-message">{errors.PromoCode}</div>
+                    {touched.promoCode && errors.promoCode ? (
+                      <div className="error-message">{errors.promoCode}</div>
                     ) : null}
                   </Form.Group>
-                  <Form.Group
-                    className="form-group"
-                    controlId="NumberOfTransactionsAllowedPerDay"
-                  >
+                  <Form.Group className="form-group" controlId="txcMaxTxPerDay">
                     <Form.Label>
                       Number of Transactions Allowed Per Day :
                     </Form.Label>
                     <Form.Control
                       type="text"
-                      name="NumberOfTransactionsAllowedPerDay"
+                      name="txcMaxTxPerDay"
                       placeholder="Number of Transactions Allowed Per Day"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.NumberOfTransactionsAllowedPerDay}
+                      value={values.txcMaxTxPerDay}
                       className={
-                        touched.NumberOfTransactionsAllowedPerDay &&
-                        errors.NumberOfTransactionsAllowedPerDay
+                        touched.txcMaxTxPerDay && errors.txcMaxTxPerDay
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.NumberOfTransactionsAllowedPerDay &&
-                    errors.NumberOfTransactionsAllowedPerDay ? (
+                    {touched.txcMaxTxPerDay && errors.txcMaxTxPerDay ? (
                       <div className="error-message">
-                        {errors.NumberOfTransactionsAllowedPerDay}
+                        {errors.txcMaxTxPerDay}
                       </div>
                     ) : null}
                   </Form.Group>
-                  <Form.Group
-                    className="form-group"
-                    controlId="TransactionCurrency"
-                  >
+                  <Form.Group className="form-group" controlId="txcTxCurrency">
                     <Form.Label>Transaction Currency :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="TransactionCurrency"
+                      name="txcTxCurrency"
                       placeholder="Transaction Currency"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.TransactionCurrency}
+                      value={values.txcTxCurrency}
                       className={
-                        touched.TransactionCurrency &&
-                        errors.TransactionCurrency
+                        touched.txcTxCurrency && errors.txcTxCurrency
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.TransactionCurrency &&
-                    errors.TransactionCurrency ? (
+                    {touched.txcTxCurrency && errors.txcTxCurrency ? (
                       <div className="error-message">
-                        {errors.TransactionCurrency}
+                        {errors.txcTxCurrency}
                       </div>
                     ) : null}
                   </Form.Group>
-                  <Form.Group
-                    className="form-group"
-                    controlId="TransactionMinimumAmount"
-                  >
+                  <Form.Group className="form-group" controlId="txcMinTxAmount">
                     <Form.Label>Transaction Minimum Amount :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="TransactionMinimumAmount"
+                      name="txcMinTxAmount"
                       placeholder="Transaction Minimum Amount"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.TransactionMinimumAmount}
+                      value={values.txcMinTxAmount}
                       className={
-                        touched.TransactionMinimumAmount &&
-                        errors.TransactionMinimumAmount
+                        touched.txcMinTxAmount && errors.txcMinTxAmount
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.TransactionMinimumAmount &&
-                    errors.TransactionMinimumAmount ? (
+                    {touched.txcMinTxAmount && errors.txcMinTxAmount ? (
                       <div className="error-message">
-                        {errors.TransactionMinimumAmount}
+                        {errors.txcMinTxAmount}
                       </div>
                     ) : null}
                   </Form.Group>
-                  <Form.Group
-                    className="form-group"
-                    controlId="TransactionMaximumAmount"
-                  >
+                  <Form.Group className="form-group" controlId="txcMaxTxAmount">
                     <Form.Label>Transaction Maximum Amount :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="TransactionMaximumAmount"
+                      name="txcMaxTxAmount"
                       placeholder="Transaction Maximum Amount"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.TransactionMaximumAmount}
+                      value={values.txcMaxTxAmount}
                       className={
-                        touched.TransactionMaximumAmount &&
-                        errors.TransactionMaximumAmount
+                        touched.txcMaxTxAmount && errors.txcMaxTxAmount
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.TransactionMaximumAmount &&
-                    errors.TransactionMaximumAmount ? (
+                    {touched.txcMaxTxAmount && errors.txcMaxTxAmount ? (
                       <div className="error-message">
-                        {errors.TransactionMaximumAmount}
+                        {errors.txcMaxTxAmount}
                       </div>
                     ) : null}
                   </Form.Group>
                   <Form.Group
                     className="form-group"
-                    controlId="TransactionGeographiesAllowed"
+                    controlId="transactionGeographiesAllowed"
                   >
                     <Form.Label>Transaction Geographies Allowed :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="TransactionGeographiesAllowed"
+                      name="transactionGeographiesAllowed"
                       placeholder="Transaction Geographies Allowed"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.TransactionGeographiesAllowed}
+                      value={values.transactionGeographiesAllowed}
                       className={
-                        touched.TransactionGeographiesAllowed &&
-                        errors.TransactionGeographiesAllowed
+                        touched.transactionGeographiesAllowed &&
+                        errors.transactionGeographiesAllowed
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.TransactionGeographiesAllowed &&
-                    errors.TransactionGeographiesAllowed ? (
+                    {touched.transactionGeographiesAllowed &&
+                    errors.transactionGeographiesAllowed ? (
                       <div className="error-message">
-                        {errors.TransactionGeographiesAllowed}
+                        {errors.transactionGeographiesAllowed}
                       </div>
                     ) : null}
                   </Form.Group>
@@ -453,45 +443,53 @@ const OnboardFormik = (props) => {
                 <div className="col m-3 p-5 form-section border border-1 rounded">
                   <h6 className="mb-3">B. Merchant Bank Details</h6>
 
-                  <Form.Group className="form-group" controlId="AccountNumber">
+                  <Form.Group
+                    className="form-group"
+                    controlId="merchantAccountNumber"
+                  >
                     <Form.Label>Account Number :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="AccountNumber"
+                      name="merchantAccountNumber"
                       placeholder="Account Number"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.AccountNumber}
+                      value={values.merchantAccountNumber}
                       className={
-                        touched.AccountNumber && errors.AccountNumber
+                        touched.merchantAccountNumber &&
+                        errors.merchantAccountNumber
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.AccountNumber && errors.AccountNumber ? (
+                    {touched.merchantAccountNumber &&
+                    errors.merchantAccountNumber ? (
                       <div className="error-message">
-                        {errors.AccountNumber}
+                        {errors.merchantAccountNumber}
                       </div>
                     ) : null}
                   </Form.Group>
-                  <Form.Group className="form-group" controlId="BankIdentifier">
+                  <Form.Group
+                    className="form-group"
+                    controlId="merchantBankCode"
+                  >
                     <Form.Label>Bank Identifier :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="BankIdentifier"
+                      name="merchantBankCode"
                       placeholder="Bank Identifier"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.BankIdentifier}
+                      value={values.merchantBankCode}
                       className={
-                        touched.BankIdentifier && errors.BankIdentifier
+                        touched.merchantBankCode && errors.merchantBankCode
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.BankIdentifier && errors.BankIdentifier ? (
+                    {touched.merchantBankCode && errors.merchantBankCode ? (
                       <div className="error-message">
-                        {errors.BankIdentifier}
+                        {errors.merchantBankCode}
                       </div>
                     ) : null}
                   </Form.Group>
@@ -501,107 +499,119 @@ const OnboardFormik = (props) => {
 
                   <Form.Group
                     className="form-group"
-                    controlId="NumberOfPosTerminals"
+                    controlId="numberOfPOSTerminalsRequired"
                   >
                     <Form.Label>Number of POS Terminals :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="NumberOfPosTerminals"
+                      name="numberOfPOSTerminalsRequired"
                       placeholder="Number of POS Terminals"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.NumberOfPosTerminals}
+                      value={values.numberOfPOSTerminalsRequired}
                       className={
-                        touched.NumberOfPosTerminals &&
-                        errors.NumberOfPosTerminals
+                        touched.numberOfPOSTerminalsRequired &&
+                        errors.numberOfPOSTerminalsRequired
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.NumberOfPosTerminals &&
-                    errors.NumberOfPosTerminals ? (
+                    {touched.numberOfPOSTerminalsRequired &&
+                    errors.numberOfPOSTerminalsRequired ? (
                       <div className="error-message">
-                        {errors.NumberOfPosTerminals}
+                        {errors.numberOfPOSTerminalsRequired}
                       </div>
                     ) : null}
                   </Form.Group>
                   <Form.Group
                     className="form-group"
-                    controlId="SecurityDeposits"
+                    controlId="securityDeposits"
                   >
                     <Form.Label>Security Deposits :</Form.Label>
                     <Form.Control
                       type="text"
-                      name="SecurityDeposits"
+                      name="securityDeposits"
                       placeholder="Security Deposits"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.SecurityDeposits}
+                      value={values.securityDeposits}
                       className={
-                        touched.SecurityDeposits && errors.SecurityDeposits
+                        touched.securityDeposits && errors.securityDeposits
                           ? "has-error"
                           : null
                       }
                     />
-                    {touched.SecurityDeposits && errors.SecurityDeposits ? (
+                    {touched.securityDeposits && errors.securityDeposits ? (
                       <div className="error-message">
-                        {errors.SecurityDeposits}
+                        {errors.securityDeposits}
                       </div>
                     ) : null}
                   </Form.Group>
 
                   <Form.Group className="form-group d-flex justify-content-between">
                     <Form.Label>Contract Signed With Merchant :</Form.Label>
+                    <div>
+                      <Form.Check
+                        type="radio"
+                        name="isContractSigned"
+                        id="isContractSignedYes"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        checked={values.isContractSigned === "yes"}
+                        label="Yes"
+                        value="yes"
+                        inline
+                      />
+                      <Form.Check
+                        type="radio"
+                        name="isContractSigned"
+                        id="isContractSignedNo"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        checked={values.isContractSigned === "no"}
+                        label="No"
+                        value="no"
+                        inline
+                      />
+                    </div>
 
-                    <Form.Check
-                      type="radio"
-                      name="contractSigned"
-                      id="contractSignedYes"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      checked={values.contractSigned === "yes"}
-                      label="Yes"
-                      value="yes"
-                      inline
-                    />
-                    <Form.Check
-                      type="radio"
-                      name="contractSigned"
-                      id="contractSignedNo"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      checked={values.contractSigned === "no"}
-                      label="No"
-                      value="no"
-                      inline
-                    />
+                    {touched.isContractSigned && errors.isContractSigned ? (
+                      <div className="error-message">
+                        {errors.isContractSigned}
+                      </div>
+                    ) : null}
                   </Form.Group>
 
                   <Form.Group className="form-group d-flex justify-content-between">
                     <Form.Label>KYC Status :</Form.Label>
+                    <div>
+                      <Form.Check
+                        type="radio"
+                        name="kycStatus"
+                        id="kycStatusYes"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        checked={values.kycStatus === "yes"}
+                        label="Yes"
+                        value="yes"
+                        inline
+                      />
+                      <Form.Check
+                        type="radio"
+                        name="kycStatus"
+                        id="kycStatusNo"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        checked={values.kycStatus === "no"}
+                        label="No"
+                        value="no"
+                        inline
+                      />
+                    </div>
 
-                    <Form.Check
-                      type="radio"
-                      name="kycStatus"
-                      id="kycStatusYes"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      checked={values.kycStatus === "yes"}
-                      label="Yes"
-                      value="yes"
-                      inline
-                    />
-                    <Form.Check
-                      type="radio"
-                      name="kycStatus"
-                      id="kycStatusNo"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      checked={values.kycStatus === "no"}
-                      label="No"
-                      value="no"
-                      inline
-                    />
+                    {touched.kycStatus && errors.kycStatus ? (
+                      <div className="error-message">{errors.kycStatus}</div>
+                    ) : null}
                   </Form.Group>
                 </div>
               </div>

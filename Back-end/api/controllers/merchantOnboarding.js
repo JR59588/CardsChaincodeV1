@@ -355,8 +355,10 @@ exports.saveOBMerchantSummary = async function (req, res) {
 
   try {
     let org = req.body.roleId;
-    if (!data[org]) {
-      return res.status(400).send("Error!. Invalid role name");
+    if (["AAD", "ACD", "AOD"].findIndex(item => item === org) === -1) {
+      return res.status(400).json({ success: false, message: "Please use a valid role" });
+    } else if (!data[org]) {
+      return res.status(400).json({ success: false, message: "Error!. Invalid role name" });
     }
     let ccpPath = path.resolve(data[org].connectionPath);
     let ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
@@ -393,13 +395,14 @@ exports.saveOBMerchantSummary = async function (req, res) {
 
     // To check if the merchantID organization is already present in the database(For now, in a JSON file.)
     if (checkOrgPresent(req.body.merchantID)) {
-      return res.status(400).send(`There's already a merchant with the ID: ${req.body.merchantID}`);
+      return res.status(400).json({ success: false, message: `There's already a merchant with the ID: ${req.body.merchantID}` });
     }
 
     // adding merchant organization to the network
     const { orgAddnError } = addOrganization(req.body.merchantID);
 
     if (orgAddnError) {
+      console.log("Error when adding org is: ", orgAddnError);
       return res.status(400).json({
         success: false,
         message: `Failed to onboard the merchant: ${req.body.merchantName}`
@@ -521,20 +524,6 @@ const addOrganization = function (orgName) {
     console.log("Error executing generate script to add new merchant organization", error)
     orgAddnSuccess = false;
   }
-  // exec(command, { cwd: scriptDirectory }, (error, stdout, stderr) => {
-  //   console.log(`Bash script output: ${stdout}`);
-  //   console.error(`Bash script errors: ${stderr}`);
-  //   if (error) {
-  //     orgAddnSuccess = false;
-  //     console.error(`Error executing Bash script: ${error}`);
-  //   }
-  //   jsonObj.currentValue = nextValue;
-  //   jsonObj.currentGlobal = nextGlobal;
-  //   fs.writeFileSync(path.join(__dirname, "..", "newOrgVars.json"), JSON.stringify(jsonObj));
-  //   //saving connection details and enrolling users for future request settlement tx's.
-  //   saveConnectionDetails(orgName);
-  //   registerAndEnrollFunc(orgName);
-  // });
 
   return { orgAddnError: orgAddnSuccess ? null : `There was an error adding organization ${orgName} to the network` }
 

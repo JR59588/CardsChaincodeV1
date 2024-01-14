@@ -82,7 +82,12 @@ function App() {
         <Route
           path="/Aggregator"
           element={
-            <Onboard
+            // <Onboard
+            //   roleId={roleId}
+            //   IP={IP}
+            //   fetchOrganizationData={fetchOrganizationData}
+            // />
+            <OnboardFormik
               roleId={roleId}
               IP={IP}
               fetchOrganizationData={fetchOrganizationData}
