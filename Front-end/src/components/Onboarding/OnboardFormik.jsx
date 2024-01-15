@@ -115,6 +115,7 @@ const OnboardFormik = (props) => {
                 }
               );
               setSubmitting(false);
+              setIsFormSubmitting(false);
               resetForm();
               console.log(response);
               setShow(true);
@@ -126,6 +127,7 @@ const OnboardFormik = (props) => {
             } catch (error) {
               console.log(error);
               setSubmitting(false);
+              setIsFormSubmitting(false);
               setShow(true);
               setPopupData({
                 header: "Sorry",
