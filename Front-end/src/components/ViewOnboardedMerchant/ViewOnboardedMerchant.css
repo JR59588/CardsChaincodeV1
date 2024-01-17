@@ -1,0 +1,87 @@
+.blr{
+    border-radius: 38px;
+    filter: blur(5px);
+    color: #008555;
+    background-color: #008555;
+    border:0px solid #008555;
+    position: relative;
+}
+.btn:active{
+    transform: translateY(3px) !important;
+}
+.authMsgD{
+ position: absolute;
+ text-align: center;
+ top: 40px;
+ width: 410px;
+ font-size: 18px;
+ left: 50px;
+ z-index: 1; 
+ color:#FFDB58;  
+}
+.authMsgB{
+ position: absolute;
+ text-align: center;
+ top: 120px;
+ width: 405px;
+ font-size: 18px;
+ left: 50px;
+ z-index: 1; 
+ color:#FFDB58;  
+}
+.authMsgC{
+ position: absolute;
+ text-align: center;
+ width: 400px;
+ font-size: 18px;
+ left: 180px;
+ z-index: 1; 
+ color:#FFDB58;  
+}
+.hidden{
+    border-radius: 38px;
+    filter: blur(5px);
+    color: #008555;
+    background-color: #008555;
+    border:0px solid #008555;
+    position: relative;
+}
+.blrHidden{
+    position: absolute;
+    text-align: center;
+    width: 520px;
+    top: 307px;
+    height: 380px;
+    font-size: 18px;
+    left: 130px;
+    z-index: 1; 
+    color:#FFDB58;
+    background-color: #008555;
+    border-radius: 20px;
+    filter: blur(5px);
+}
+.messageA{
+    position: absolute;
+    z-index: 10;
+    text-align: center;
+    top: 460px;
+    left: 160px;
+    width: 450px;
+    font-size: 18px;
+    color:#FFDB58;
+}
+.buttonbt2{
+
+    background-color: #10005d;
+    border-radius: 5px;
+    border-color:#10005d ;
+    color:white;
+    font-size: medium;
+  
+  
+  
+  }
+ 
+.notValid{
+    color: red !important;
+}
