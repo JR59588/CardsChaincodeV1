@@ -17,7 +17,7 @@ class PYMTUtils {
 
 
       // SA_ORG_MSPID: "SAOrgMSP",
-       MRT1_ORG_NAME: "Org1MSP",
+      MRT1_ORG_NAME: "Org1MSP",
       // AP_ORG_NAME: "APMSP",
       // AGG_ORG_NAME: "AggOrgMSP",
       // CACCT_ORG_NAME: "CAcctMSP",
@@ -53,15 +53,15 @@ class PYMTUtils {
       // PYMTTxPreSettlementCC: "PYMTTxPreSettlementCC",
       // processSettlementTxFN: "processSettlementTX",
 
-       readSettlementTxFN: "readState",
-       
-       IsMerchantContractSigned: "IsMerchantContractSigned",
+      readSettlementTxFN: "readState",
+
+      IsMerchantContractSigned: "IsMerchantContractSigned",
       // APChaincodeName: "APvalidationcc",
       // SACCFuncName: "validation",
       // APCCFuncName: "validation",
       // acceptSettlementTxFN: "acceptSettlementTx",
       // validateSettlementTxFN: "validateSettlementTx",
-       initiateSettlementTxFN: "initiateSettlementTx",
+      initiateSettlementTxFN: "initiateSettlementTx",
       // requestSettlementTxFN: "requestSettlementTx",
       // TXSTATUS_REQUESTED: "TxRequested",
       // TXSTATUS_VALIDATED: "TxValidated",
@@ -73,12 +73,12 @@ class PYMTUtils {
       // TXSTATUS_CLEARED: "TxCleared",
       // TXSTATUS_NOT_CLEARED: "TxNotCleared",
       // TXSTATUS_INITIATED: "TxInitiated",
-      // TXSTATUS_CONFIRMED: "TxConfirmed",
-      // TXSTATUS_NON_CONFIRMED: "TxNonConfirmed",
+      TXSTATUS_CONFIRMED: "TxConfirmed",
+      TXSTATUS_NON_CONFIRMED: "TxNonConfirmed",
       // TXSTATUS_BALANCED: "TxBalanced",
       // TXSTATUS_NON_BALANCED: "TxNonBalanced",
-      // TXSTATUS_ACCOUNTED: "TxAccounted",
-      // TXSTATUS_NON_ACCOUNTED: "TxNonAccounted",
+      TXSTATUS_ACCOUNTED: "TxAccounted",
+      TXSTATUS_NON_ACCOUNTED: "TxNonAccounted",
 
     };
     return hc;

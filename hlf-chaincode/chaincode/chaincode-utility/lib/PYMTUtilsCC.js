@@ -68,7 +68,6 @@ class PYMTUtilsCC extends Contract {
     currencyCode,
     personalIdentificationNumber,
     additionalData,
-    executionMode
   ) {
     // acl
 
@@ -142,7 +141,6 @@ class PYMTUtilsCC extends Contract {
       currencyCode: currencyCode,
       personalIdentificationNumber: personalIdentificationNumber,
       additionalData: additionalData,
-      executionMode: executionMode,
     };
 
     let { initiateSettlementTxFN } = await pymtutils.hlfconstants();
@@ -200,8 +198,7 @@ class PYMTUtilsCC extends Contract {
       MERCHANT_IT_EVENT.eventID,
       key,
       initiateTxObj,
-      OrgMSPID,
-      channelName
+      OrgMSPID
     );
     const txBuffer = Buffer.from(JSON.stringify(initiateTxObj));
     ctx.stub.setEvent("E-TxInitiated", txBuffer);
@@ -234,7 +231,6 @@ class PYMTUtilsCC extends Contract {
     currencyCode,
     personalIdentificationNumber,
     additionalData,
-    executionMode
   ) {
     // acl
 
@@ -300,7 +296,6 @@ class PYMTUtilsCC extends Contract {
       currencyCode: currencyCode,
       personalIdentificationNumber: personalIdentificationNumber,
       additionalData: additionalData,
-      executionMode: executionMode
     };
 
     let { requestSettlementTxFN } = await pymtutils.hlfconstants();
@@ -388,7 +383,6 @@ class PYMTUtilsCC extends Contract {
       emittingOrgType: "NA",
       evTxId: "99999",
       key: keyIn,
-      executionMode: txIn.executionMode
     };
     const eventPayload = JSON.stringify(evtPayload);
 
