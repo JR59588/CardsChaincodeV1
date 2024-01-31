@@ -42,7 +42,9 @@ class PYMTUtils {
       TXSTATUS_NOT_CLEARED: "TxNotCleared",
       submitSettlementTxFN: "submitSettlementTx",
       requestSettlementTxFN: "requestSettlementTx",
-
+      accountSettlementTxFN: "accountSettlementTx",
+      initiateSettlementTxFN: "initiateSettlementTx",
+      reconciliationSettlementTxFN: "reconciliationSettlementTx",
       PYMTUtilsCC: "PYMTUtilsCC",
       PYMTUtilsCCReadState: "readState",
       PYMTUtilsCCWriteState: "writeState",
@@ -61,7 +63,7 @@ class PYMTUtils {
       // APCCFuncName: "validation",
       // acceptSettlementTxFN: "acceptSettlementTx",
       // validateSettlementTxFN: "validateSettlementTx",
-      initiateSettlementTxFN: "initiateSettlementTx",
+
       // requestSettlementTxFN: "requestSettlementTx",
       // TXSTATUS_REQUESTED: "TxRequested",
       // TXSTATUS_VALIDATED: "TxValidated",

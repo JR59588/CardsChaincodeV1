@@ -99,6 +99,7 @@ class SubmitSettlementTxCC extends Contract {
   async submitTxByAOD(ctx, txIn) {
     var isSubmitted = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
+    // TODO: Validation has to be changed according to the response of issuing bank
     const hasTxsystemTraceAuditNumber = "systemsTraceAuditNumber" in txIn;
     if (hasTxsystemTraceAuditNumber) {
       if (txIn.systemsTraceAuditNumber === "" || txIn.systemsTraceAuditNumber.length == 0) {

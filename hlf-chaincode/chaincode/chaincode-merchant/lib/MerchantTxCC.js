@@ -84,6 +84,150 @@ class MerchantTxCC extends Contract {
   }
 
 
+  async submitSettlementTx(
+    ctx,
+    MerchantId,
+    MerchantName,
+    CustomerId,
+    LoanReferenceNumber,
+    txObjJSON
+  ) {
+    console.log(".....In submitSettlementTx ......");
+    // var OrgMSPId = ctx.clientIdentity.getMSPID();
+    var pymtutils = new PYMTUtils(ctx);
+    var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
+
+    let { TXSTATUS_SUBMITTED } = await pymtutils.hlfconstants();
+    let { PYMTUtilsCC, MRT1_ORG_NAME } = await pymtutils.hlfconstants();
+
+    try {
+      await pymtutils.checkNull(MerchantId, CustomerId, LoanReferenceNumber);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    // TODO: remove hardcoded Ord1MSP
+    const accessValid = true; //await pymtutils.validateOrganization(ctx, OrgMSPID);
+
+    if (!accessValid) {
+      throw new Error(
+        "This transaction already exists for merchantId : " +
+        MerchantId +
+        " customerId :" +
+        CustomerId +
+        "LoanReferenceNumber :" +
+        LoanReferenceNumber
+      );
+    }
+
+    // TODO: check merchant ID is within specific range. If merchantId is true then proced else return error
+    // TODO: key needs tobe modified to be prefixed by orgid/orgMSPId. This will be required for various validation. for ex: in acceptSettlementTx() 
+    // if isValidMerchantId(m101)
+    let key = await pymtutils.makeTxKey(
+      OrgMSPID,
+      MerchantId,
+      CustomerId,
+      LoanReferenceNumber
+    );
+    console.log(" merchantsettlementcc.js:key", key);
+    // else return error
+
+    let channelName = await pymtutils.getChannelIdentity(ctx, "Org1MSP");
+
+    // ==== Create tx object and marshal to JSON ====
+
+    console.log("txObjJSON = ", txObjJSON);
+    const tx = JSON.parse(txObjJSON);
+    console.log('orgMSPID: ', OrgMSPID);
+    console.log('Contents: ', txObjJSON);
+
+    let verified = false;
+    // if (OrgMSPID == MRT1_ORG_NAME) {
+    verified = await this.doVerifySubmitSettlementTx(ctx, tx);
+
+    console.log("After verifying merchantchecks: " + verified);
+
+    //}
+    return verified;
+    // === Save transaction to state ===
+    // await ctx.stub.putState(key, Buffer.from(JSON.stringify(settlementTx)));
+    // const txBuffer = Buffer.from(JSON.stringify(settlementTx));
+    // ctx.stub.setEvent("E-TxRequested", txBuffer);
+
+  }
+
+  async accountSettlementTx(
+    ctx,
+    MerchantId,
+    MerchantName,
+    CustomerId,
+    LoanReferenceNumber,
+    txObjJSON
+  ) {
+    console.log(".....In accountSettlementTx ......");
+    // var OrgMSPId = ctx.clientIdentity.getMSPID();
+    var pymtutils = new PYMTUtils(ctx);
+    var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
+
+    let { TXSTATUS_ACCOUNTED } = await pymtutils.hlfconstants();
+    let { PYMTUtilsCC, MRT1_ORG_NAME } = await pymtutils.hlfconstants();
+
+    try {
+      await pymtutils.checkNull(MerchantId, CustomerId, LoanReferenceNumber);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    // TODO: remove hardcoded Ord1MSP
+    const accessValid = true; //await pymtutils.validateOrganization(ctx, OrgMSPID);
+
+    if (!accessValid) {
+      throw new Error(
+        "This transaction already exists for merchantId : " +
+        MerchantId +
+        " customerId :" +
+        CustomerId +
+        "LoanReferenceNumber :" +
+        LoanReferenceNumber
+      );
+    }
+
+    // TODO: check merchant ID is within specific range. If merchantId is true then proced else return error
+    // TODO: key needs tobe modified to be prefixed by orgid/orgMSPId. This will be required for various validation. for ex: in acceptSettlementTx() 
+    // if isValidMerchantId(m101)
+    let key = await pymtutils.makeTxKey(
+      OrgMSPID,
+      MerchantId,
+      CustomerId,
+      LoanReferenceNumber
+    );
+    console.log(" merchantsettlementcc.js:key", key);
+    // else return error
+
+    let channelName = await pymtutils.getChannelIdentity(ctx, "Org1MSP");
+
+    // ==== Create tx object and marshal to JSON ====
+
+    console.log("txObjJSON = ", txObjJSON);
+    const tx = JSON.parse(txObjJSON);
+    console.log('orgMSPID: ', OrgMSPID);
+    console.log('Contents: ', txObjJSON);
+
+    let verified = false;
+    // if (OrgMSPID == MRT1_ORG_NAME) {
+    verified = await this.doVerifyAccountSettlementTx(ctx, tx);
+
+    console.log("After verifying merchantchecks: " + verified);
+
+    //}
+    return verified;
+    // === Save transaction to state ===
+    // await ctx.stub.putState(key, Buffer.from(JSON.stringify(settlementTx)));
+    // const txBuffer = Buffer.from(JSON.stringify(settlementTx));
+    // ctx.stub.setEvent("E-TxRequested", txBuffer);
+
+  }
+
   async getRequestedTx(ctx, channelName, MerchantId, CustomerID, LoanReferenceNumber) {
 
     var pymtutils = new PYMTUtils(ctx);
@@ -265,6 +409,7 @@ class MerchantTxCC extends Contract {
     return verified;
   }
 
+
   async doVerifyRequestSettlementTx(ctx, tx) {
     var isVerified = true;
     const hasTxprimaryAccountNumber = "primaryAccountNumber" in tx;
@@ -282,6 +427,45 @@ class MerchantTxCC extends Contract {
     }
     return isVerified;
   }
+
+  async doVerifySubmitSettlementTx(ctx, tx) {
+    // TODO: Please check the reconciliation message either accepted or rejected and check that one particular field.
+    var isVerified = true;
+    const hasTxprimaryAccountNumber = "primaryAccountNumber" in tx;
+    if (hasTxprimaryAccountNumber) {
+      if (tx.primaryAccountNumber === "" || tx.primaryAccountNumber.length == 0) {
+        isVerified = false;
+        console.log(
+          "Validation primaryAccountNumber not valid: ",
+          isVerified
+        );
+        return isVerified;
+      }
+    } else {
+      return false;
+    }
+    return isVerified;
+  }
+
+  async doVerifyAccountSettlementTx(ctx, tx) {
+    // TODO: Please check the reconciliation message either accepted or rejected and check that one particular field.
+    var isVerified = true;
+    const hasTxprimaryAccountNumber = "primaryAccountNumber" in tx;
+    if (hasTxprimaryAccountNumber) {
+      if (tx.primaryAccountNumber === "" || tx.primaryAccountNumber.length == 0) {
+        isVerified = false;
+        console.log(
+          "Validation primaryAccountNumber not valid: ",
+          isVerified
+        );
+        return isVerified;
+      }
+    } else {
+      return false;
+    }
+    return isVerified;
+  }
+
 
   async doVerifyinitiateSettlementTx(ctx, tx) {
     var isVerify = true;

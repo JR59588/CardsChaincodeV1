@@ -374,6 +374,350 @@ class PYMTUtilsCC extends Contract {
     // */
   }
 
+  // TODO add submit request fields.
+  async submitTx(
+    ctx,
+    MerchantId,
+    CustomerId,
+    LoanReferenceNumber,
+    MerchantName,
+    primaryAccountNumber,
+    processingCode,
+    transactionAmount,
+    transmissionDateAndTime,
+    systemsTraceAuditNumber,
+    localTime,
+    localDate,
+    expirationDate,
+    merchantCategoryCode,
+    pointOfServiceEntryMode,
+    acquiringInstitutionIdentificationCode,
+    retrievalReferenceNumber,
+    cardAcceptorTerminalIdentification,
+    cardAcceptorIdentificationCode,
+    cardAcceptorNameAndLocation,
+    currencyCode,
+    personalIdentificationNumber,
+    additionalData,
+  ) {
+    // acl
+
+    var OrgMSPId = ctx.clientIdentity.getMSPID();
+    var pymtutils = new PYMTUtils(ctx);
+    var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
+    var channelName = await pymtutils.getChannelIdentity(ctx, "Org1");
+    console.log("channel name : ", channelName);
+
+    try {
+      // TODO: change the parameters as per the requirement by changing mid, cid, lrf.
+      await pymtutils.checkNull(MerchantId, CustomerId, LoanReferenceNumber);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    // TODO: remove hardcoded Org1MSP
+    const accessValid = true;//await pymtutils.validateOrganization(ctx, "Org1MSP");
+    // TODO: change the message as per the requirement by changing mid, cid, lrf.
+    if (!accessValid) {
+      throw new Error(
+        "This transaction already exists for merchantId : " +
+        MerchantId +
+        " customerId :" +
+        CustomerId +
+        "LoanReferenceNumber :" +
+        LoanReferenceNumber
+      );
+    }
+    console.log("access valid : ", accessValid);
+
+    console.log("before the key in utilscc");
+    // TODO: change the key as per the requirement by changing mid, cid, lrf.
+
+    let key = await pymtutils.makeTxKey(
+      OrgMSPID,
+      MerchantId,
+      CustomerId,
+      LoanReferenceNumber
+    );
+    console.log("after the key in utilscc");
+
+    // TODO: fields should be changed accordingly
+    let settlementTx = {
+      MerchantId: MerchantId,
+      CustomerId: CustomerId,
+      LoanReferenceNumber: LoanReferenceNumber,
+      MerchantName: MerchantName,
+      primaryAccountNumber: primaryAccountNumber,
+      processingCode: processingCode,
+      transactionAmount: transactionAmount,
+      transmissionDateAndTime: transmissionDateAndTime,
+      systemsTraceAuditNumber: systemsTraceAuditNumber,
+      localTime: localTime,
+      localDate: localDate,
+      expirationDate: expirationDate,
+      merchantCategoryCode: merchantCategoryCode,
+      pointOfServiceEntryMode: pointOfServiceEntryMode,
+      acquiringInstitutionIdentificationCode: acquiringInstitutionIdentificationCode,
+      retrievalReferenceNumber: retrievalReferenceNumber,
+      cardAcceptorTerminalIdentification: cardAcceptorTerminalIdentification,
+      cardAcceptorIdentificationCode: cardAcceptorIdentificationCode,
+      cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
+      currencyCode: currencyCode,
+      personalIdentificationNumber: personalIdentificationNumber,
+      additionalData: additionalData,
+    };
+
+    // TODO: add a function called submitSettlementTxFN
+    let { submitSettlementTxFN } = await pymtutils.hlfconstants();
+
+    let strObj = JSON.stringify(settlementTx);
+    console.log(" strObj = ", strObj);
+    var iCCName;
+
+    // TODO: Chaincode name should be written appropriately
+    iCCName = "MC_" + PYMTTX_MERCHANT_CC_SUFFIX;
+    console.log(" PYTMutilscc.js iCCName : ", iCCName);
+    // TODO: replace mid, mname, cid, lrf with the required fields as per the chaincode.
+
+    const chaincodeResponse = await ctx.stub.invokeChaincode(
+      iCCName,
+      [
+        // TODO: submitSettlementTxFN
+        submitSettlementTxFN,
+        MerchantId,
+        MerchantName,
+        CustomerId,
+        LoanReferenceNumber,
+        strObj,
+      ],
+      // SAChannelName
+      channelName
+    );
+
+    console.log(" chaincodeResponse ", chaincodeResponse);
+
+    var ccPayload = await checkInvokeCCResponse(chaincodeResponse);
+
+    // var txIn = await this.getTxObject(ctx, key);
+    let { TXSTATUS_SUBMITTED, TXSTATUS_NOT_SUBMITTED } =
+      await pymtutils.hlfconstants();
+    console.log("PYTMutilscc.js ccPayload ", ccPayload);
+
+    if (ccPayload == "true") {
+      console.log("PYTMutilscc.js ccPayload ", ccPayload);
+      settlementTx.TxStatus = TXSTATUS_SUBMITTED;
+    } else {
+      settlementTx.TxStatus = TXSTATUS_NOT_SUBMITTED;
+    }
+
+    // === Save transaction to state ===
+
+    console.log("------saving Txstate------");
+    try {
+      await this.saveTxState(ctx, key, settlementTx);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+
+    // console.log("before the putste in utilscc");
+    // await ctx.stub.putState(key, Buffer.from(JSON.stringify(settlementTx)));
+    // console.log("after the putstae in utilscc")
+    const txBuffer = Buffer.from(JSON.stringify(settlementTx));
+    // ctx.stub.setEvent("E-TxRequested", txBuffer);
+    console.log("tx buffer : ", txBuffer);
+    var hlfevent = new HLFEVENT();
+    let { MERCHANT_RT_EVENT } = await hlfevent.hlfevents();
+    // /**
+    try {
+      await this.emitEvent(
+        ctx,
+        MERCHANT_RT_EVENT,
+        MERCHANT_RT_EVENT.eventID,
+        key,
+        settlementTx,
+        OrgMSPId,
+        channelName
+      );
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    console.log("The END");
+    // return JSON.stringify(settlementTx);
+    // */
+  }
+
+  async accountTx(
+    ctx,
+    MerchantId,
+    CustomerId,
+    LoanReferenceNumber,
+    MerchantName,
+    primaryAccountNumber,
+    processingCode,
+    transactionAmount,
+    transmissionDateAndTime,
+    systemsTraceAuditNumber,
+    localTime,
+    localDate,
+    expirationDate,
+    merchantCategoryCode,
+    pointOfServiceEntryMode,
+    acquiringInstitutionIdentificationCode,
+    retrievalReferenceNumber,
+    cardAcceptorTerminalIdentification,
+    cardAcceptorIdentificationCode,
+    cardAcceptorNameAndLocation,
+    currencyCode,
+    personalIdentificationNumber,
+    additionalData,
+  ) {
+    // acl
+
+    var OrgMSPId = ctx.clientIdentity.getMSPID();
+    var pymtutils = new PYMTUtils(ctx);
+    var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
+    var channelName = await pymtutils.getChannelIdentity(ctx, "Org1");
+    console.log("channel name : ", channelName);
+
+    try {
+      // TODO: change the parameters as per the requirement by changing mid, cid, lrf.
+      await pymtutils.checkNull(MerchantId, CustomerId, LoanReferenceNumber);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    // TODO: remove hardcoded Org1MSP
+    const accessValid = true;//await pymtutils.validateOrganization(ctx, "Org1MSP");
+    // TODO: change the message as per the requirement by changing mid, cid, lrf.
+    if (!accessValid) {
+      throw new Error(
+        "This transaction already exists for merchantId : " +
+        MerchantId +
+        " customerId :" +
+        CustomerId +
+        "LoanReferenceNumber :" +
+        LoanReferenceNumber
+      );
+    }
+    console.log("access valid : ", accessValid);
+
+    console.log("before the key in utilscc");
+    // TODO: change the key as per the requirement by changing mid, cid, lrf.
+
+    let key = await pymtutils.makeTxKey(
+      OrgMSPID,
+      MerchantId,
+      CustomerId,
+      LoanReferenceNumber
+    );
+    console.log("after the key in utilscc");
+
+    // TODO: fields should be changed accordingly
+    let settlementTx = {
+      MerchantId: MerchantId,
+      CustomerId: CustomerId,
+      LoanReferenceNumber: LoanReferenceNumber,
+      MerchantName: MerchantName,
+      primaryAccountNumber: primaryAccountNumber,
+      processingCode: processingCode,
+      transactionAmount: transactionAmount,
+      transmissionDateAndTime: transmissionDateAndTime,
+      systemsTraceAuditNumber: systemsTraceAuditNumber,
+      localTime: localTime,
+      localDate: localDate,
+      expirationDate: expirationDate,
+      merchantCategoryCode: merchantCategoryCode,
+      pointOfServiceEntryMode: pointOfServiceEntryMode,
+      acquiringInstitutionIdentificationCode: acquiringInstitutionIdentificationCode,
+      retrievalReferenceNumber: retrievalReferenceNumber,
+      cardAcceptorTerminalIdentification: cardAcceptorTerminalIdentification,
+      cardAcceptorIdentificationCode: cardAcceptorIdentificationCode,
+      cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
+      currencyCode: currencyCode,
+      personalIdentificationNumber: personalIdentificationNumber,
+      additionalData: additionalData,
+    };
+
+    // TODO: add a function called accountSettlementTxFN
+    let { accountSettlementTxFN } = await pymtutils.hlfconstants();
+
+    let strObj = JSON.stringify(settlementTx);
+    console.log(" strObj = ", strObj);
+    var iCCName;
+    iCCName = "MC_" + PYMTTX_MERCHANT_CC_SUFFIX;
+    console.log(" PYTMutilscc.js iCCName : ", iCCName);
+    // TODO: replace mid, mname, cid, lrf with the required fields as per the chaincode.
+    const chaincodeResponse = await ctx.stub.invokeChaincode(
+      iCCName,
+      [
+        // TODO: accountSettlementTxFN
+        accountSettlementTxFN,
+        MerchantId,
+        MerchantName,
+        CustomerId,
+        LoanReferenceNumber,
+        strObj,
+      ],
+      // SAChannelName
+      channelName
+    );
+
+    console.log(" chaincodeResponse ", chaincodeResponse);
+
+    var ccPayload = await checkInvokeCCResponse(chaincodeResponse);
+
+    // var txIn = await this.getTxObject(ctx, key);
+    let { TXSTATUS_ACCOUNTED, TXSTATUS_NON_ACCOUNTED } =
+      await pymtutils.hlfconstants();
+    console.log("PYTMutilscc.js ccPayload ", ccPayload);
+
+    if (ccPayload == "true") {
+      console.log("PYTMutilscc.js ccPayload ", ccPayload);
+      settlementTx.TxStatus = TXSTATUS_ACCOUNTED;
+    } else {
+      settlementTx.TxStatus = TXSTATUS_NON_ACCOUNTED;
+    }
+
+    // === Save transaction to state ===
+
+    console.log("------saving Txstate------");
+    try {
+      await this.saveTxState(ctx, key, settlementTx);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+
+    // console.log("before the putste in utilscc");
+    // await ctx.stub.putState(key, Buffer.from(JSON.stringify(settlementTx)));
+    // console.log("after the putstae in utilscc")
+    const txBuffer = Buffer.from(JSON.stringify(settlementTx));
+    // ctx.stub.setEvent("E-TxRequested", txBuffer);
+    console.log("tx buffer : ", txBuffer);
+    var hlfevent = new HLFEVENT();
+    let { MERCHANT_RT_EVENT } = await hlfevent.hlfevents();
+    // /**
+    try {
+      await this.emitEvent(
+        ctx,
+        MERCHANT_RT_EVENT,
+        MERCHANT_RT_EVENT.eventID,
+        key,
+        settlementTx,
+        OrgMSPId,
+        channelName
+      );
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    console.log("The END");
+    // return JSON.stringify(settlementTx);
+    // */
+  }
+
   async emitEvent(ctx, eventType, eventID, keyIn, txIn, MSPId, chName) {
     let evtPayload = {
       eventMap: eventType,
