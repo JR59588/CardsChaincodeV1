@@ -9,6 +9,8 @@ const PYMTUtils = require("./PYMTUtils");
 const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 const PYMTTX_MERCHANT_CC_SUFFIX = "PYMTTxMerchantCC";
+const SUBMIT_CC_SUFFIX = "SubmitSettlementTxCC";
+const ACCOUNT_CC_SUFFIX = "AccountSettlementTxCC";
 
 async function checkInvokeCCResponse(chaincodeResponse) {
   console.log("LN 22 - checkInvokeCCResponse", chaincodeResponse.toString());
@@ -67,7 +69,7 @@ class PYMTUtilsCC extends Contract {
     cardAcceptorNameAndLocation,
     currencyCode,
     personalIdentificationNumber,
-    additionalData,
+    additionalData
   ) {
     // acl
 
@@ -140,7 +142,7 @@ class PYMTUtilsCC extends Contract {
       cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
       currencyCode: currencyCode,
       personalIdentificationNumber: personalIdentificationNumber,
-      additionalData: additionalData,
+      additionalData: additionalData
     };
 
     let { initiateSettlementTxFN } = await pymtutils.hlfconstants();
@@ -207,6 +209,7 @@ class PYMTUtilsCC extends Contract {
 
   //@required for V1
   ///"TODO"  add settlement tx details /// should be add and invoked from this contract.........
+  // x100
   async requestTx(
     ctx,
     MerchantId,
@@ -218,8 +221,8 @@ class PYMTUtilsCC extends Contract {
     transactionAmount,
     transmissionDateAndTime,
     systemsTraceAuditNumber,
-    localTime,
-    localDate,
+
+
     expirationDate,
     merchantCategoryCode,
     pointOfServiceEntryMode,
@@ -229,8 +232,10 @@ class PYMTUtilsCC extends Contract {
     cardAcceptorIdentificationCode,
     cardAcceptorNameAndLocation,
     currencyCode,
-    personalIdentificationNumber,
+
     additionalData,
+    batchNumber
+
   ) {
     // acl
 
@@ -269,7 +274,8 @@ class PYMTUtilsCC extends Contract {
       OrgMSPID,
       MerchantId,
       CustomerId,
-      LoanReferenceNumber
+      LoanReferenceNumber,
+      "x100",
     );
     console.log("after the key in utilscc");
 
@@ -283,8 +289,6 @@ class PYMTUtilsCC extends Contract {
       transactionAmount: transactionAmount,
       transmissionDateAndTime: transmissionDateAndTime,
       systemsTraceAuditNumber: systemsTraceAuditNumber,
-      localTime: localTime,
-      localDate: localDate,
       expirationDate: expirationDate,
       merchantCategoryCode: merchantCategoryCode,
       pointOfServiceEntryMode: pointOfServiceEntryMode,
@@ -294,8 +298,8 @@ class PYMTUtilsCC extends Contract {
       cardAcceptorIdentificationCode: cardAcceptorIdentificationCode,
       cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
       currencyCode: currencyCode,
-      personalIdentificationNumber: personalIdentificationNumber,
       additionalData: additionalData,
+      batchNumber: batchNumber
     };
 
     let { requestSettlementTxFN } = await pymtutils.hlfconstants();
@@ -375,6 +379,7 @@ class PYMTUtilsCC extends Contract {
   }
 
   // TODO add submit request fields.
+  // x110
   async submitTx(
     ctx,
     MerchantId,
@@ -386,8 +391,6 @@ class PYMTUtilsCC extends Contract {
     transactionAmount,
     transmissionDateAndTime,
     systemsTraceAuditNumber,
-    localTime,
-    localDate,
     expirationDate,
     merchantCategoryCode,
     pointOfServiceEntryMode,
@@ -397,8 +400,10 @@ class PYMTUtilsCC extends Contract {
     cardAcceptorIdentificationCode,
     cardAcceptorNameAndLocation,
     currencyCode,
-    personalIdentificationNumber,
     additionalData,
+    batchNumber,
+    approverCode,
+    authorizationId
   ) {
     // acl
 
@@ -437,7 +442,8 @@ class PYMTUtilsCC extends Contract {
       OrgMSPID,
       MerchantId,
       CustomerId,
-      LoanReferenceNumber
+      LoanReferenceNumber,
+      "x110"
     );
     console.log("after the key in utilscc");
 
@@ -452,8 +458,7 @@ class PYMTUtilsCC extends Contract {
       transactionAmount: transactionAmount,
       transmissionDateAndTime: transmissionDateAndTime,
       systemsTraceAuditNumber: systemsTraceAuditNumber,
-      localTime: localTime,
-      localDate: localDate,
+
       expirationDate: expirationDate,
       merchantCategoryCode: merchantCategoryCode,
       pointOfServiceEntryMode: pointOfServiceEntryMode,
@@ -463,8 +468,11 @@ class PYMTUtilsCC extends Contract {
       cardAcceptorIdentificationCode: cardAcceptorIdentificationCode,
       cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
       currencyCode: currencyCode,
-      personalIdentificationNumber: personalIdentificationNumber,
-      additionalData: additionalData,
+      batchNumber: batchNumber,
+      approverCode: approverCode,
+      authorizationId: authorizationId,
+      additionalData: additionalData
+
     };
 
     // TODO: add a function called submitSettlementTxFN
@@ -475,7 +483,7 @@ class PYMTUtilsCC extends Contract {
     var iCCName;
 
     // TODO: Chaincode name should be written appropriately
-    iCCName = "MC_" + PYMTTX_MERCHANT_CC_SUFFIX;
+    iCCName = SUBMIT_CC_SUFFIX;
     console.log(" PYTMutilscc.js iCCName : ", iCCName);
     // TODO: replace mid, mname, cid, lrf with the required fields as per the chaincode.
 
@@ -484,11 +492,11 @@ class PYMTUtilsCC extends Contract {
       [
         // TODO: submitSettlementTxFN
         submitSettlementTxFN,
-        MerchantId,
-        MerchantName,
-        CustomerId,
-        LoanReferenceNumber,
-        strObj,
+        // MerchantId,
+        // MerchantName,
+        // CustomerId,
+        // LoanReferenceNumber,
+        strObj
       ],
       // SAChannelName
       channelName
@@ -548,6 +556,7 @@ class PYMTUtilsCC extends Contract {
     // */
   }
 
+  // x500
   async accountTx(
     ctx,
     MerchantId,
@@ -557,21 +566,14 @@ class PYMTUtilsCC extends Contract {
     primaryAccountNumber,
     processingCode,
     transactionAmount,
-    transmissionDateAndTime,
     systemsTraceAuditNumber,
-    localTime,
-    localDate,
-    expirationDate,
-    merchantCategoryCode,
-    pointOfServiceEntryMode,
-    acquiringInstitutionIdentificationCode,
-    retrievalReferenceNumber,
+    networkInternationalId,
     cardAcceptorTerminalIdentification,
     cardAcceptorIdentificationCode,
-    cardAcceptorNameAndLocation,
-    currencyCode,
-    personalIdentificationNumber,
-    additionalData,
+    transactionCurrencyCode,
+    transactionLifecycleId,
+    batchNumber,
+    totalNumberOfTransactions
   ) {
     // acl
 
@@ -610,7 +612,8 @@ class PYMTUtilsCC extends Contract {
       OrgMSPID,
       MerchantId,
       CustomerId,
-      LoanReferenceNumber
+      LoanReferenceNumber,
+      "x500"
     );
     console.log("after the key in utilscc");
 
@@ -623,21 +626,14 @@ class PYMTUtilsCC extends Contract {
       primaryAccountNumber: primaryAccountNumber,
       processingCode: processingCode,
       transactionAmount: transactionAmount,
-      transmissionDateAndTime: transmissionDateAndTime,
       systemsTraceAuditNumber: systemsTraceAuditNumber,
-      localTime: localTime,
-      localDate: localDate,
-      expirationDate: expirationDate,
-      merchantCategoryCode: merchantCategoryCode,
-      pointOfServiceEntryMode: pointOfServiceEntryMode,
-      acquiringInstitutionIdentificationCode: acquiringInstitutionIdentificationCode,
-      retrievalReferenceNumber: retrievalReferenceNumber,
+      networkInternationalId: networkInternationalId,
       cardAcceptorTerminalIdentification: cardAcceptorTerminalIdentification,
       cardAcceptorIdentificationCode: cardAcceptorIdentificationCode,
-      cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
-      currencyCode: currencyCode,
-      personalIdentificationNumber: personalIdentificationNumber,
-      additionalData: additionalData,
+      transactionCurrencyCode: transactionCurrencyCode,
+      transactionLifecycleId: transactionLifecycleId,
+      batchNumber: batchNumber,
+      totalNumberOfTransactions: totalNumberOfTransactions
     };
 
     // TODO: add a function called accountSettlementTxFN
@@ -646,7 +642,8 @@ class PYMTUtilsCC extends Contract {
     let strObj = JSON.stringify(settlementTx);
     console.log(" strObj = ", strObj);
     var iCCName;
-    iCCName = "MC_" + PYMTTX_MERCHANT_CC_SUFFIX;
+    // iCCName = "MC_" + PYMTTX_MERCHANT_CC_SUFFIX;
+    iCCName = ACCOUNT_CC_SUFFIX;
     console.log(" PYTMutilscc.js iCCName : ", iCCName);
     // TODO: replace mid, mname, cid, lrf with the required fields as per the chaincode.
     const chaincodeResponse = await ctx.stub.invokeChaincode(
@@ -654,10 +651,10 @@ class PYMTUtilsCC extends Contract {
       [
         // TODO: accountSettlementTxFN
         accountSettlementTxFN,
-        MerchantId,
-        MerchantName,
-        CustomerId,
-        LoanReferenceNumber,
+        // MerchantId,
+        // MerchantName,
+        // CustomerId,
+        // LoanReferenceNumber,
         strObj,
       ],
       // SAChannelName

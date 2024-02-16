@@ -116,21 +116,22 @@ class PYMTUtils {
   }
 
   // TODO: Check the arguments to make the key. (discussion in team)
-  async makeTxKey(OrgMSPID, merchantId, customerId, loanReferenceNumber) {
+  async makeTxKey(OrgMSPID, merchantId, customerId, loanReferenceNumber, messageType) {
     // TODO: add checks to make sure parameters are not null, else throw error
     console.log(
       "it is reading this line after maketxkey : ",
       OrgMSPID,
       merchantId,
       customerId,
-      loanReferenceNumber
+      loanReferenceNumber,
+      messageType
     );
     await this.checkNull(merchantId, customerId, loanReferenceNumber);
 
     let key =
       // OrgMSPID +
       // "-" +
-      merchantId + "-" + customerId + "-" + loanReferenceNumber;
+      messageType + "-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
     ///// add cross chain invocation for getstate from utilscc....
     try {
       let txInfo = await this.ctx.stub.getState(key);

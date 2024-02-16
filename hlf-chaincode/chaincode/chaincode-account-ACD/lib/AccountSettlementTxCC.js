@@ -10,7 +10,7 @@ const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class AccountSettlementTxCC extends Contract {
-  async accountSettlementTx(ctx, merchantId, customerId, loanReferenceNumber) {
+  async accountSettlementTx(ctx, x500Msg) {
     try {
       console.log("------>>>In accountSettlementTxCC <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);
@@ -27,7 +27,7 @@ class AccountSettlementTxCC extends Contract {
         );
       }
       // TODO : please check the parameters 
-      await pymtutils.checkNull(merchantId, customerId, loanReferenceNumber);
+      // await pymtutils.checkNull(merchantId, customerId, loanReferenceNumber);
 
       let {
         // TODO : update the utils.js file (hlfconstants)  
@@ -39,57 +39,61 @@ class AccountSettlementTxCC extends Contract {
       //TODO : change the function of the utils.js for channel name.(replace:getChannelIdentity )
       const channelName = await pymtutils.getChannelIdentity(ctx);
       // TODO: Change the parameters based on requirement.
-      let key = merchantId + "-" + customerId + "-" + loanReferenceNumber;
-      console.log(" confirmTx.js:key", key);
+      // let key = merchantId + "-" + customerId + "-" + loanReferenceNumber;
+      // console.log(" confirmTx.js:key", key);
 
-      var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
-      console.log(JSON.stringify(txObj) + "tx value");
+      // var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
+      // console.log(JSON.stringify(txObj) + "tx value");
 
-      let currentTxReadState = JSON.parse(txObj);
+      let currentTxReadState = JSON.parse(x500Msg);
       console.log("printing the currentTxReadState :", currentTxReadState);
 
       //@to-do verify chaincode has data for key
       if (currentTxReadState.length == 0) {
-        throw new Error(`Invalid Key : ${key} not found `);
+        throw new Error(`Invalid Key : ${x500Msg} not found `);
       }
 
       //@to-do verify chaincode tx state is initiated only.
       // TODO verify chaincode tx state is as per requirement.
-      if (!(currentTxReadState.TxStatus == TXSTATUS_SUBMITTED)) {
-        throw new Error(`Invalid Transaction state  for key  : ${key}`);
-      }
+      // if (!(currentTxReadState.TxStatus == TXSTATUS_SUBMITTED)) {
+      //   throw new Error(`Invalid Transaction state  for key  : ${key}`);
+      // }
 
-      const isAccounted = await this.accountTxByACD(
+      let isAccounted = false;
+
+      isAccounted = await this.accountTxByACD(
         ctx,
         currentTxReadState
       );
 
-      var state;
-      if (isAccounted) {
-        state = TXSTATUS_ACCOUNTED;
-      } else {
-        state = TXSTATUS_NON_ACCOUNTED;
-      }
-      // putState the state to utilsCC
-      currentTxReadState.TxStatus = state;
-      var txObj = await pymtutils.writeTxStatus(ctx, key, channelName, currentTxReadState);
-      console.log("txObj", txObj);
-      var OrgMSPId = await ctx.clientIdentity.getMSPID();
-      var hlfevent = new HLFEVENT();
-      let { AOD_ACD_AT_EVENT } = await hlfevent.hlfevents();
-      try {
-        await this.emitEvent(
-          ctx,
-          AOD_ACD_AT_EVENT,
-          AOD_ACD_AT_EVENT.eventID,
-          key,
-          OrgMSPId,
-          channelName
-        );
-      } catch (err) {
-        console.log(err);
-        throw err;
-      }
+      // var state;
+      // if (isAccounted) {
+      //   state = TXSTATUS_ACCOUNTED;
+      // } else {
+      //   state = TXSTATUS_NON_ACCOUNTED;
+      // }
+      // // putState the state to utilsCC
+      // currentTxReadState.TxStatus = state;
+      // var txObj = await pymtutils.writeTxStatus(ctx, key, channelName, currentTxReadState);
+      // console.log("txObj", txObj);
+      // var OrgMSPId = await ctx.clientIdentity.getMSPID();
+      // var hlfevent = new HLFEVENT();
+      // let { AOD_ACD_AT_EVENT } = await hlfevent.hlfevents();
+      // try {
+      //   await this.emitEvent(
+      //     ctx,
+      //     AOD_ACD_AT_EVENT,
+      //     AOD_ACD_AT_EVENT.eventID,
+      //     key,
+      //     OrgMSPId,
+      //     channelName
+      //   );
+      // } catch (err) {
+      //   console.log(err);
+      //   throw err;
+      // }
+
+      return isAccounted;
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error));
       throw Error(error);
@@ -99,12 +103,12 @@ class AccountSettlementTxCC extends Contract {
   async accountTxByACD(ctx, txIn) {
     var isAccounted = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
-    const hasTxmerchantCategoryCode = "merchantCategoryCode" in txIn;
-    if (hasTxmerchantCategoryCode) {
-      if (txIn.merchantCategoryCode === "" || txIn.merchantCategoryCode.length == 0) {
+    const hasTxnetworkInternationalId = "networkInternationalId" in txIn;
+    if (hasTxnetworkInternationalId) {
+      if (txIn.networkInternationalId === "" || txIn.networkInternationalId.length == 0) {
         isAccounted = false;
         console.log(
-          "Validation by ACD... merchantCategoryCode not valid: ",
+          "Validation by ACD... networkInternationalId not valid: ",
           isAccounted
         );
         return isAccounted;

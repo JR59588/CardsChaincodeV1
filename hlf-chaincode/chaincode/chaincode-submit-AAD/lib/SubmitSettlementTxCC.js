@@ -10,7 +10,7 @@ const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class SubmitSettlementTxCC extends Contract {
-  async submitSettlementTx(ctx, merchantId, customerId, loanReferenceNumber) {
+  async submitSettlementTx(ctx, x110Msg) {
     try {
       console.log("------>>>In authorizeSettlementTx <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);
@@ -27,7 +27,7 @@ class SubmitSettlementTxCC extends Contract {
         );
       }
       // TODO : please check the parameters 
-      await pymtutils.checkNull(merchantId, customerId, loanReferenceNumber);
+      // await pymtutils.checkNull(merchantId, customerId, loanReferenceNumber);
 
       let {
         // TODO : update the utils.js file (hlfconstants)  
@@ -40,57 +40,65 @@ class SubmitSettlementTxCC extends Contract {
       //TODO : change the function of the utils.js for channel name.(replace:getChannelIdentity )
       const channelName = await pymtutils.getChannelIdentity(ctx);
       // TODO: Change the parameters based on requirement.
-      let key = merchantId + "-" + customerId + "-" + loanReferenceNumber;
-      console.log(" confirmTx.js:key", key);
+      // let key = merchantId + "-" + customerId + "-" + loanReferenceNumber;
+      // console.log(" confirmTx.js:key", key);
 
-      var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
-      console.log(JSON.stringify(txObj) + "tx value");
+      // var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
+      // console.log(JSON.stringify(txObj) + "tx value");
 
-      let currentTxReadState = JSON.parse(txObj);
+      let currentTxReadState = JSON.parse(x110Msg);
       console.log("printing the currentTxReadState :", currentTxReadState);
 
       //@to-do verify chaincode has data for key
       if (currentTxReadState.length == 0) {
-        throw new Error(`Invalid Key : ${key} not found `);
+        // throw new Error(`Invalid Key : ${key} not found `);
+        throw new Error(`Invalid x110 message : ${x110Msg} not found `);
+
       }
 
       //@to-do verify chaincode tx state is initiated only.
       // TODO verify chaincode tx state is as per requirement.
-      if (!(currentTxReadState.TxStatus == TXSTATUS_CONFIRMED)) {
-        throw new Error(`Invalid Transaction state  for key  : ${key}`);
-      }
+      // if (!(currentTxReadState.TxStatus == TXSTATUS_CONFIRMED)) {
+      //   return false;
+      // }
 
-      const isSubmitted = await this.submitTxByAAD(
+      let isSubmitted = false;
+
+      isSubmitted = await this.submitTxByAAD(
         ctx,
         currentTxReadState
       );
 
-      var state;
-      if (isSubmitted) {
-        state = TXSTATUS_SUBMITTED;
-      } else {
-        state = TXSTATUS_NOT_SUBMITTED;
-      }
+      // var state;
+      // if (isSubmitted) {
+      //   state = TXSTATUS_SUBMITTED;
+      // } else {
+      //   state = TXSTATUS_NOT_SUBMITTED;
+      // }
       // putState the state to utilsCC
-      currentTxReadState.TxStatus = state;
-      var txObj = await pymtutils.writeTxStatus(ctx, key, channelName, currentTxReadState);
-      console.log("txObj", txObj);
-      var OrgMSPId = await ctx.clientIdentity.getMSPID();
-      var hlfevent = new HLFEVENT();
-      let { AAD_AOD_ST_EVENT } = await hlfevent.hlfevents();
-      try {
-        await this.emitEvent(
-          ctx,
-          AAD_AOD_ST_EVENT,
-          AAD_AOD_ST_EVENT.eventID,
-          key,
-          OrgMSPId,
-          channelName
-        );
-      } catch (err) {
-        console.log(err);
-        throw err;
-      }
+      // currentTxReadState.TxStatus = state;
+      // var txObj = await pymtutils.writeTxStatus(ctx, key, channelName, currentTxReadState);
+
+
+      // console.log("txObj", txObj);
+      // var OrgMSPId = await ctx.clientIdentity.getMSPID();
+      // var hlfevent = new HLFEVENT();
+      // let { AAD_AOD_ST_EVENT } = await hlfevent.hlfevents();
+      // try {
+      //   await this.emitEvent(
+      //     ctx,
+      //     AAD_AOD_ST_EVENT,
+      //     AAD_AOD_ST_EVENT.eventID,
+      //     key,
+      //     OrgMSPId,
+      //     channelName
+      //   );
+      // } catch (err) {
+      //   console.log(err);
+      //   throw err;
+      // }
+
+      return isSubmitted;
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error));
       throw Error(error);
