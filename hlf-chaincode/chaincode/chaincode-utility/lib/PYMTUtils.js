@@ -42,6 +42,7 @@ class PYMTUtils {
       TXSTATUS_NOT_CLEARED: "TxNotCleared",
       submitSettlementTxFN: "submitSettlementTx",
       requestSettlementTxFN: "requestSettlementTx",
+      confirmSettlementTxFN: "confirmSettlementTx",
       accountSettlementTxFN: "accountSettlementTx",
       initiateSettlementTxFN: "initiateSettlementTx",
       reconciliationSettlementTxFN: "reconciliationSettlementTx",

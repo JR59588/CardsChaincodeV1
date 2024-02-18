@@ -53,6 +53,25 @@ class AccountSettlementTxCC extends Contract {
         throw new Error(`Invalid Key : ${x500Msg} not found `);
       }
 
+      let queryString = {
+        selector: {
+          messageType: "x110",
+        }
+      }
+
+      const settlementTxIterator = await ctx.stub.getQueryResultWithPagination(JSON.stringify(queryString)); // get the settlementTx from chaincode state
+      let allResults = [];
+      while (await settlementTxIterator.hasNext()) {
+        const result = await settlementTxIterator.next();
+        const key = result.value.key;
+        const value = result.value.value;
+        allResults.push(value);
+        // Process the key or retrieve associated data
+        console.log(`Found key: ${key} value: ${value}`);
+      }
+      settlementTxIterator.close();
+      console.log("read x110 messages: ", allResults);
+
       //@to-do verify chaincode tx state is initiated only.
       // TODO verify chaincode tx state is as per requirement.
       // if (!(currentTxReadState.TxStatus == TXSTATUS_SUBMITTED)) {

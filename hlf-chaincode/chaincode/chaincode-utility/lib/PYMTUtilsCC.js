@@ -10,6 +10,7 @@ const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 const PYMTTX_MERCHANT_CC_SUFFIX = "PYMTTxMerchantCC";
 const SUBMIT_CC_SUFFIX = "SubmitSettlementTxCC";
+const CONFIRM_CC_SUFFIX = "ConfirmSettlementTxCC";
 const ACCOUNT_CC_SUFFIX = "AccountSettlementTxCC";
 
 async function checkInvokeCCResponse(chaincodeResponse) {
@@ -234,7 +235,8 @@ class PYMTUtilsCC extends Contract {
     currencyCode,
 
     additionalData,
-    batchNumber
+    batchNumber,
+    messageType,
 
   ) {
     // acl
@@ -275,7 +277,7 @@ class PYMTUtilsCC extends Contract {
       MerchantId,
       CustomerId,
       LoanReferenceNumber,
-      "x100",
+      messageType,
     );
     console.log("after the key in utilscc");
 
@@ -299,7 +301,8 @@ class PYMTUtilsCC extends Contract {
       cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
       currencyCode: currencyCode,
       additionalData: additionalData,
-      batchNumber: batchNumber
+      batchNumber: batchNumber,
+      messageType: messageType,
     };
 
     let { requestSettlementTxFN } = await pymtutils.hlfconstants();
@@ -378,6 +381,138 @@ class PYMTUtilsCC extends Contract {
     // */
   }
 
+  // // x100 message
+  // async confirmTx(
+  //   ctx,
+  //   MerchantId,
+  //   CustomerId,
+  //   LoanReferenceNumber,
+  //   MerchantName,
+  // ) {
+  //   // acl
+
+  //   var OrgMSPId = ctx.clientIdentity.getMSPID();
+  //   var pymtutils = new PYMTUtils(ctx);
+  //   var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
+  //   var channelName = await pymtutils.getChannelIdentity(ctx, "Org1");
+  //   console.log("channel name : ", channelName);
+
+  //   try {
+  //     // TODO: change the parameters as per the requirement by changing mid, cid, lrf.
+  //     await pymtutils.checkNull(MerchantId, CustomerId, LoanReferenceNumber);
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw err;
+  //   }
+  //   // TODO: remove hardcoded Org1MSP
+  //   const accessValid = true;//await pymtutils.validateOrganization(ctx, "Org1MSP");
+  //   // TODO: change the message as per the requirement by changing mid, cid, lrf.
+  //   if (!accessValid) {
+  //     throw new Error(
+  //       "This transaction already exists for merchantId : " +
+  //       MerchantId +
+  //       " customerId :" +
+  //       CustomerId +
+  //       "LoanReferenceNumber :" +
+  //       LoanReferenceNumber
+  //     );
+  //   }
+  //   console.log("access valid : ", accessValid);
+
+  //   console.log("before the key in utilscc");
+  //   // TODO: change the key as per the requirement by changing mid, cid, lrf.
+
+  //   let key = await pymtutils.makeTxKey(
+  //     OrgMSPID,
+  //     MerchantId,
+  //     CustomerId,
+  //     LoanReferenceNumber,
+  //     "x100",
+  //   );
+  //   console.log("after the key in utilscc");
+
+  //   let settlementTx = {
+  //     MerchantId: MerchantId,
+  //     CustomerId: CustomerId,
+  //     LoanReferenceNumber: LoanReferenceNumber,
+  //     MerchantName: MerchantName
+  //   };
+
+  //   let { confirmSettlementTxFN } = await pymtutils.hlfconstants();
+
+  //   let strObj = JSON.stringify(settlementTx);
+  //   console.log(" strObj = ", strObj);
+  //   var iCCName = CONFIRM_CC_SUFFIX;
+  //   console.log(" PYTMutilscc.js iCCName : ", iCCName);
+  //   // TODO: replace mid, mname, cid, lrf with the required fields as per the chaincode.
+  //   const chaincodeResponse = await ctx.stub.invokeChaincode(
+  //     iCCName,
+  //     [
+  //       confirmSettlementTxFN,
+  //       MerchantId,
+  //       MerchantName,
+  //       CustomerId,
+  //       LoanReferenceNumber,
+  //       strObj,
+  //     ],
+  //     // SAChannelName
+  //     channelName
+  //   );
+
+  //   console.log(" chaincodeResponse ", chaincodeResponse);
+
+  //   var ccPayload = await checkInvokeCCResponse(chaincodeResponse);
+
+  //   // var txIn = await this.getTxObject(ctx, key);
+  //   let { TXSTATUS_CONFIRMED, TXSTATUS_NON_CONFIRMED } =
+  //     await pymtutils.hlfconstants();
+  //   console.log("PYTMutilscc.js ccPayload ", ccPayload);
+
+  //   if (ccPayload == "true") {
+  //     console.log("PYTMutilscc.js ccPayload ", ccPayload);
+  //     settlementTx.TxStatus = TXSTATUS_CONFIRMED;
+  //   } else {
+  //     settlementTx.TxStatus = TXSTATUS_NON_CONFIRMED;
+  //   }
+
+  //   // === Save transaction to state ===
+
+  //   console.log("------saving Txstate------");
+  //   try {
+  //     await this.saveTxState(ctx, key, settlementTx);
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw err;
+  //   }
+
+  //   // console.log("before the putste in utilscc");
+  //   // await ctx.stub.putState(key, Buffer.from(JSON.stringify(settlementTx)));
+  //   // console.log("after the putstae in utilscc")
+  //   const txBuffer = Buffer.from(JSON.stringify(settlementTx));
+  //   // ctx.stub.setEvent("E-TxRequested", txBuffer);
+  //   console.log("tx buffer : ", txBuffer);
+  //   var hlfevent = new HLFEVENT();
+  //   let { MERCHANT_RT_EVENT } = await hlfevent.hlfevents();
+  //   // /**
+  //   try {
+  //     await this.emitEvent(
+  //       ctx,
+  //       MERCHANT_RT_EVENT,
+  //       MERCHANT_RT_EVENT.eventID,
+  //       key,
+  //       settlementTx,
+  //       OrgMSPId,
+  //       channelName
+  //     );
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw err;
+  //   }
+  //   console.log("The END");
+  //   // return JSON.stringify(settlementTx);
+  //   // */
+  // }
+
   // TODO add submit request fields.
   // x110
   async submitTx(
@@ -403,7 +538,8 @@ class PYMTUtilsCC extends Contract {
     additionalData,
     batchNumber,
     approverCode,
-    authorizationId
+    authorizationId,
+    messageType,
   ) {
     // acl
 
@@ -443,7 +579,7 @@ class PYMTUtilsCC extends Contract {
       MerchantId,
       CustomerId,
       LoanReferenceNumber,
-      "x110"
+      messageType,
     );
     console.log("after the key in utilscc");
 
@@ -471,8 +607,8 @@ class PYMTUtilsCC extends Contract {
       batchNumber: batchNumber,
       approverCode: approverCode,
       authorizationId: authorizationId,
-      additionalData: additionalData
-
+      additionalData: additionalData,
+      messageType: messageType
     };
 
     // TODO: add a function called submitSettlementTxFN
@@ -573,7 +709,8 @@ class PYMTUtilsCC extends Contract {
     transactionCurrencyCode,
     transactionLifecycleId,
     batchNumber,
-    totalNumberOfTransactions
+    totalNumberOfTransactions,
+    messageType
   ) {
     // acl
 
@@ -613,7 +750,7 @@ class PYMTUtilsCC extends Contract {
       MerchantId,
       CustomerId,
       LoanReferenceNumber,
-      "x500"
+      messageType
     );
     console.log("after the key in utilscc");
 
@@ -633,7 +770,8 @@ class PYMTUtilsCC extends Contract {
       transactionCurrencyCode: transactionCurrencyCode,
       transactionLifecycleId: transactionLifecycleId,
       batchNumber: batchNumber,
-      totalNumberOfTransactions: totalNumberOfTransactions
+      totalNumberOfTransactions: totalNumberOfTransactions,
+      messageType: messageType
     };
 
     // TODO: add a function called accountSettlementTxFN
