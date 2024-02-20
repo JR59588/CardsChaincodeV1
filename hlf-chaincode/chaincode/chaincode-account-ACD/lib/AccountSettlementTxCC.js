@@ -60,18 +60,28 @@ class AccountSettlementTxCC extends Contract {
         }
       }
 
-      const settlementTxIterator = await ctx.stub.getQueryResultWithPagination(JSON.stringify(queryString)); // get the settlementTx from chaincode state
       let allResults = [];
-      while (await settlementTxIterator.hasNext()) {
-        const result = await settlementTxIterator.next();
-        const key = result.value.key;
-        const value = result.value.value;
-        allResults.push(value);
-        // Process the key or retrieve associated data
-        console.log(`Found key: ${key} value: ${value}`);
-      }
-      settlementTxIterator.close();
-      console.log("read x100 messages: ", allResults);
+      // const settlementTxIterator = await ctx.stub.getQueryResultWithPagination(JSON.stringify(queryString), 10, ''); // get the settlementTx from chaincode state
+      // while (await settlementTxIterator.hasNext()) {
+      //   const nextItem = await settlementTxIterator.next();
+      //   if (nextItem.value) {
+      //     // const key = result.value.key;
+      //     const value = JSON.parse(result.value.value.toString('utf8'));
+      //     allResults.push(value);
+      //     // Process the key or retrieve associated data
+      //     console.log(`Found item value: ${value}`);
+
+      //   }
+      // }
+
+      // // close settlementtx iterator
+      // settlementTxIterator.close();
+
+      // getting all x 100 messages
+      let resultsIterator = await ctx.stub.getStateByRange("M1", "M2");
+      let results = await this.GetAllResults(ctx, resultsIterator, false);
+      console.log("Found " + results.length + " Transactions");
+      console.log("read x100 messages: ", results);
 
 
       //@to-do verify chaincode tx state is initiated only.
@@ -169,6 +179,47 @@ class AccountSettlementTxCC extends Contract {
       console.log(" error in emitting event : ", err);
       throw err;
     }
+  }
+
+
+  async GetTxByRange(ctx, startKey, endKey) {
+    let resultsIterator = await ctx.stub.getStateByRange(startKey, endKey);
+    let results = await this.GetAllResults(resultsIterator, false);
+    console.log("Found " + results.length + " Transactions");
+    return results;
+  }
+
+  async GetAllResults(iterator, isHistory) {
+    let allResults = [];
+    let res = await iterator.next();
+    while (!res.done) {
+      if (res.value && res.value.value.toString()) {
+        let jsonRes = {};
+        console.log(res.value.value.toString("utf8"));
+        if (isHistory && isHistory === true) {
+          jsonRes.TxId = res.value.tx_id;
+          jsonRes.Timestamp = res.value.timestamp;
+          try {
+            jsonRes.Value = JSON.parse(res.value.value.toString("utf8"));
+          } catch (err) {
+            console.log(err);
+            jsonRes.Value = res.value.value.toString("utf8");
+          }
+        } else {
+          jsonRes.Key = res.value.key;
+          try {
+            jsonRes.Record = JSON.parse(res.value.value.toString("utf8"));
+          } catch (err) {
+            console.log(err);
+            jsonRes.Record = res.value.value.toString("utf8");
+          }
+        }
+        allResults.push(jsonRes);
+      }
+      res = await iterator.next();
+    }
+    iterator.close();
+    return allResults;
   }
 }
 
