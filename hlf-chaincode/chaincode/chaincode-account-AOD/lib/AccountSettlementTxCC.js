@@ -8,6 +8,8 @@
 const PYMTUtils = require("./PYMTUtils");
 const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
+const PYMT_CC = "PYMTUtilsCC";
+
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class AccountSettlementTxCC extends Contract {
   async accountSettlementTx(ctx, x500Msg) {
@@ -76,22 +78,40 @@ class AccountSettlementTxCC extends Contract {
       // // close settlement tx iterator
       // settlementTxIterator.close();
 
-      let resultsIterator = await ctx.stub.getStateByRange(startKey, endKey);
-      let results = await this.GetAllResults(ctx, resultsIterator, false);
-      console.log("Found " + results.length + " Transactions");
-      console.log("read x110 messages: ", results);
+      // let results = await this.GetTxByRange(ctx, "", "");
+
+      // getting pymtutilscc name
+      const iCCName = PYMT_CC;
+      const getTxByRangeFn = "GetTxByRange";
+      const chaincodeResponse = await ctx.stub.invokeChaincode(
+        iCCName,
+        [
+          getTxByRangeFn,
+          "",
+          ""
+        ]
+      );
+      const payload = Buffer.from(chaincodeResponse.payload).toString();
+      console.log("Chaincode response is: ", chaincodeResponse, " Payload is: ", payload, " Payload parsed: ", JSON.parse(chaincodeResponse.toString()));
+
+      // console.log("Found " + results.length + " Transactions");
+      // console.log("read x110 messages: ", results);
 
       //@to-do verify chaincode tx state is initiated only.
       // TODO verify chaincode tx state is as per requirement.
       // if (!(currentTxReadState.TxStatus == TXSTATUS_SUBMITTED)) {
       //   throw new Error(`Invalid Transaction state  for key  : ${key}`);
       // }
+
+      // set is acc to false
       let isAccounted = false;
 
       isAccounted = await this.accountTxByAOD(
         ctx,
-        currentTxReadState
+        currentTxReadState,
       );
+
+      // todo
 
       //   var state;
       //   if (isAccounted) {
@@ -119,6 +139,8 @@ class AccountSettlementTxCC extends Contract {
       //     console.log(err);
       //     throw err;
       //   }
+
+      // return is accounted
       return isAccounted;
 
     } catch (error) {
@@ -157,7 +179,7 @@ class AccountSettlementTxCC extends Contract {
       key: keyIn,
     };
     const eventPayload = JSON.stringify(evtPayload);
-
+    // todo
     try {
       if (
         !(
@@ -178,7 +200,7 @@ class AccountSettlementTxCC extends Contract {
 
   // getting all x110 messages
   async GetTxByRange(ctx, startKey, endKey) {
-    let resultsIterator = await ctx.stub.getStateByRange("M1", "M2");
+    let resultsIterator = await ctx.stub.getStateByRange(startKey, endKey);
     let results = await this.GetAllResults(resultsIterator, false);
     console.log("Found " + results.length + " Transactions");
     return results;
