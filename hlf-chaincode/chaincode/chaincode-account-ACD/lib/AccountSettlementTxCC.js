@@ -10,7 +10,7 @@ const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class AccountSettlementTxCC extends Contract {
-  async accountSettlementTx(ctx, x500Msg) {
+  async accountSettlementTx(ctx, x500Msg, prevTxnStr) {
     try {
       console.log("------>>>In accountSettlementTxCC <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);
@@ -53,14 +53,33 @@ class AccountSettlementTxCC extends Contract {
         throw new Error(`Invalid Key : ${x500Msg} not found `);
       }
 
+      const prevTxns = JSON.parse(prevTxnStr);
+      const stan = currentTxReadState.systemsTraceAuditNumber;
+      console.log("Stan is: ", stan);
+      console.log(prevTxns);
 
-      let queryString = {
-        selector: {
-          messageType: "x100",
+      const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
+
+
+      let x100Verified = true;
+
+      for (let i = 0; i < x100Msgs.length; i++) {
+        const x100Msg = x100Msgs[i];
+        if (x100Msg.Record.TxStatus !== 'TxConfirmed') {
+          x100Verified = false;
+          break;
         }
       }
 
-      let allResults = [];
+
+
+      // let queryString = {
+      //   selector: {
+      //     messageType: "x100",
+      //   }
+      // }
+
+      // let allResults = [];
       // const settlementTxIterator = await ctx.stub.getQueryResultWithPagination(JSON.stringify(queryString), 10, ''); // get the settlementTx from chaincode state
       // while (await settlementTxIterator.hasNext()) {
       //   const nextItem = await settlementTxIterator.next();
@@ -78,10 +97,10 @@ class AccountSettlementTxCC extends Contract {
       // settlementTxIterator.close();
 
       // getting all x 100 messages
-      let resultsIterator = await ctx.stub.getStateByRange("M1", "M2");
-      let results = await this.GetAllResults(ctx, resultsIterator, false);
-      console.log("Found " + results.length + " Transactions");
-      console.log("read x100 messages: ", results);
+      // let resultsIterator = await ctx.stub.getStateByRange("M1", "M2");
+      // let results = await this.GetAllResults(ctx, resultsIterator, false);
+      // console.log("Found " + results.length + " Transactions");
+      // console.log("read x100 messages: ", results);
 
 
       //@to-do verify chaincode tx state is initiated only.
@@ -124,7 +143,7 @@ class AccountSettlementTxCC extends Contract {
       //   throw err;
       // }
 
-      return isAccounted;
+      return isAccounted && x100Verified;
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error));
       throw Error(error);

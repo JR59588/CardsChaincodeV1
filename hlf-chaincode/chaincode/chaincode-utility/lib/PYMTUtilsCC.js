@@ -779,6 +779,8 @@ class PYMTUtilsCC extends Contract {
 
     let strObj = JSON.stringify(settlementTx);
     console.log(" strObj = ", strObj);
+
+    const transactionsStrObj = await this.GetTxByRange(ctx, "", "");
     var iCCName;
     // iCCName = "MC_" + PYMTTX_MERCHANT_CC_SUFFIX;
     iCCName = ACCOUNT_CC_SUFFIX;
@@ -794,6 +796,7 @@ class PYMTUtilsCC extends Contract {
         // CustomerId,
         // LoanReferenceNumber,
         strObj,
+        transactionsStrObj,
       ],
       // SAChannelName
       channelName
