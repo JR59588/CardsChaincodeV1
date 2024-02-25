@@ -10,7 +10,7 @@ const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class ConfirmSettlementTxCC extends Contract {
-  async confirmSettlementTx(ctx, merchantId, customerId, loanReferenceNumber) {
+  async confirmSettlementTx(ctx, messageType, merchantId, customerId, loanReferenceNumber) {
     try {
       console.log("------>>>In submitSettlementTx <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);
@@ -38,7 +38,7 @@ class ConfirmSettlementTxCC extends Contract {
       } = await pymtutils.hlfconstants();
       //TODO : change the function of the utils.js for channel name.(replace:getChannelIdentity )
       const channelName = await pymtutils.getChannelIdentity(ctx);
-      let key = merchantId + "-" + customerId + "-" + loanReferenceNumber;
+      let key = messageType + "-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
       console.log(" confirmTx.js:key", key);
 
       var txObj = await pymtutils.readTxStatus(ctx, key, channelName);

@@ -56,10 +56,11 @@ class AccountSettlementTxCC extends Contract {
       const prevTxns = JSON.parse(prevTxnStr);
       const stan = currentTxReadState.systemsTraceAuditNumber;
       console.log("Stan is: ", stan);
-      console.log(prevTxns);
+      console.log("Previous transactions are:", prevTxns);
 
       const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
 
+      console.log("Filtered x100 messages are: ", x100Msgs);
 
       let x100Verified = true;
 
@@ -71,6 +72,7 @@ class AccountSettlementTxCC extends Contract {
         }
       }
 
+      console.log("Result after verifying all x100 messages with stan ", stan, x100Verified);
 
 
       // let queryString = {
