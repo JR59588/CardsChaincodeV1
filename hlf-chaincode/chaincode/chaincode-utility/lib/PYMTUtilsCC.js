@@ -781,6 +781,15 @@ class PYMTUtilsCC extends Contract {
     console.log(" strObj = ", strObj);
 
     const transactionsStrObj = await this.GetTxByRange(ctx, "", "");
+    const prevTxns = JSON.parse(transactionsStrObj);
+    const stan = settlementTx.systemsTraceAuditNumber;
+    console.log("Stan is: ", stan);
+    console.log("Previous transactions are:", prevTxns);
+
+    const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
+    const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === stan);
+
+    console.log("Prev txns are: ", prevTxns, "X100 messages are: ", x100Msgs, "X110 messages are: ", x110Msgs);
     var iCCName;
     // iCCName = "MC_" + PYMTTX_MERCHANT_CC_SUFFIX;
     iCCName = ACCOUNT_CC_SUFFIX;
@@ -814,8 +823,32 @@ class PYMTUtilsCC extends Contract {
     if (ccPayload == "true") {
       console.log("PYTMutilscc.js ccPayload ", ccPayload);
       settlementTx.TxStatus = TXSTATUS_ACCOUNTED;
+      for(let i = 0; i < x100Msgs.length; i++) {
+        const x100Msg = x100Msgs[i];
+        console.log("Inside for loop x100 msg: ", x100Msg);
+        x100Msg.Record.TxStatus = TXSTATUS_ACCOUNTED;
+      }
+
+      for(let i = 0; i < x110Msgs.length; i++) {
+        const x110Msg = x110Msgs[i];
+        console.log("Inside for loop x110 msg: ", x110Msg);
+
+        x110Msg.Record.TxStatus = TXSTATUS_ACCOUNTED;
+      }
     } else {
       settlementTx.TxStatus = TXSTATUS_NON_ACCOUNTED;
+      for(let i = 0; i < x100Msgs.length; i++) {
+        const x100Msg = x100Msgs[i];
+        console.log("Inside for loop x100 msg: ", x100Msg);
+        x100Msg.Record.TxStatus = TXSTATUS_NON_ACCOUNTED;
+      }
+
+      for(let i = 0; i < x110Msgs.length; i++) {
+        const x110Msg = x110Msgs[i];
+        console.log("Inside for loop x110 msg: ", x110Msg);
+
+        x110Msg.Record.TxStatus = TXSTATUS_NON_ACCOUNTED;
+      }
     }
 
     // === Save transaction to state ===
@@ -823,6 +856,18 @@ class PYMTUtilsCC extends Contract {
     console.log("------saving Txstate------");
     try {
       await this.saveTxState(ctx, key, settlementTx);
+      for(let i = 0; i < x100Msgs.length; i++) {
+        const x100Msg = x100Msgs[i];
+        await this.saveTxState(ctx, x100Msg.Key, x100Msg.Record);
+
+      }
+
+      for(let i = 0; i < x110Msgs.length; i++) {
+        const x110Msg = x110Msgs[i];
+        await this.saveTxState(ctx, x110Msg.Key, x110Msg.Record);
+
+      }
+
     } catch (err) {
       console.log(err);
       throw err;
