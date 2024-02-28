@@ -7,7 +7,7 @@ import axios from "axios";
 import Alert from "./Alert";
 import { NotificationManager } from "react-notifications";
 let UNAUTHORIZED = "Unauthorized";
-
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 //let showVerifyDefault=true;
 
 const ViewTx = (props) => {
@@ -35,7 +35,7 @@ const ViewTx = (props) => {
     TxCleared: "(ACD, AAD)",
   };
 
-  const GetTxByRange_URL = `http://localhost:3001/api/v1/GetTxByRange`;
+  const GetTxByRange_URL = `${apiBaseUrl}/api/v1/GetTxByRange`;
   //storing the combined response of getTxByRange & retrivePvMerchantData(only aggId) from response.
   const [transactionsData, setTransactionsData] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -189,7 +189,7 @@ const ViewTx = (props) => {
     verifyData.merchantName = verificationData.Record.MerchantName;
     axios
       .post(
-        `http://localhost:3001/api/v1/${txStageVerificationUrls[status]}`,
+        `${apiBaseUrl}/api/v1/${txStageVerificationUrls[status]}`,
         verifyData,
         {
           header: { "Content-Type": "application/json" },

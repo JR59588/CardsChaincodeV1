@@ -21,9 +21,10 @@ import ISO8583FileFormikComponent from "./components/Merchant-Submit-Deails/ISO8
 import Settlement from "./components/SettlementRequests/Settlement";
 import Footer from "./components/Footer";
 import OnboardFormik from "./components/Onboarding/OnboardFormik";
-const IP = "localhost";
-const socketEndpointUrl = "http://localhost:3001";
-
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+const apiIP = process.env.REACT_APP_API_IP;
+const socketEndpointUrl = `${apiBaseUrl}`;
+const IP = `${apiIP}`;
 function App() {
   //storing the roleId...
   const [roleId, setRoleId] = useState("Org1");
@@ -32,7 +33,7 @@ function App() {
 
   function fetchOrganizationData() {
     axios
-      .get(`http://${IP}:3001/api/v1/getOrgs`)
+      .get(`${apiBaseUrl}/api/v1/getOrgs`)
       .then((response) => {
         setOrgOptions([...response.data.orgs]);
       })

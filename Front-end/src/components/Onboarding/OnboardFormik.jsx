@@ -5,10 +5,10 @@ import * as Yup from "yup";
 import { Form, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 import Loader from "../Loader/Loader";
-
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 const OnboardFormik = (props) => {
   const settlementFormUrl =
-    "http://localhost:3001/api/v1/saveOBMerchantSummary";
+    `${apiBaseUrl}/api/v1/saveOBMerchantSummary`;
 
   const [show, setShow] = useState(false);
   const [popupData, setPopupData] = useState({ header: "", content: "" });
@@ -92,7 +92,6 @@ const OnboardFormik = (props) => {
             product: "",
             merchantCategoryCode: "",
             merchantDescription: "",
-            merchantCategoryCode: "",
             merchantName: "",
             MerchantId: "MID",
             CustomerId: "CID",

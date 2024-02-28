@@ -5,9 +5,9 @@ import * as Yup from "yup";
 import { Form, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 import Loader from "../Loader/Loader";
-
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 const SingleRequest = (props) => {
-  const iso8583requesturl = `http://localhost:3001/api/v1/merchantTx`;
+  const iso8583requesturl = `${apiBaseUrl}/api/v1/merchantTx`;
   const { roleId } = props;
 
   const [show, setShow] = useState(false);

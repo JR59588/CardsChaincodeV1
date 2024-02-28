@@ -4,7 +4,7 @@ import { NotificationManager } from "react-notifications";
 import Chart from "chart.js/auto";
 import "./Merchant.css";
 import Modal from "react-bootstrap/Modal";
-
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 const dateFunc = (timestamp) => {
   let datetime = new Date(Date.parse(timestamp)); //new Date(actualTime * 1000);
   return datetime.toDateString();
@@ -210,7 +210,7 @@ const DashboardSummary = ({ roleId }) => {
       try {
         if (roleId) {
           const apiResponse = await axios.get(
-            `http://localhost:3001/api/v1/dashboard/stats/${roleId}`
+            `${apiBaseUrl}/api/v1/dashboard/stats/${roleId}`
           );
           console.log(apiResponse);
           setTransactionStatsData(apiResponse.data.stats);

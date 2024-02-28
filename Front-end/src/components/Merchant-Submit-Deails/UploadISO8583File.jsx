@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import "./UploadISO8583File.css";
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 const UploadISO8583File = ({ roleId }) => {
   const [file, setFile] = useState(null);
   //loader state
@@ -20,7 +21,7 @@ const UploadISO8583File = ({ roleId }) => {
     reason: "",
   });
 
-  const fileUploadUrl = "http://localhost:3001/api/v1/uploadCSV";
+  const fileUploadUrl = `${apiBaseUrl}/api/v1/uploadCSV`;
 
   const handleUpload = async (event) => {
     event.preventDefault();

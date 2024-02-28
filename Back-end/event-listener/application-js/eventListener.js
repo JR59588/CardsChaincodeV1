@@ -11,27 +11,29 @@ const { buildCCP, buildWallet } = require('./AppUtil.js');
 const server = require('../../server.js');
 const socketIo = require('socket.io');
 const io = socketIo(server, {
+
 	cors: {
-		origin: "http://localhost:3000",
+		origins: ["http://localhost:3000", "http://172.16.10.22:3000"],
+
 	}
 });
 
 const channelName = 'channel1';
 
 const org1MSP = 'Org1MSP';
-const Org1UserId = 'appOrg1User25';
+const Org1UserId = 'appOrg1User26';
 
 const orgPSPMSP = 'PSPMSP';
-const OrgPSPUserId = 'appOrgPSPUser25';
+const OrgPSPUserId = 'appOrgPSPUser26';
 
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser25';
+const OrgACDUserId = 'appOrgACDUser26';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser25';
+const OrgAADUserId = 'appOrgAADUser26';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser25';
+const OrgAODUserId = 'appOrgAODUser26';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';
