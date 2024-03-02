@@ -1016,3 +1016,38 @@ exports.verifyClearTxUtils = async function (req, res) {
     });
   }
 }
+
+exports.verifyConfirmTxUtils = async function (req, res) {
+  const { roleId, merchantId, customerId, loanReferenceNumber, msgType } = req.body;
+
+  if (!(roleId && msgType && merchantId && customerId && loanReferenceNumber)) {
+    res.status(400).json({
+      success: false,
+      message: `Ensure to provide valid request parameters for verifying confirm tx`
+    });
+  }
+
+  if (!(roleId === "AOD")) {
+    return res.status(400).json({
+      success: false,
+      message: "Please use AOD for this operation"
+    })
+  }
+
+  const { error, result } = await evaluateTransaction(roleId, channelName, "ConfirmSettlementTxCC", "confirmSettlementTx", [msgType, merchantId, customerId, loanReferenceNumber]);
+  console.log("Error in confirm tx: ", error);
+  console.log("Result in confirm tx: ", result);
+  if (error) {
+    console.log(`verify confirm tx error: ${error}`)
+    res.status(400).json({
+      success: false,
+      message: `Error in confirm tx verification ${error}`
+    });
+  } else {
+    console.log(`verify confirm tx result: ${result}`);
+    res.status(200).json({
+      success: true,
+      message: `Successfully invoked confirm tx verification`
+    });
+  }
+}

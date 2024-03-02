@@ -14,6 +14,7 @@ import NewViewOnboardingStatic from "./components/ViewOnboardingStatic/NewViewOn
 import "react-notifications/lib/notifications.css";
 import { NotificationContainer } from "react-notifications";
 import ViewTx from "./components/ViewTx";
+// import ViewSettlementRequests from "./components/ViewSettlementRequests";
 import socketIOClient from "socket.io-client";
 import axios from "axios";
 import ISO8583FormikComponent from "./components/Merchant-Submit-Deails/ISO8583Formik/ISO8583FormikComponent";
@@ -21,6 +22,9 @@ import ISO8583FileFormikComponent from "./components/Merchant-Submit-Deails/ISO8
 import Settlement from "./components/SettlementRequests/Settlement";
 import Footer from "./components/Footer";
 import OnboardFormik from "./components/Onboarding/OnboardFormik";
+import ViewAuthorizationTxnRequests from "./components/ViewAuthorizationTxnRequests";
+import ViewAuthorizationTxnResponses from "./components/ViewAuthorizationTxnResponses";
+import ViewSettlementTxnRequests from "./components/ViewSettlementTxnRequests";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 const apiIP = process.env.REACT_APP_API_IP;
 const socketEndpointUrl = `${apiBaseUrl}`;
@@ -123,6 +127,22 @@ function App() {
           path="/ViewTx"
           element={<ViewTx roleId={roleId} IP={IP} socket={socket} />}
         />
+        <Route
+          path="/ViewAuthorizationTxnRequests"
+          element={<ViewAuthorizationTxnRequests roleId={roleId} IP={IP} socket={socket} />}
+        />
+        <Route
+          path="/ViewAuthorizationTxnResponses"
+          element={<ViewAuthorizationTxnResponses roleId={roleId} IP={IP} socket={socket} />}
+        />
+        <Route
+          path="/ViewSettlementTxnRequests"
+          element={<ViewSettlementTxnRequests roleId={roleId} IP={IP} socket={socket} />}
+        />
+        {/* <Route
+          path="/ViewSettlementRequests"
+          element={<ViewSettlementRequests roleId={roleId} IP={IP} socket={socket} />}
+        /> */}
         <Route
           path="/View-Onboarding-Static"
           element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}

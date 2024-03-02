@@ -6,7 +6,8 @@ var cors = require("cors");
 var mongoose = require("mongoose");
 var logger = require("./logger");
 const multer = require('multer');
-const csv = require('csv-parser')
+const csv = require('csv-parser');
+
 var http = require('http');
 let controller = require("./api/controllers/controller");
 // set up multer
@@ -52,7 +53,6 @@ app.use(cors());
 let routes = require("./api/routes/routes");
 const { checkResultErrors } = require("ethers/lib/utils");
 routes(app);
-
 
 
 

@@ -7,9 +7,10 @@ const { Wallets, Gateway } = require("fabric-network");
 const fs = require("fs");
 const path = require("path");
 const ISO8583 = require("../iso8583");
-const multer = require('multer');
-const csv = require('csv-parser');
+const multer = require("multer");
+const csv = require("csv-parser");
 const { evaluateTransaction } = require("./utils");
+const { evaluateTransactionWithEndorsingOrganizations } = require("./utils");
 
 const app = express();
 
@@ -43,27 +44,359 @@ const verifyToken = (req, res) => {
   }
 };
 
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, 'iso8583FileUploads'))
+    cb(null, path.join(__dirname, "iso8583FileUploads"));
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix + ".csv")
-  }
-})
+    const uniqueFileName = `${file.originalname}-${Date.now()}`;
+    cb(null, uniqueFileName);
+  },
+});
 
 const upload = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
-    if (path.extname(file.originalname) !== '.csv') {
-      return cb(new Error('Only csv files are allowed'))
+    if (path.extname(file.originalname) !== ".csv") {
+      return cb(new Error("Only csv files are allowed"));
     }
-    cb(null, true)
-  }
-}).single('file');
+    cb(null, true);
+  },
+}).single("file");
 
+const storageWithType = multer.diskStorage({
+  destination: function (req, file, cb) {
+    try {
+      let filePath = "";
+      switch (req.body.fileType) {
+        case "settlementRequest":
+          filePath = "SettlementRequestFiles";
+          break;
+        case "authorizationRequest":
+          filePath = "AuthorizationRequestFiles";
+          break;
+        case "authorizationResponse":
+          filePath = "AuthorizationResponseFiles";
+          break;
+        default:
+          throw new Error(
+            "Ensure you are using proper file type when uploading the file"
+          );
+      }
+      cb(null, path.join(__dirname, filePath));
+    } catch (error) {
+      cb(error, null);
+    }
+  },
+  filename: function (req, file, cb) {
+    const uniqueFileName = Date.now() + file.originalname;
+    cb(null, uniqueFileName);
+  },
+});
+
+const uploadWithType = multer({
+  storage: storageWithType,
+  fileFilter: function (req, file, cb) {
+    if (path.extname(file.originalname) !== ".csv") {
+      return cb(new Error("Only csv files are allowed"));
+    }
+    cb(null, true);
+  },
+}).single("file");
+
+const getArgsArray = (msg, type) => {
+  try {
+    if (type == "authorizationRequest") {
+      return [
+        msg.MerchantId,
+        msg.CustomerId,
+        msg.LoanReferenceNumber,
+        msg.MerchantName,
+        msg.primaryAccountNumber,
+        msg.processingCode,
+        msg.transactionAmount,
+        msg.transmissionDateAndTime,
+        msg.systemsTraceAuditNumber,
+        msg.expirationDate,
+        msg.merchantCategoryCode,
+        msg.pointOfServiceEntryMode,
+        msg.acquiringInstitutionIdentificationCode,
+        msg.retrievalReferenceNumber,
+        msg.cardAcceptorTerminalIdentification,
+        msg.cardAcceptorIdentificationCode,
+        msg.cardAcceptorNameAndLocation,
+        msg.currencyCode,
+        msg.additionalData,
+        msg.batchNumber,
+        msg.messageType,
+      ];
+    } else if (type == "authorizationResponse") {
+      return [
+        msg.MerchantId,
+        msg.CustomerId,
+        msg.LoanReferenceNumber,
+        msg.MerchantName,
+        msg.primaryAccountNumber,
+        msg.processingCode,
+        msg.transactionAmount,
+        msg.transmissionDateAndTime,
+        msg.systemsTraceAuditNumber,
+        msg.expirationDate,
+        msg.merchantCategoryCode,
+        msg.pointOfServiceEntryMode,
+        msg.acquiringInstitutionIdentificationCode,
+        msg.retrievalReferenceNumber,
+        msg.cardAcceptorTerminalIdentification,
+        msg.cardAcceptorIdentificationCode,
+        msg.cardAcceptorNameAndLocation,
+        msg.currencyCode,
+        msg.additionalData,
+        msg.batchNumber,
+        msg.approverCode,
+        msg.authorizationId,
+        msg.messageType,
+      ];
+    } else if (type == "settlementRequest") {
+      return [
+        msg.MerchantId,
+        msg.CustomerId,
+        msg.LoanReferenceNumber,
+        msg.MerchantName,
+        msg.primaryAccountNumber,
+        msg.processingCode,
+        msg.transactionAmount,
+        msg.systemsTraceAuditNumber,
+        msg.networkInternationalId,
+        msg.cardAcceptorTerminalIdentification,
+        msg.cardAcceptorIdentificationCode,
+        msg.transactionCurrencyCode,
+        msg.transactionLifecycleId,
+        msg.batchNumber,
+        msg.totalNumberOfTransactions,
+        msg.messageType,
+      ];
+    }
+  } catch (error) {
+    console.log("Error in processing submitted ISO8583 CSV with type", error);
+    return res.status(400).json({
+      success: false,
+      message: "Error in processing submitted ISO8583 CSV file",
+    });
+  }
+};
+
+exports.processISO8583CSVWithType = async function (req, res) {
+  try {
+    uploadWithType(req, res, function (err) {
+      if (err) {
+        console.log("Error uploading file: ", err);
+        return res.status(400).json({
+          success: false,
+          message: "Error in uploading ISO8583 CSV file with type",
+          reason: err.message,
+        });
+      } else {
+        console.log("There is no error in uploading the file with type");
+        console.log(
+          "request body is: ",
+          req.body,
+          " fileType in request body is: ",
+          req.body.fileType,
+          " file path is: ",
+          req.file.path
+        );
+        const executionMode = req.body.executionMode;
+        const results = [];
+        const responses = [];
+
+        fs.createReadStream(req.file.path)
+          .pipe(csv())
+          .on("data", (data) => results.push(data))
+          .on("end", async () => {
+            console.log("Results after reading csv: ", results);
+            let invokedFunc = "";
+            let org = "";
+            let endorsers = [];
+            switch (req.body.fileType) {
+              case "settlementRequest":
+                invokedFunc = "accountTx";
+                org = "AAD";
+                endorsers = ["ACDMSP", "AODMSP"]
+                break;
+              case "authorizationRequest":
+                invokedFunc = "requestTx";
+                org = "Org1";
+                break;
+              case "authorizationResponse":
+                invokedFunc = "submitTx";
+                org = "ACD";
+                endorsers = ["AADMSP", "AODMSP"]
+                break;
+              default:
+                throw new Error(
+                  "Ensure you are using proper message type when uploading the file"
+                );
+            }
+
+            if (org !== req.body.roleId) {
+              return res.status(400).json({
+                success: false,
+                message: `Please select ${org} for this operation`
+              })
+            }
+
+            for (let i = 0; i < results.length; i++) {
+              console.log("Result " + i, results[i]);
+
+              const { error, result } = await
+
+                evaluateTransactionWithEndorsingOrganizations
+                  // evaluateTransaction
+                  (
+                    req.body.roleId,
+                    "channel1",
+                    "PYMTUtilsCC",
+                    invokedFunc,
+                    getArgsArray(results[i], req.body.fileType),
+                    endorsers
+                  );
+              if (error) {
+                console.log("error in uploadwithtype is: ", error)
+                responses.push({
+                  key: [
+                    results[i].MerchantId,
+                    results[i].CustomerId,
+                    results[i].LoanReferenceNumber,
+                    results[i].systemsTraceAuditNumber,
+                  ],
+                  index: i,
+                  success: false,
+                  result,
+                });
+              } else {
+                console.log("Result in uploadwithtype is: ", result.toString())
+
+                responses.push({
+                  key: [
+                    results[i].MerchantId,
+                    results[i].CustomerId,
+                    results[i].LoanReferenceNumber,
+                    results[i].systemsTraceAuditNumber,
+
+                  ],
+                  index: i,
+                  success: true,
+                  result,
+                });
+              }
+            }
+            return res.status(200).json({
+              success: true,
+              message: "File upload successful",
+              responses,
+            });
+          });
+      }
+    });
+  } catch (error) {
+    console.log("Error in processing submitted ISO8583 CSV with type", error);
+    return res.status(400).json({
+      success: false,
+      message: "Error in processing submitted ISO8583 CSV file",
+    });
+  }
+};
+
+exports.processISO8583CSV = async function (req, res) {
+  try {
+    upload(req, res, function (err) {
+      if (err) {
+        console.log("Error uploading file: ", err);
+        return res.status(400).json({
+          success: false,
+          message: "Error in uploading ISO8583 CSV file",
+          reason: err.message,
+        });
+      } else {
+        console.log("Filer parser: ", req.body.executionMode);
+        const executionMode = req.body.executionMode;
+        const results = [];
+        const responses = [];
+        fs.createReadStream(req.file.path)
+          .pipe(csv())
+          .on("data", (data) => results.push(data))
+          .on("end", async () => {
+            console.log("Results after reading csv: ", results);
+            for (let i = 0; i < results.length; i++) {
+              const {
+                merchantID,
+                customerID,
+                loanReferenceNumber,
+                ISO8583Message,
+              } = results[i];
+              const settlementTxObject = makeTxObj(
+                merchantID,
+                customerID,
+                loanReferenceNumber,
+                ISO8583Message,
+                executionMode ?? "manual"
+              );
+              console.log("Settlement Tx Object: ", settlementTxObject);
+              const { error, result } = await evaluateTransaction(
+                req.body.roleId,
+                "channel1",
+                "PYMTUtilsCC",
+                "requestTx",
+                [
+                  settlementTxObject.MerchantId,
+                  settlementTxObject.CustomerId,
+                  settlementTxObject.LoanReferenceNumber,
+                  settlementTxObject.MerchantName,
+                  settlementTxObject.primaryAccountNumber,
+                  settlementTxObject.processingCode,
+                  settlementTxObject.transactionAmount,
+                  settlementTxObject.transmissionDateAndTime,
+                  settlementTxObject.systemsTraceAuditNumber,
+                  settlementTxObject.timeLocalTransactionHHMMSS,
+                  settlementTxObject.dateLocalTransactionMMDD,
+                  settlementTxObject.expirationDate,
+                  settlementTxObject.merchantCategoryCode,
+                  settlementTxObject.pointOfServiceEntryMode,
+                  settlementTxObject.acquiringInstitutionIdentificationCode,
+                  settlementTxObject.retrievalReferenceNumber,
+                  settlementTxObject.cardAcceptorTerminalIdentification,
+                  settlementTxObject.cardAcceptorIdentificationCode,
+                  settlementTxObject.cardAcceptorNameAndLocation,
+                  settlementTxObject.currencyCode,
+                  settlementTxObject.personalIdentificationNumber,
+                  settlementTxObject.additionalDataPrivate,
+                  settlementTxObject.executionMode,
+                ]
+              );
+
+              if (error) {
+                responses.push({ i, success: false, result });
+              } else {
+                responses.push({ i, success: true, result });
+              }
+            }
+            return res.status(200).json({
+              success: true,
+              message: "Successfully uploaded the ISO8583 CSV",
+              responses,
+            });
+          });
+      }
+    });
+  } catch (error) {
+    console.log("Error in processing submitted ISO8583 CSV");
+    return res.status(400).json({
+      success: false,
+      message: "Error in processing submitted ISO8583 CSV file",
+      reason: "Something went wrong in processing the ISO8583 CSV file",
+    });
+  }
+};
 
 exports.requestSettlementTx = async function (req, res) {
   try {
@@ -76,7 +409,13 @@ exports.requestSettlementTx = async function (req, res) {
       res.status(400).send("Error!. Invalid role name");
     }
 
-    let stxObj = makeTxObj(req.body.merchantID, req.body.customerID, req.body.loanReferenceNumber, req.body.ISO8583Message, req.body.executionMode ?? "manual");
+    let stxObj = makeTxObj(
+      req.body.merchantID,
+      req.body.customerID,
+      req.body.loanReferenceNumber,
+      req.body.ISO8583Message,
+      req.body.executionMode ?? "manual"
+    );
 
     console.log("stxObj: ", stxObj);
 
@@ -98,7 +437,7 @@ exports.requestSettlementTx = async function (req, res) {
       console.log("Run the registerUser.js application before retrying");
       return res.status(400).json({
         success: false,
-        message: `An identity for the organization ${org} doesn't exist in the wallet`
+        message: `An identity for the organization ${org} doesn't exist in the wallet`,
       });
     }
 
@@ -130,11 +469,11 @@ exports.requestSettlementTx = async function (req, res) {
 
     // Submit the specified transaction.
 
-
     console.log(
       "trying to add data in requestsetllmentTx for merchantId",
       stxObj.MerchantId,
-      ccFunctionName);
+      ccFunctionName
+    );
     console.log("controller line no 108", JSON.stringify(stxObj));
     await contract.submitTransaction(
       ccFunctionName,
@@ -164,7 +503,6 @@ exports.requestSettlementTx = async function (req, res) {
     );
     console.log("inside requestsetllmentTx ,Transaction has been submitted");
 
-
     // Disconnect from the gateway.
     await gateway.disconnect();
     return res.status(200).json({
@@ -180,95 +518,21 @@ exports.requestSettlementTx = async function (req, res) {
   }
 };
 
-exports.processISO8583CSV = async function (req, res) {
-  try {
-    upload(req, res, function (err) {
-      if (err) {
-        console.log("Error uploading file: ", err);
-        return res.status(400).json({
-          success: false,
-          message: "Error in uploading ISO8583 CSV file",
-          reason: err.message
-        });
-      } else {
-        console.log("Filer parser: ", req.body.executionMode)
-        const executionMode = req.body.executionMode;
-        const results = [];
-        const responses = [];
-        fs.createReadStream(req.file.path)
-          .pipe(csv())
-          .on('data', (data) => results.push(data))
-          .on('end', async () => {
-            console.log("Results after reading csv: ", results);
-            for (let i = 0; i < results.length; i++) {
-              const { merchantID, customerID, loanReferenceNumber, ISO8583Message } = results[i];
-              const settlementTxObject = makeTxObj(merchantID, customerID, loanReferenceNumber, ISO8583Message, executionMode ?? "manual");
-              console.log("Settlement Tx Object: ", settlementTxObject)
-              const { error, result } = await evaluateTransaction(req.body.roleId, 'channel1', 'PYMTUtilsCC', 'requestTx',
-                [settlementTxObject.MerchantId,
-                settlementTxObject.CustomerId,
-                settlementTxObject.LoanReferenceNumber,
-                settlementTxObject.MerchantName,
-                settlementTxObject.primaryAccountNumber,
-                settlementTxObject.processingCode,
-                settlementTxObject.transactionAmount,
-                settlementTxObject.transmissionDateAndTime,
-                settlementTxObject.systemsTraceAuditNumber,
-                settlementTxObject.timeLocalTransactionHHMMSS,
-                settlementTxObject.dateLocalTransactionMMDD,
-                settlementTxObject.expirationDate,
-                settlementTxObject.merchantCategoryCode,
-                settlementTxObject.pointOfServiceEntryMode,
-                settlementTxObject.acquiringInstitutionIdentificationCode,
-                settlementTxObject.retrievalReferenceNumber,
-                settlementTxObject.cardAcceptorTerminalIdentification,
-                settlementTxObject.cardAcceptorIdentificationCode,
-                settlementTxObject.cardAcceptorNameAndLocation,
-                settlementTxObject.currencyCode,
-                settlementTxObject.personalIdentificationNumber,
-                settlementTxObject.additionalDataPrivate,
-                settlementTxObject.executionMode]);
-
-              if (error) {
-                responses.push({ i, success: false, result });
-              } else {
-                responses.push({ i, success: true, result });
-              }
-            }
-            return res.status(200).json({
-              success: true,
-              message: "Successfully uploaded the ISO8583 CSV",
-              responses
-            });
-          });
-      }
-
-    });
-
-  } catch (error) {
-    console.log("Error in processing submitted ISO8583 CSV");
-    return res.status(400).json({
-      success: false,
-      message: "Error in processing submitted ISO8583 CSV file",
-      reason: "Something went wrong in processing the ISO8583 CSV file"
-    });
-  }
-};
-
 exports.getOrgs = async function (req, res) {
   try {
-    const jsonStr = fs.readFileSync(path.resolve(__dirname, "..", "orgsAdded.json"));
+    const jsonStr = fs.readFileSync(
+      path.resolve(__dirname, "..", "orgsAdded.json")
+    );
     const jsonObj = JSON.parse(jsonStr);
 
     res.status(200).json(jsonObj);
   } catch (error) {
     console.log("Error when reading organizations data: ", error);
     res.status(500).json({
-      message: "There was an error fetching organization data"
+      message: "There was an error fetching organization data",
     });
   }
-
-}
+};
 
 function getChannelName(mode, MSPId) {
   //14.02.23 todo: this logic has to be completed
@@ -284,35 +548,43 @@ function getChannelName(mode, MSPId) {
   return chName;
 }
 
-
-
 function getFunctionName(mode, MSPId) {
   var fnName;
   if (mode == "PSP") {
-
     fnName = "initiateTx";
   }
 
   //direct mode requestTx
   else {
     fnName = "requestTx";
-
   }
 
   console.log("WARNING : Function name : ", fnName);
   return fnName;
 }
 
-function makeTxObj(merchantID, customerID, loanReferenceNumber, iso8583Message, executionMode) {
+
+
+
+function makeTxObj(
+  merchantID,
+  customerID,
+  loanReferenceNumber,
+  iso8583Message,
+  executionMode
+) {
   //TODO: change the property values of the object according to the requirements
   if (iso8583Message != undefined) {
     try {
       var iso = new ISO8583(iso8583Message, 1);
       var data = iso.parseDataElement();
-      const dataObj = data.reduce((obj, item) => ({
-        ...obj,
-        [item.fieldName]: item.fieldValue
-      }), {});
+      const dataObj = data.reduce(
+        (obj, item) => ({
+          ...obj,
+          [item.fieldName]: item.fieldValue,
+        }),
+        {}
+      );
       const iso8583Obj = { ...iso, ...dataObj };
       let localTxObj = {
         MerchantId: merchantID,
@@ -329,21 +601,26 @@ function makeTxObj(merchantID, customerID, loanReferenceNumber, iso8583Message, 
         expirationDate: iso8583Obj.expirationDate,
         merchantCategoryCode: iso8583Obj.merchantCategoryCode,
         pointOfServiceEntryMode: iso8583Obj.pointOfServiceEntryMode,
-        acquiringInstitutionIdentificationCode: iso8583Obj.acquiringInstitutionIdentificationCode,
+        acquiringInstitutionIdentificationCode:
+          iso8583Obj.acquiringInstitutionIdentificationCode,
         retrievalReferenceNumber: iso8583Obj.retrievalReferenceNumber,
-        cardAcceptorTerminalIdentification: iso8583Obj.cardAcceptorTerminalIdentification,
-        cardAcceptorIdentificationCode: iso8583Obj.cardAcceptorIdentificationCode,
+        cardAcceptorTerminalIdentification:
+          iso8583Obj.cardAcceptorTerminalIdentification,
+        cardAcceptorIdentificationCode:
+          iso8583Obj.cardAcceptorIdentificationCode,
         cardAcceptorNameAndLocation: iso8583Obj.cardAcceptorNameAndLocation,
         currencyCode: iso8583Obj.currencyCode,
         personalIdentificationNumber: iso8583Obj.personalIdentificationNumber,
         additionalDataPrivate: iso8583Obj.additionalDataPrivate,
-        executionMode
+        executionMode,
       };
       console.log("Constructed tx obj: ", localTxObj);
       return localTxObj;
     } catch (error) {
-      console.log("There was an error in decoding the ISO8583 message: ", error);
+      console.log(
+        "There was an error in decoding the ISO8583 message: ",
+        error
+      );
     }
   }
 }
-

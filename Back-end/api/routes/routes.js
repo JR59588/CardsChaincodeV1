@@ -21,6 +21,12 @@ module.exports = function (app) {
 
   app
 
+    .route("/api/v1/uploadCSVWithType")
+
+    .post(controller.processISO8583CSVWithType);
+
+  app
+
     .route("/api/v1/uploadCSV")
 
     .post(controller.processISO8583CSV);
@@ -108,6 +114,12 @@ module.exports = function (app) {
     .route("/api/v1/verifyClearTx")
 
     .post(merchantController.verifyClearTxUtils);
+
+  app
+
+    .route("/api/v1/verifyConfirmTx")
+
+    .post(merchantController.verifyConfirmTxUtils);
 
   // app
 

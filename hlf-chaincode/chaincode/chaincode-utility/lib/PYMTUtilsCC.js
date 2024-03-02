@@ -222,8 +222,6 @@ class PYMTUtilsCC extends Contract {
     transactionAmount,
     transmissionDateAndTime,
     systemsTraceAuditNumber,
-
-
     expirationDate,
     merchantCategoryCode,
     pointOfServiceEntryMode,
@@ -233,11 +231,9 @@ class PYMTUtilsCC extends Contract {
     cardAcceptorIdentificationCode,
     cardAcceptorNameAndLocation,
     currencyCode,
-
     additionalData,
     batchNumber,
     messageType,
-
   ) {
     // acl
 
@@ -823,13 +819,13 @@ class PYMTUtilsCC extends Contract {
     if (ccPayload == "true") {
       console.log("PYTMutilscc.js ccPayload ", ccPayload);
       settlementTx.TxStatus = TXSTATUS_ACCOUNTED;
-      for(let i = 0; i < x100Msgs.length; i++) {
+      for (let i = 0; i < x100Msgs.length; i++) {
         const x100Msg = x100Msgs[i];
         console.log("Inside for loop x100 msg: ", x100Msg);
         x100Msg.Record.TxStatus = TXSTATUS_ACCOUNTED;
       }
 
-      for(let i = 0; i < x110Msgs.length; i++) {
+      for (let i = 0; i < x110Msgs.length; i++) {
         const x110Msg = x110Msgs[i];
         console.log("Inside for loop x110 msg: ", x110Msg);
 
@@ -837,13 +833,13 @@ class PYMTUtilsCC extends Contract {
       }
     } else {
       settlementTx.TxStatus = TXSTATUS_NON_ACCOUNTED;
-      for(let i = 0; i < x100Msgs.length; i++) {
+      for (let i = 0; i < x100Msgs.length; i++) {
         const x100Msg = x100Msgs[i];
         console.log("Inside for loop x100 msg: ", x100Msg);
         x100Msg.Record.TxStatus = TXSTATUS_NON_ACCOUNTED;
       }
 
-      for(let i = 0; i < x110Msgs.length; i++) {
+      for (let i = 0; i < x110Msgs.length; i++) {
         const x110Msg = x110Msgs[i];
         console.log("Inside for loop x110 msg: ", x110Msg);
 
@@ -856,13 +852,13 @@ class PYMTUtilsCC extends Contract {
     console.log("------saving Txstate------");
     try {
       await this.saveTxState(ctx, key, settlementTx);
-      for(let i = 0; i < x100Msgs.length; i++) {
+      for (let i = 0; i < x100Msgs.length; i++) {
         const x100Msg = x100Msgs[i];
         await this.saveTxState(ctx, x100Msg.Key, x100Msg.Record);
 
       }
 
-      for(let i = 0; i < x110Msgs.length; i++) {
+      for (let i = 0; i < x110Msgs.length; i++) {
         const x110Msg = x110Msgs[i];
         await this.saveTxState(ctx, x110Msg.Key, x110Msg.Record);
 

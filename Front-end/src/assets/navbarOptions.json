@@ -30,9 +30,19 @@
                 "url": "/settlement-request"
             },
             {
-                "name": "View Submitted Request",
+                "name": "View Authorization Requests",
                 "id": "32",
-                "url": "/ViewTx"
+                "url": "/ViewAuthorizationTxnRequests"
+            },
+            {
+                "name": "View Authorization Responses",
+                "id": "33",
+                "url": "/ViewAuthorizationTxnResponses"
+            },
+            {
+                "name": "View Settlement Requests",
+                "id": "34",
+                "url": "/ViewSettlementTxnRequests"
             }
         ]
     },
