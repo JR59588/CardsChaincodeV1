@@ -83,7 +83,14 @@ let contractPYMTUTILSCCOrg1, contractSubmitSettlementTxCCOrgPSP, contractSubmitS
 	contractBalanceSettlementTxCCOrgAAD,
 	contractBalanceSettlementTxCCOrgAOD,
 	contractClearSettlementTxCCOrgAOD,
-	contractClearSettlementTxCCOrgAAD;
+	contractClearSettlementTxCCOrgAAD,
+	contractSubmitSettlementTxCCOrgAAD,
+	contractSubmitSettlementTxCCOrgAOD,
+	contractConfirmSettlementTxCCOrgAAD,
+	contractConfirmSettlementTxCCOrgACD,
+	contractAccountSettlementTxCCOrgACD,
+	contractAccountSettlementTxCCOrgAOD;
+
 
 const initialize = async (callback) => {
 	try {
@@ -109,6 +116,14 @@ const initialize = async (callback) => {
 		contractClearSettlementTxCCOrgAOD = network1OrgAOD.getContract("ClearSettlementTxCC");
 		contractClearSettlementTxCCOrgAAD = network1OrgAAD.getContract("ClearSettlementTxCC");
 
+
+		contractSubmitSettlementTxCCOrgAAD = network1OrgAAD.getContract("SubmitSettlementTxCC");
+		contractSubmitSettlementTxCCOrgAOD = network1OrgAOD.getContract("SubmitSettlementTxCC");
+		contractConfirmSettlementTxCCOrgAAD = network1OrgAAD.getContract("ConfirmSettlementTxCC");
+		contractConfirmSettlementTxCCOrgACD = network1OrgACD.getContract("ConfirmSettlementTxCC");
+		contractAccountSettlementTxCCOrgACD = network1OrgACD.getContract("AccountSettlementTxCC");
+		contractAccountSettlementTxCCOrgAOD = network1OrgAOD.getContract("AccountSettlementTxCC");
+
 		callback();
 	} catch (error) {
 		console.error(`Error in setup: ${error}`);
@@ -127,9 +142,6 @@ const startServer = () => {
 		try {
 			console.log(`${BLUE} **** CHAINCODE EVENTS ****${RESET}`);
 			let transaction;
-
-
-
 
 			try {
 

@@ -220,16 +220,23 @@ exports.processISO8583CSVWithType = async function (req, res) {
             switch (req.body.fileType) {
               case "settlementRequest":
                 invokedFunc = "accountTx";
-                org = "AAD";
+                orgs = ["AAD"];
                 endorsers = ["ACDMSP", "AODMSP"]
                 break;
               case "authorizationRequest":
                 invokedFunc = "requestTx";
-                org = "Org1";
+                const orgsDataStr = fs.readFileSync(
+                  path.resolve(__dirname, "..", "orgsAdded.json")
+                );
+                console.log("Orgs data str is : ", orgsDataStr);
+                const orgsData = JSON.parse(orgsDataStr);
+                console.log("Orgs data is : ", orgsData);
+                orgs = orgsData.orgs.map(orgData => orgData.orgId);
+                console.log("Orgs are: ", orgs);
                 break;
               case "authorizationResponse":
                 invokedFunc = "submitTx";
-                org = "ACD";
+                orgs = ["ACD"];
                 endorsers = ["AADMSP", "AODMSP"]
                 break;
               default:
@@ -238,58 +245,62 @@ exports.processISO8583CSVWithType = async function (req, res) {
                 );
             }
 
-            if (org !== req.body.roleId) {
+            if (!orgs.includes(req.body.roleId)) {
               return res.status(400).json({
                 success: false,
-                message: `Please select ${org} for this operation`
+                message: `Please select one of these org(s) for this operation: ${orgs.join("/")}`,
               })
             }
 
-            for (let i = 0; i < results.length; i++) {
-              console.log("Result " + i, results[i]);
+            if (executionMode === "auto") {
+              for (let i = 0; i < results.length; i++) {
+                console.log("Result " + i, results[i]);
 
-              const { error, result } = await
+                const { error, result } = await
 
-                evaluateTransactionWithEndorsingOrganizations
-                  // evaluateTransaction
-                  (
-                    req.body.roleId,
-                    "channel1",
-                    "PYMTUtilsCC",
-                    invokedFunc,
-                    getArgsArray(results[i], req.body.fileType),
-                    endorsers
-                  );
-              if (error) {
-                console.log("error in uploadwithtype is: ", error)
-                responses.push({
-                  key: [
-                    results[i].MerchantId,
-                    results[i].CustomerId,
-                    results[i].LoanReferenceNumber,
-                    results[i].systemsTraceAuditNumber,
-                  ],
-                  index: i,
-                  success: false,
-                  result,
-                });
-              } else {
-                console.log("Result in uploadwithtype is: ", result.toString())
+                  evaluateTransactionWithEndorsingOrganizations
+                    // evaluateTransaction
+                    (
+                      req.body.roleId,
+                      "channel1",
+                      "PYMTUtilsCC",
+                      invokedFunc,
+                      getArgsArray(results[i], req.body.fileType),
+                      endorsers
+                    );
+                if (error) {
+                  console.log("error in uploadwithtype is: ", error)
+                  responses.push({
+                    key: [
+                      results[i].MerchantId,
+                      results[i].CustomerId,
+                      results[i].LoanReferenceNumber,
+                      results[i].systemsTraceAuditNumber,
+                    ],
+                    index: i,
+                    success: false,
+                    result,
+                  });
+                } else {
+                  console.log("Result in uploadwithtype is: ", result.toString())
 
-                responses.push({
-                  key: [
-                    results[i].MerchantId,
-                    results[i].CustomerId,
-                    results[i].LoanReferenceNumber,
-                    results[i].systemsTraceAuditNumber,
+                  responses.push({
+                    key: [
+                      results[i].MerchantId,
+                      results[i].CustomerId,
+                      results[i].LoanReferenceNumber,
+                      results[i].systemsTraceAuditNumber,
 
-                  ],
-                  index: i,
-                  success: true,
-                  result,
-                });
+                    ],
+                    index: i,
+                    success: true,
+                    result,
+                  });
+                }
               }
             }
+
+
             return res.status(200).json({
               success: true,
               message: "File upload successful",

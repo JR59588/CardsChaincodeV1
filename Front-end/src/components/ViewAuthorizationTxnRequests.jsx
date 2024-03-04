@@ -29,14 +29,16 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
       );
 
       if (response.data.success === true) {
-        const TxStatus = response.data.x100Message.Record.TxStatus;
-        const Key = response.data.x100Message.Record.Key;
-        const x100Messages = x100Msgs;
-        const changedMsg = x100Messages.find(
-          (x100Message) => x100Message.Record.Key === Key
-        );
-        changedMsg.TxStatus = TxStatus;
-        setX100Msgs(x100Messages);
+        const { TxStatus, Key } = response.data.x100Message;
+
+        setX100Msgs((x100Messages) => {
+          return x100Messages.map((x100Message) => {
+            if (x100Message.Key === Key) {
+              x100Message.Record.TxStatus = TxStatus;
+            }
+            return x100Message;
+          });
+        });
       }
     } catch (error) {
       console.log("Error submitting confirm tx: ", error);
@@ -83,7 +85,7 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
                 <tr>
                   <th>No</th>
                   <th colSpan={3}>Txn Summary (Hyperledger)</th>
-                  <th colSpan={4}>Txn Submission Details</th>
+                  <th colSpan={5}>Txn Submission Details</th>
                   <th colSpan={1}>Txn Verification Summary</th>
                 </tr>
                 <tr>
@@ -95,6 +97,7 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
                   <th>Merchant Name</th>
                   <th>Customer Details</th>
                   <th>Txn Reference Number</th>
+                  <th>Systems trace audit number</th>
                   <th>Request Txn</th>
                 </tr>
               </thead>
@@ -111,11 +114,12 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
                     <td>{x100Msg.Record.MerchantName}</td>
                     <td>{x100Msg.Record.CustomerId}</td>
                     <td>{x100Msg.Record.LoanReferenceNumber}</td>
+                    <td>{x100Msg.Record.systemsTraceAuditNumber}</td>
                     <td>
                       {getButtonOrStatus(
                         x100Msg.Record.TxStatus,
-                        "TxConfirmed",
-                        "TxNonConfirmed",
+                        ["TxConfirmed", "TxAccounted"],
+                        ["TxNonConfirmed"],
                         () =>
                           handleTxnRequest(
                             "x100",
@@ -146,11 +150,11 @@ const Loading = () => {
 
 const getButtonOrStatus = (
   status,
-  requiredStatus,
-  rejectedStatus,
+  requiredStatuses,
+  rejectedStatuses,
   handlerFunc
 ) => {
-  if (status === requiredStatus || status === rejectedStatus) {
+  if (requiredStatuses.includes(status) || rejectedStatuses.includes(status)) {
     return <>{status}</>;
   } else {
     return <LoaderButton handlerFunc={handlerFunc} />;

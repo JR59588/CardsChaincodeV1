@@ -53,8 +53,7 @@ const ViewAuthorizationTxnResponses = ({ roleId }) => {
                 <tr>
                   <th>No</th>
                   <th colSpan={3}>Txn Summary (Hyperledger)</th>
-                  <th colSpan={4}>Txn Submission Details</th>
-                  <th colSpan={1}>Txn Verification Summary</th>
+                  <th colSpan={5}>Txn Submission Details</th>
                 </tr>
                 <tr>
                   <th></th>
@@ -65,7 +64,7 @@ const ViewAuthorizationTxnResponses = ({ roleId }) => {
                   <th>Merchant Name</th>
                   <th>Customer Details</th>
                   <th>Txn Reference Number</th>
-                  <th>Request Txn</th>
+                  <th>Systems trace audit number</th>
                 </tr>
               </thead>
               <tbody>
@@ -81,6 +80,7 @@ const ViewAuthorizationTxnResponses = ({ roleId }) => {
                     <td>{x110Msg.Record.MerchantName}</td>
                     <td>{x110Msg.Record.CustomerId}</td>
                     <td>{x110Msg.Record.LoanReferenceNumber}</td>
+                    <td>{x110Msg.Record.systemsTraceAuditNumber}</td>
                   </tr>
                 ))}
               </tbody>

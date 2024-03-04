@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 // Setting for Hyperledger Fabric
 const { Wallets, Gateway } = require("fabric-network");
 const registerAndEnrollFunc = require("../../registerAndEnroll");
-const { evaluateTransaction } = require("./utils");
+const { evaluateTransaction, evaluateTransactionWithEndorsingOrganizations } = require("./utils");
 const channelName = "channel1";
 const contractName = "onboardingMerchantC";
 
@@ -1034,9 +1034,9 @@ exports.verifyConfirmTxUtils = async function (req, res) {
     })
   }
 
-  const { error, result } = await evaluateTransaction(roleId, channelName, "ConfirmSettlementTxCC", "confirmSettlementTx", [msgType, merchantId, customerId, loanReferenceNumber]);
+  const { error, confirmTxResult } = await evaluateTransactionWithEndorsingOrganizations(roleId, channelName, "ConfirmSettlementTxCC", "confirmSettlementTx", [msgType, merchantId, customerId, loanReferenceNumber], ["AADMSP", "ACDMSP"]);
   console.log("Error in confirm tx: ", error);
-  console.log("Result in confirm tx: ", result);
+  console.log("Result in confirm tx: ", confirmTxResult);
   if (error) {
     console.log(`verify confirm tx error: ${error}`)
     res.status(400).json({
@@ -1044,10 +1044,15 @@ exports.verifyConfirmTxUtils = async function (req, res) {
       message: `Error in confirm tx verification ${error}`
     });
   } else {
-    console.log(`verify confirm tx result: ${result}`);
+    console.log(`verify confirm tx result: ${confirmTxResult}`);
+    const key = "x100-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
+    console.log("key is: ", key);
+    const { error, result } = await evaluateTransaction(roleId, channelName, "PYMTUtilsCC", "readState", [key]);
+    // const 
     res.status(200).json({
       success: true,
-      message: `Successfully invoked confirm tx verification`
+      message: `Successfully invoked confirm tx verification`,
+      x100Message: { Key: key, ...JSON.parse(result.toString()) },
     });
   }
 }

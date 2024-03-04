@@ -194,7 +194,7 @@ const FileRequest = (props) => {
                       <div className="error-message">{errors.fileType}</div>
                     ) : null}
                   </Form.Group>
-                  {values.fileType === "settlementRequest" && (
+                  {/* {values.fileType === "settlementRequest" && (
                     <Form.Group className="mb-3">
                       <Form.Label>Execution Mode</Form.Label>
                       <div className="row pe-2 ps-2">
@@ -227,7 +227,7 @@ const FileRequest = (props) => {
                         <div className="error-message">{errors.fileType}</div>
                       ) : null}
                     </Form.Group>
-                  )}
+                  )} */}
                   <Button
                     variant="primary"
                     type="submit"
