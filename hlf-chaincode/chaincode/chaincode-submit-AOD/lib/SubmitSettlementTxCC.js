@@ -10,7 +10,7 @@ const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class SubmitSettlementTxCC extends Contract {
-  async submitSettlementTx(ctx, x110Msg) {
+  async submitSettlementTx(ctx, messageType, merchantId, customerId, loanReferenceNumber) {
     try {
       console.log("------>>>In submitSettlementTx <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);
@@ -23,7 +23,7 @@ class SubmitSettlementTxCC extends Contract {
 
       if (!accessValid) {
         throw new Error(
-          "Unauthorized to Perform the transaction for submitSettlementTx : "
+          "Unauthorized to Perform the transaction for accountSettlementTxCC : "
         );
       }
       // TODO : please check the parameters 
@@ -31,77 +31,108 @@ class SubmitSettlementTxCC extends Contract {
 
       let {
         // TODO : update the utils.js file (hlfconstants)  
-        TXSTATUS_CONFIRMED,
         TXSTATUS_SUBMITTED,
+        TXSTATUS_CONFIRMED,
         TXSTATUS_NOT_SUBMITTED
 
       } = await pymtutils.hlfconstants();
       //TODO : change the function of the utils.js for channel name.(replace:getChannelIdentity )
       const channelName = await pymtutils.getChannelIdentity(ctx);
-      // TODO: Change the parameters based on requirement.
-      // let key = merchantId + "-" + customerId + "-" + loanReferenceNumber;
-      // console.log(" confirmTx.js:key", key);
-
-      // var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
-      // console.log(JSON.stringify(txObj) + "tx value");
-
-      let currentTxReadState = JSON.parse(x110Msg);
-      console.log("printing the currentTxReadState :", currentTxReadState);
-
-      //@to-do verify chaincode has data for key
-      if (currentTxReadState.length == 0) {
-        // throw new Error(`Invalid Key : ${key} not found `);
-        throw new Error(`Invalid x110 message : ${x110Msg} not found `);
-      }
-
-      //@to-do verify chaincode tx state is initiated only.
-      // TODO verify chaincode tx state is as per requirement.
-      // if (!(currentTxReadState.TxStatus == TXSTATUS_CONFIRMED)) {
-      //   throw new Error(`Invalid Transaction state  for key  : ${key}`);
-      // }
 
       let isSubmitted = false;
-
-      isSubmitted = await this.submitTxByAOD(
+      isSubmitted = await this.accountTxByACD(
         ctx,
         currentTxReadState
       );
 
-      // var state;
-      // if (isSubmitted) {
-      //   state = TXSTATUS_SUBMITTED;
-      // } else {
-      //   state = TXSTATUS_NOT_SUBMITTED;
-      // }
-      // putState the state to utilsCC
-      // currentTxReadState.TxStatus = state;
-      // var txObj = await pymtutils.writeTxStatus(ctx, key, channelName, currentTxReadState);
-      // console.log("txObj", txObj);
+      if (isSubmitted == false) {
+        throw new Error(`Invalid Key : ${x500Msg} not valid error thrown by ACD `);
+      }
+      // var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
+      // console.log(JSON.stringify(txObj) + "tx value");
+      const prevTxnsStr = await pymtutils.readAllPrevTxns(ctx, channelName); //read prev txns using channel name
 
-      // var OrgMSPId = await ctx.clientIdentity.getMSPID();
-      // var hlfevent = new HLFEVENT();
-      // let { AAD_AOD_ST_EVENT } = await hlfevent.hlfevents();
-      // try {
-      //   await this.emitEvent(
-      //     ctx,
-      //     AAD_AOD_ST_EVENT,
-      //     AAD_AOD_ST_EVENT.eventID,
-      //     key,
-      //     OrgMSPId,
-      //     channelName
-      //   );
-      // } catch (err) {
-      //   console.log(err);
-      //   throw err;
-      // }
+      let currentTxReadState = JSON.parse(x500Msg);
+      console.log("printing the currentTxReadState :", currentTxReadState);
 
-      return isSubmitted;
+      //@to-do verify chaincode has data for key
+      if (currentTxReadState.length == 0) {
+        throw new Error(`Invalid Key : ${x500Msg} not found `);
+      }
+
+      const prevTxns = JSON.parse(prevTxnsStr);
+      const stan = currentTxReadState.systemsTraceAuditNumber;
+      let stans = stan.split(',')
+      let statuses = []
+      for (let iii = 0; iii < stans.length; iii++) {
+        stan = stans[iii]
+        console.log("Stan is: ", stan);
+        console.log("Previous transactions are:", prevTxns);
+
+        const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
+
+        console.log("Filtered x100 messages are: ", x100Msgs);
+
+        let x100Verified = true;
+        const x100Msg = x100Msgs[0]; //if no x100Msg raise error
+        if (x100Msg.Record.TxStatus !== 'TxConfirmed') {
+          x100Verified = false;
+        }
+
+        //const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === stan);
+
+        // let x110Verified = true;
+        // const x110Msg = x110Msgs[0];
+        // if (x110Msg.Record.TxStatus !== 'TxSubmitted') {
+        //     x110Verified = false;
+        // }
+
+        if (x100Verified) {
+          statuses.append('TxSubmitted')
+          console.log("Result after verifying all x100 messages with stan ", stan, 'TxSubmitted');
+
+          x100Msg.TxStatus = 'TxSubmitted';
+          // x110Msg.TxStatus = 'TxSubmitted';
+          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.merchantId + "-" + x100Msg.Record.customerId + "-" + x100Msg.Record.loanReferenceNumber;
+          console.log(" x100 key::", key);
+          let txObj = x100Msg.Record
+          txObj.TxStatus = 'TxSubmitted'
+          var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+          console.log("txobj2", txobj2);
+
+
+          // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
+          // console.log(" x100 key::", key);
+          // txObj = x110Msg.Record
+          // txObj.TxStatus = 'TxSubmitted'
+          // var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+          // console.log("txobj2", txobj2);
+
+        } else {
+          statuses.append('TxNotSubmitted')
+          console.log("Result after verifying all x100 messages with stan ", stan, 'TxNotSubmitted');
+
+          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.merchantId + "-" + x100Msg.Record.customerId + "-" + x100Msg.Record.loanReferenceNumber;
+          console.log(" x100 key::", key);
+          let txObj = x100Msg.Record
+          txObj.TxStatus = 'TxNotSubmitted'
+          var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+          console.log("txobj2", txobj2);
+
+
+          // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
+          // console.log(" x100 key::", key);
+          // txObj = x110Msg.Record
+          // txObj.TxStatus = 'TxNotSubmitted'
+          // var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+          // console.log("txobj2", txobj2);
+        }
+      }
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error));
       throw Error(error);
     }
   }
-
   async submitTxByAOD(ctx, txIn) {
     var isSubmitted = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)

@@ -10,7 +10,7 @@ const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class ConfirmSettlementTxCC extends Contract {
-  async confirmSettlementTx(ctx, messageType, merchantId, customerId, loanReferenceNumber, prevTxnsstr) {
+  async confirmSettlementTx(ctx, messageType, merchantId, customerId, loanReferenceNumber) {
     try {
       console.log("------>>>In submitSettlementTx <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);
@@ -42,7 +42,10 @@ class ConfirmSettlementTxCC extends Contract {
       console.log(" confirmTx.js:key", key);
 
       var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
+
       console.log(JSON.stringify(txObj) + "tx value");
+
+      const prevTxnsStr = await pymtutils.readAllPrevTxns(ctx, channelName); //read prev txns using channel name
 
       let currentTxReadState = JSON.parse(txObj);
       console.log("printing the currentTxReadState :", currentTxReadState);
@@ -57,8 +60,8 @@ class ConfirmSettlementTxCC extends Contract {
         throw new Error(`Invalid Transaction state  for key  : ${key}`);
       }
 
-      const prevTxns = JSON.parse(prevTxnsstr);
-      x100_stan = currentTxReadState.systemsTraceAuditNumber
+      const prevTxns = JSON.parse(prevTxnsStr);
+      const x100_stan = currentTxReadState.systemsTraceAuditNumber;
       const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === x100_stan);
 
       const isConfirmed = await this.confirmTxByACD(
@@ -103,8 +106,8 @@ class ConfirmSettlementTxCC extends Contract {
   async confirmTxByACD(ctx, txIn, x110Msg) {
     var isConfirmed = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
-    
-    if (x110Msg.Record.approverCode === 0){ // not approved.
+
+    if (x110Msg.Record.approverCode === 0) { // not approved.
       isConfirmed = false
     }
 

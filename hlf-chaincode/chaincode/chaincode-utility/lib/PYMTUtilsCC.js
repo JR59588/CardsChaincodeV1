@@ -211,7 +211,7 @@ class PYMTUtilsCC extends Contract {
   //@required for V1
   ///"TODO"  add settlement tx details /// should be add and invoked from this contract.........
   // x100
-  async requestTx(
+  async requestX100Tx(
     ctx,
     MerchantId,
     CustomerId,
@@ -265,7 +265,7 @@ class PYMTUtilsCC extends Contract {
     }
     console.log("access valid : ", accessValid);
 
-    console.log("before the key in utilscc");
+    console.log("Inside requestX100Tx, generating key");
     // TODO: change the key as per the requirement by changing mid, cid, lrf.
 
     let key = await pymtutils.makeTxKey(
@@ -275,7 +275,9 @@ class PYMTUtilsCC extends Contract {
       LoanReferenceNumber,
       messageType,
     );
-    console.log("after the key in utilscc");
+
+    console.log("Inside requestX100Tx, Key generated: ", key);
+
 
     let settlementTx = {
       MerchantId: MerchantId,
@@ -375,6 +377,258 @@ class PYMTUtilsCC extends Contract {
     console.log("The END");
     // return JSON.stringify(settlementTx);
     // */
+  }
+
+  // x110 message
+  async requestX110Tx(
+    ctx,
+    MerchantId,
+    CustomerId,
+    LoanReferenceNumber,
+    MerchantName,
+    primaryAccountNumber,
+    processingCode,
+    transactionAmount,
+    transmissionDateAndTime,
+    systemsTraceAuditNumber,
+    expirationDate,
+    merchantCategoryCode,
+    pointOfServiceEntryMode,
+    acquiringInstitutionIdentificationCode,
+    retrievalReferenceNumber,
+    cardAcceptorTerminalIdentification,
+    cardAcceptorIdentificationCode,
+    cardAcceptorNameAndLocation,
+    currencyCode,
+    additionalData,
+    batchNumber,
+    approverCode,
+    authorizationId,
+    messageType,
+  ) {
+    // acl
+
+    var OrgMSPId = ctx.clientIdentity.getMSPID();
+    var pymtutils = new PYMTUtils(ctx);
+    var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
+    var channelName = await pymtutils.getChannelIdentity(ctx, "Org1");
+    console.log("channel name : ", channelName);
+
+    try {
+      // TODO: change the parameters as per the requirement by changing mid, cid, lrf.
+      await pymtutils.checkNull(MerchantId, CustomerId, LoanReferenceNumber);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    // TODO: remove hardcoded Org1MSP
+    const accessValid = true;//await pymtutils.validateOrganization(ctx, "Org1MSP");
+    // TODO: change the message as per the requirement by changing mid, cid, lrf.
+    if (!accessValid) {
+      throw new Error(
+        "This transaction already exists for merchantId : " +
+        MerchantId +
+        " customerId :" +
+        CustomerId +
+        "LoanReferenceNumber :" +
+        LoanReferenceNumber
+      );
+    }
+    console.log("access valid : ", accessValid);
+
+    console.log("Inside requestX110Tx, generating key");
+    // TODO: change the key as per the requirement by changing mid, cid, lrf.
+
+    let key = await pymtutils.makeTxKey(
+      OrgMSPID,
+      MerchantId,
+      CustomerId,
+      LoanReferenceNumber,
+      messageType,
+    );
+    console.log("Inside requestX500Tx, Key generated: ", key);
+
+
+    // TODO: fields should be changed accordingly
+    let settlementTx = {
+      MerchantId: MerchantId,
+      CustomerId: CustomerId,
+      LoanReferenceNumber: LoanReferenceNumber,
+      MerchantName: MerchantName,
+      primaryAccountNumber: primaryAccountNumber,
+      processingCode: processingCode,
+      transactionAmount: transactionAmount,
+      transmissionDateAndTime: transmissionDateAndTime,
+      systemsTraceAuditNumber: systemsTraceAuditNumber,
+      expirationDate: expirationDate,
+      merchantCategoryCode: merchantCategoryCode,
+      pointOfServiceEntryMode: pointOfServiceEntryMode,
+      acquiringInstitutionIdentificationCode: acquiringInstitutionIdentificationCode,
+      retrievalReferenceNumber: retrievalReferenceNumber,
+      cardAcceptorTerminalIdentification: cardAcceptorTerminalIdentification,
+      cardAcceptorIdentificationCode: cardAcceptorIdentificationCode,
+      cardAcceptorNameAndLocation: cardAcceptorNameAndLocation,
+      currencyCode: currencyCode,
+      batchNumber: batchNumber,
+      approverCode: approverCode,
+      authorizationId: authorizationId,
+      additionalData: additionalData,
+      messageType: messageType
+    };
+
+    let strObj = JSON.stringify(settlementTx);
+    console.log("Inside requestX110Tx, Requested Object String is: ", strObj);
+
+    // === Save transaction to state ===
+
+    console.log("------saving Txstate------");
+    try {
+      await this.saveTxState(ctx, key, settlementTx);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+
+    const txBuffer = Buffer.from(JSON.stringify(settlementTx));
+    console.log("Inside requestX110Tx, buffer is: ", txBuffer);
+    var hlfevent = new HLFEVENT();
+
+    let { MERCHANT_RTX110_EVENT } = await hlfevent.hlfevents();
+
+    try {
+      await this.emitEvent(
+        ctx,
+        MERCHANT_RTX110_EVENT,
+        MERCHANT_RTX110_EVENT.eventID,
+        key,
+        settlementTx,
+        OrgMSPId,
+        channelName
+      );
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    console.log("The END");
+  }
+
+
+  // x500 message
+
+  async requestX500Tx(
+    ctx,
+    MerchantId,
+    CustomerId,
+    LoanReferenceNumber,
+    MerchantName,
+    primaryAccountNumber,
+    processingCode,
+    transactionAmount,
+    systemsTraceAuditNumber,
+    networkInternationalId,
+    cardAcceptorTerminalIdentification,
+    cardAcceptorIdentificationCode,
+    transactionCurrencyCode,
+    transactionLifecycleId,
+    batchNumber,
+    totalNumberOfTransactions,
+    messageType
+  ) {
+    // acl
+
+    var OrgMSPId = ctx.clientIdentity.getMSPID();
+    var pymtutils = new PYMTUtils(ctx);
+    var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
+    var channelName = await pymtutils.getChannelIdentity(ctx, "Org1");
+    console.log("channel name : ", channelName);
+
+    try {
+      // TODO: change the parameters as per the requirement by changing mid, cid, lrf.
+      await pymtutils.checkNull(MerchantId, CustomerId, LoanReferenceNumber);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    // TODO: remove hardcoded Org1MSP
+    const accessValid = true;//await pymtutils.validateOrganization(ctx, "Org1MSP");
+    // TODO: change the message as per the requirement by changing mid, cid, lrf.
+    if (!accessValid) {
+      throw new Error(
+        "This transaction already exists for merchantId : " +
+        MerchantId +
+        " customerId :" +
+        CustomerId +
+        "LoanReferenceNumber :" +
+        LoanReferenceNumber
+      );
+    }
+    console.log("access valid : ", accessValid);
+
+    console.log("before the key in utilscc");
+    // TODO: change the key as per the requirement by changing mid, cid, lrf.
+
+    let key = await pymtutils.makeTxKey(
+      OrgMSPID,
+      MerchantId,
+      CustomerId,
+      LoanReferenceNumber,
+      messageType
+    );
+
+    console.log("Inside requestX500Tx, Key generated: ", key);
+
+    // TODO: fields should be changed accordingly
+    let settlementTx = {
+      MerchantId: MerchantId,
+      CustomerId: CustomerId,
+      LoanReferenceNumber: LoanReferenceNumber,
+      MerchantName: MerchantName,
+      primaryAccountNumber: primaryAccountNumber,
+      processingCode: processingCode,
+      transactionAmount: transactionAmount,
+      systemsTraceAuditNumber: systemsTraceAuditNumber,
+      networkInternationalId: networkInternationalId,
+      cardAcceptorTerminalIdentification: cardAcceptorTerminalIdentification,
+      cardAcceptorIdentificationCode: cardAcceptorIdentificationCode,
+      transactionCurrencyCode: transactionCurrencyCode,
+      transactionLifecycleId: transactionLifecycleId,
+      batchNumber: batchNumber,
+      totalNumberOfTransactions: totalNumberOfTransactions,
+      messageType: messageType
+    };
+
+    let strObj = JSON.stringify(settlementTx);
+    console.log("Inside requestX500Tx, Requested Object String is: ", strObj);
+
+    // === Save transaction to state ===
+
+    console.log("------saving Txstate------");
+    try {
+      await this.saveTxState(ctx, key, settlementTx);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    const txBuffer = Buffer.from(JSON.stringify(settlementTx));
+    console.log("Inside requestX500Tx, buffer is : ", txBuffer);
+    var hlfevent = new HLFEVENT();
+    let { MERCHANT_RTX500_EVENT } = await hlfevent.hlfevents();
+
+    try {
+      await this.emitEvent(
+        ctx,
+        MERCHANT_RTX500_EVENT,
+        MERCHANT_RTX500_EVENT.eventID,
+        key,
+        settlementTx,
+        OrgMSPId,
+        channelName
+      );
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    console.log("End of requestX500Tx");
   }
 
   // // x100 message

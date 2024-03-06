@@ -10,7 +10,7 @@ const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class SubmitSettlementTxCC extends Contract {
-  async submitSettlementTx(ctx, x500Msg, prevTxnStr) {
+  async submitSettlementTx(ctx, messageType, merchantId, customerId, loanReferenceNumber) {
     try {
       console.log("------>>>In SubmitSettlementTx <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);
@@ -50,6 +50,7 @@ class SubmitSettlementTxCC extends Contract {
       }
       // var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
       // console.log(JSON.stringify(txObj) + "tx value");
+      const prevTxnsStr = await pymtutils.readAllPrevTxns(ctx, channelName); //read prev txns using channel name
 
       let currentTxReadState = JSON.parse(x500Msg);
       console.log("printing the currentTxReadState :", currentTxReadState);
@@ -59,11 +60,11 @@ class SubmitSettlementTxCC extends Contract {
         throw new Error(`Invalid Key : ${x500Msg} not found `);
       }
 
-      const prevTxns = JSON.parse(prevTxnStr);
+      const prevTxns = JSON.parse(prevTxnsStr);
       const stan = currentTxReadState.systemsTraceAuditNumber;
       let stans = stan.split(',')
       let statuses = []
-      for(let iii = 0; iii < stans.length ; iii++){
+      for (let iii = 0; iii < stans.length; iii++) {
         stan = stans[iii]
         console.log("Stan is: ", stan);
         console.log("Previous transactions are:", prevTxns);
@@ -71,13 +72,13 @@ class SubmitSettlementTxCC extends Contract {
         const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
 
         console.log("Filtered x100 messages are: ", x100Msgs);
-        
+
         let x100Verified = true;
         const x100Msg = x100Msgs[0]; //if no x100Msg raise error
         if (x100Msg.Record.TxStatus !== 'TxConfirmed') {
           x100Verified = false;
         }
-        
+
         //const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === stan);
 
         // let x110Verified = true;
@@ -86,20 +87,20 @@ class SubmitSettlementTxCC extends Contract {
         //     x110Verified = false;
         // }
 
-        if (x100Verified){
+        if (x100Verified) {
           statuses.append('TxSubmitted')
           console.log("Result after verifying all x100 messages with stan ", stan, 'TxSubmitted');
-          
+
           x100Msg.TxStatus = 'TxSubmitted';
           // x110Msg.TxStatus = 'TxSubmitted';
-          let key = x100Msg.Record.messageType + "-" +  x100Msg.Record.merchantId + "-" +  x100Msg.Record.customerId + "-" +  x100Msg.Record.loanReferenceNumber;
+          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.merchantId + "-" + x100Msg.Record.customerId + "-" + x100Msg.Record.loanReferenceNumber;
           console.log(" x100 key::", key);
           let txObj = x100Msg.Record
           txObj.TxStatus = 'TxSubmitted'
           var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
           console.log("txobj2", txobj2);
 
-          
+
           // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
           // console.log(" x100 key::", key);
           // txObj = x110Msg.Record
@@ -107,18 +108,18 @@ class SubmitSettlementTxCC extends Contract {
           // var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
           // console.log("txobj2", txobj2);
 
-        }else{
+        } else {
           statuses.append('TxNotSubmitted')
           console.log("Result after verifying all x100 messages with stan ", stan, 'TxNotSubmitted');
-        
-          let key = x100Msg.Record.messageType + "-" +  x100Msg.Record.merchantId + "-" +  x100Msg.Record.customerId + "-" +  x100Msg.Record.loanReferenceNumber;
+
+          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.merchantId + "-" + x100Msg.Record.customerId + "-" + x100Msg.Record.loanReferenceNumber;
           console.log(" x100 key::", key);
           let txObj = x100Msg.Record
           txObj.TxStatus = 'TxNotSubmitted'
           var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
           console.log("txobj2", txobj2);
 
-          
+
           // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
           // console.log(" x100 key::", key);
           // txObj = x110Msg.Record
