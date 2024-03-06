@@ -10,7 +10,7 @@ const { Contract } = require("fabric-contract-api");
 const HLFEVENT = require("./HLFEVENT");
 // TODO : mid , cid, lrf has to be changed accordingly......(discussion in team)
 class ConfirmSettlementTxCC extends Contract {
-  async confirmSettlementTx(ctx, messageType, merchantId, customerId, loanReferenceNumber) {
+  async confirmSettlementTx(ctx, messageType, merchantId, customerId, loanReferenceNumber, prevTxnsstr) {
     try {
       console.log("------>>>In submitSettlementTx <<<<<<<-------");
       var pymtutils = new PYMTUtils(ctx);
@@ -57,9 +57,14 @@ class ConfirmSettlementTxCC extends Contract {
         throw new Error(`Invalid Transaction state  for key  : ${key}`);
       }
 
+      const prevTxns = JSON.parse(prevTxnsstr);
+      x100_stan = currentTxReadState.systemsTraceAuditNumber
+      const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === x100_stan);
+
       const isConfirmed = await this.confirmTxByACD(
         ctx,
-        currentTxReadState
+        currentTxReadState,
+        x110Msgs[0]
       );
 
       var state;
@@ -95,9 +100,14 @@ class ConfirmSettlementTxCC extends Contract {
     }
   }
 
-  async confirmTxByACD(ctx, txIn) {
+  async confirmTxByACD(ctx, txIn, x110Msg) {
     var isConfirmed = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
+    
+    if (x110Msg.Record.approverCode === 0){ // not approved.
+      isConfirmed = false
+    }
+
     const hasTxprocessingCode = "processingCode" in txIn;
     if (hasTxprocessingCode) {
       if (txIn.processingCode === "" || txIn.processingCode.length == 0) {

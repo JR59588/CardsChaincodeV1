@@ -38,10 +38,16 @@ class AccountSettlementTxCC extends Contract {
       } = await pymtutils.hlfconstants();
       //TODO : change the function of the utils.js for channel name.(replace:getChannelIdentity )
       const channelName = await pymtutils.getChannelIdentity(ctx);
-      // TODO: Change the parameters based on requirement.
-      // let key = merchantId + "-" + customerId + "-" + loanReferenceNumber;
-      // console.log(" confirmTx.js:key", key);
 
+      let isAccounted = false;
+      isAccounted = await this.accountTxByACD(
+        ctx,
+        currentTxReadState
+      );
+
+      if (isAccounted == false) {
+        throw new Error(`Invalid Key : ${x500Msg} not valid error thrown by ACD `);
+      }
       // var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
       // console.log(JSON.stringify(txObj) + "tx value");
 
@@ -55,97 +61,72 @@ class AccountSettlementTxCC extends Contract {
 
       const prevTxns = JSON.parse(prevTxnStr);
       const stan = currentTxReadState.systemsTraceAuditNumber;
-      console.log("Stan is: ", stan);
-      console.log("Previous transactions are:", prevTxns);
+      let stans = stan.split(',')
+      let statuses = []
+      for(let iii = 0; iii < stans.length ; iii++){
+        stan = stans[iii]
+        console.log("Stan is: ", stan);
+        console.log("Previous transactions are:", prevTxns);
 
-      const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
+        const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
 
-      console.log("Filtered x100 messages are: ", x100Msgs);
-
-      let x100Verified = true;
-
-      for (let i = 0; i < x100Msgs.length; i++) {
-        const x100Msg = x100Msgs[i];
-        if (x100Msg.Record.TxStatus !== 'TxConfirmed') {
+        console.log("Filtered x100 messages are: ", x100Msgs);
+        
+        let x100Verified = true;
+        const x100Msg = x100Msgs[0]; //if no x100Msg raise error
+        if (x100Msg.Record.TxStatus !== 'TxSubmitted') {
           x100Verified = false;
-          break;
+        }
+        
+        // const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === stan);
+
+        // let x110Verified = true;
+        // const x110Msg = x110Msgs[0];
+        // if (x110Msg.Record.TxStatus !== 'TxSubmitted') {
+        //     x110Verified = false;
+        // }
+
+        if (x100Verified){
+          statuses.append('TxAccounted')
+          console.log("Result after verifying all x100 messages with stan ", stan, 'TxAccounted');
+          
+          x100Msg.TxStatus = 'TxAccounted';
+          // x110Msg.TxStatus = 'TxAccounted';
+          let key = x100Msg.Record.messageType + "-" +  x100Msg.Record.merchantId + "-" +  x100Msg.Record.customerId + "-" +  x100Msg.Record.loanReferenceNumber;
+          console.log(" x100 key::", key);
+          let txObj = x100Msg.Record
+          txObj.TxStatus = 'TxAccounted'
+          var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+          console.log("txobj2", txobj2);
+
+          
+          // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
+          // console.log(" x100 key::", key);
+          // txObj = x110Msg.Record
+          // txObj.TxStatus = 'TxAccounted'
+          // var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+          // console.log("txobj2", txobj2);
+
+        }else{
+          statuses.append('TxNonAccounted')
+          console.log("Result after verifying all x100 messages with stan ", stan, 'TxNonAccounted');
+        
+          let key = x100Msg.Record.messageType + "-" +  x100Msg.Record.merchantId + "-" +  x100Msg.Record.customerId + "-" +  x100Msg.Record.loanReferenceNumber;
+          console.log(" x100 key::", key);
+          let txObj = x100Msg.Record
+          txObj.TxStatus = 'TxNonAccounted'
+          var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+          console.log("txobj2", txobj2);
+
+          
+          // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
+          // console.log(" x100 key::", key);
+          // txObj = x110Msg.Record
+          // txObj.TxStatus = 'TxNonAccounted'
+          // var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+          // console.log("txobj2", txobj2);
         }
       }
-
-      console.log("Result after verifying all x100 messages with stan ", stan, x100Verified);
-
-
-      // let queryString = {
-      //   selector: {
-      //     messageType: "x100",
-      //   }
-      // }
-
-      // let allResults = [];
-      // const settlementTxIterator = await ctx.stub.getQueryResultWithPagination(JSON.stringify(queryString), 10, ''); // get the settlementTx from chaincode state
-      // while (await settlementTxIterator.hasNext()) {
-      //   const nextItem = await settlementTxIterator.next();
-      //   if (nextItem.value) {
-      //     // const key = result.value.key;
-      //     const value = JSON.parse(result.value.value.toString('utf8'));
-      //     allResults.push(value);
-      //     // Process the key or retrieve associated data
-      //     console.log(`Found item value: ${value}`);
-
-      //   }
-      // }
-
-      // // close settlementtx iterator
-      // settlementTxIterator.close();
-
-      // getting all x 100 messages
-      // let resultsIterator = await ctx.stub.getStateByRange("M1", "M2");
-      // let results = await this.GetAllResults(ctx, resultsIterator, false);
-      // console.log("Found " + results.length + " Transactions");
-      // console.log("read x100 messages: ", results);
-
-
-      //@to-do verify chaincode tx state is initiated only.
-      // TODO verify chaincode tx state is as per requirement.
-      // if (!(currentTxReadState.TxStatus == TXSTATUS_SUBMITTED)) {
-      //   throw new Error(`Invalid Transaction state  for key  : ${key}`);
-      // }
-
-      let isAccounted = false;
-
-      isAccounted = await this.accountTxByACD(
-        ctx,
-        currentTxReadState
-      );
-
-      // var state;
-      // if (isAccounted) {
-      //   state = TXSTATUS_ACCOUNTED;
-      // } else {
-      //   state = TXSTATUS_NON_ACCOUNTED;
-      // }
-      // // putState the state to utilsCC
-      // currentTxReadState.TxStatus = state;
-      // var txObj = await pymtutils.writeTxStatus(ctx, key, channelName, currentTxReadState);
-      // console.log("txObj", txObj);
-      // var OrgMSPId = await ctx.clientIdentity.getMSPID();
-      // var hlfevent = new HLFEVENT();
-      // let { AOD_ACD_AT_EVENT } = await hlfevent.hlfevents();
-      // try {
-      //   await this.emitEvent(
-      //     ctx,
-      //     AOD_ACD_AT_EVENT,
-      //     AOD_ACD_AT_EVENT.eventID,
-      //     key,
-      //     OrgMSPId,
-      //     channelName
-      //   );
-      // } catch (err) {
-      //   console.log(err);
-      //   throw err;
-      // }
-
-      return isAccounted && x100Verified;
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error));
       throw Error(error);
@@ -169,9 +150,9 @@ class AccountSettlementTxCC extends Contract {
       return false;
     }
 
-
     return isAccounted;
   }
+
   async emitEvent(ctx, eventType, eventID, keyIn, txIn, MSPId, chName) {
     let evtPayload = {
       eventMap: eventType,
