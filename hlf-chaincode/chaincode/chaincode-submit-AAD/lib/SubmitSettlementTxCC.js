@@ -69,7 +69,7 @@ class SubmitSettlementTxCC extends Contract {
       const prevTxnsStr = await pymtutils.readAllPrevTxns(ctx, channelName); //read prev txns using channel name
 
       const prevTxns = JSON.parse(prevTxnsStr);
-      const stan = currentTxReadState.systemsTraceAuditNumber;
+      let stan = currentTxReadState.systemsTraceAuditNumber;
       let stans = stan.split(',')
       let statuses = []
       for (let iii = 0; iii < stans.length; iii++) {
@@ -96,12 +96,12 @@ class SubmitSettlementTxCC extends Contract {
         // }
 
         if (x100Verified) {
-          statuses.append('TxSubmitted')
+          statuses.push('TxSubmitted')
           console.log("Result after verifying all x100 messages with stan ", stan, 'TxSubmitted');
 
           x100Msg.TxStatus = 'TxSubmitted';
           // x110Msg.TxStatus = 'TxSubmitted';
-          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.merchantId + "-" + x100Msg.Record.customerId + "-" + x100Msg.Record.loanReferenceNumber;
+          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
           console.log(" x100 key::", key);
           let txObj = x100Msg.Record
           txObj.TxStatus = 'TxSubmitted'
@@ -117,10 +117,11 @@ class SubmitSettlementTxCC extends Contract {
           // console.log("txobj2", txobj2);
 
         } else {
-          statuses.append('TxNotSubmitted')
+          statuses.push('TxNotSubmitted')
           console.log("Result after verifying all x100 messages with stan ", stan, 'TxNotSubmitted');
 
-          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.merchantId + "-" + x100Msg.Record.customerId + "-" + x100Msg.Record.loanReferenceNumber;
+          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
+
           console.log(" x100 key::", key);
           let txObj = x100Msg.Record
           txObj.TxStatus = 'TxNotSubmitted'
@@ -137,7 +138,7 @@ class SubmitSettlementTxCC extends Contract {
         }
       }
     } catch (error) {
-      console.log("Error inside submit Tx :", JSON.stringify(error));
+      console.log("Error inside submit Tx :", JSON.stringify(error), error);
       throw Error(error);
     }
   }
