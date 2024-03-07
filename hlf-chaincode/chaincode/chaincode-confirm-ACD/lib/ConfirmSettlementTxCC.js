@@ -64,6 +64,10 @@ class ConfirmSettlementTxCC extends Contract {
       const x100_stan = currentTxReadState.systemsTraceAuditNumber;
       const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === x100_stan);
 
+      if (x110Msgs.length == 0) {
+        throw new Error(`No x110 messages found corresponding to x100 message with given Systems trace audit number ${currentTxReadState.systemsTraceAuditNumber}`);
+      }
+
       const isConfirmed = await this.confirmTxByACD(
         ctx,
         currentTxReadState,

@@ -39,8 +39,24 @@ class SubmitSettlementTxCC extends Contract {
       //TODO : change the function of the utils.js for channel name.(replace:getChannelIdentity )
       const channelName = await pymtutils.getChannelIdentity(ctx);
 
+      let key = messageType + "-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
+      console.log(" confirmTx.js:key", key);
+
+      var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
+
+      const x500Msg = JSON.parse(txObj);
+
+      let currentTxReadState = x500Msg;
+      console.log("printing the currentTxReadState :", currentTxReadState);
+
+
+      //@to-do verify chaincode has data for key
+      if (currentTxReadState.length == 0) {
+        throw new Error(`Invalid Key : ${x500Msg} not found `);
+      }
+
       let isSubmitted = false;
-      isSubmitted = await this.accountTxByACD(
+      isSubmitted = await this.submitTxByAAD(
         ctx,
         currentTxReadState
       );
@@ -51,14 +67,6 @@ class SubmitSettlementTxCC extends Contract {
       // var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
       // console.log(JSON.stringify(txObj) + "tx value");
       const prevTxnsStr = await pymtutils.readAllPrevTxns(ctx, channelName); //read prev txns using channel name
-
-      let currentTxReadState = JSON.parse(x500Msg);
-      console.log("printing the currentTxReadState :", currentTxReadState);
-
-      //@to-do verify chaincode has data for key
-      if (currentTxReadState.length == 0) {
-        throw new Error(`Invalid Key : ${x500Msg} not found `);
-      }
 
       const prevTxns = JSON.parse(prevTxnsStr);
       const stan = currentTxReadState.systemsTraceAuditNumber;

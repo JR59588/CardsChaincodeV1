@@ -42,7 +42,7 @@ class PYMTUtils {
       TXSTATUS_NOT_CLEARED: "TxNotCleared",
       submitSettlementTxFN: "submitSettlementTx",
       requestSettlementTxFN: "requestSettlementTx",
-      confirmSettlementTxFN: "confirmSettlementTx",
+      requestSettlementX500TxFN: "requestSettlementX500Tx",
       accountSettlementTxFN: "accountSettlementTx",
       initiateSettlementTxFN: "initiateSettlementTx",
       reconciliationSettlementTxFN: "reconciliationSettlementTx",
@@ -57,7 +57,7 @@ class PYMTUtils {
       // processSettlementTxFN: "processSettlementTX",
 
       readSettlementTxFN: "readState",
-
+      readAllPrevTxnsFN: "GetTxByRange",
       IsMerchantContractSigned: "IsMerchantContractSigned",
       // APChaincodeName: "APvalidationcc",
       // SACCFuncName: "validation",
@@ -183,6 +183,40 @@ class PYMTUtils {
     if (!chaincodeResponse) {
       let jsonResp = {};
       jsonResp.Error = "Error while reading Tx status for key :" + key;
+      throw new Error(JSON.stringify(jsonResp));
+    }
+    const payload = Buffer.from(chaincodeResponse.payload, "base64").toString();
+
+    return payload;
+  }
+
+  // Reading all previously submitted messages / txns
+  async readAllPrevTxns(ctx, channelName) {
+    console.log(
+      "line no 194----PYMTutils.js----readAllPrevTxns--",
+      channelName
+    );
+    var pymtutils = new PYMTUtils(ctx);
+    let { PYMTUtilsCC, readAllPrevTxnsFN } = await pymtutils.hlfconstants();
+
+    const chaincodeResponse = await this.ctx.stub.invokeChaincode(
+      PYMTUtilsCC,
+      [readAllPrevTxnsFN, "", ""],
+      channelName
+    );
+
+    console.log(
+      "line no 133----PYMTutils.js----readAllPrevTxns ",
+      chaincodeResponse
+    );
+
+    if (chaincodeResponse.status !== 200) {
+      throw new Error(chaincodeResponse.message);
+    }
+
+    if (!chaincodeResponse) {
+      let jsonResp = {};
+      jsonResp.Error = "Error while reading previous txns";
       throw new Error(JSON.stringify(jsonResp));
     }
     const payload = Buffer.from(chaincodeResponse.payload, "base64").toString();

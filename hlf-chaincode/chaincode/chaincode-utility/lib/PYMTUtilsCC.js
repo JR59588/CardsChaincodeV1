@@ -564,7 +564,7 @@ class PYMTUtilsCC extends Contract {
     }
     console.log("access valid : ", accessValid);
 
-    console.log("before the key in utilscc");
+    console.log("Inside requestX100Tx, generating key");
     // TODO: change the key as per the requirement by changing mid, cid, lrf.
 
     let key = await pymtutils.makeTxKey(
@@ -572,12 +572,12 @@ class PYMTUtilsCC extends Contract {
       MerchantId,
       CustomerId,
       LoanReferenceNumber,
-      messageType
+      messageType,
     );
 
-    console.log("Inside requestX500Tx, Key generated: ", key);
+    console.log("Inside requestX100Tx, Key generated: ", key);
 
-    // TODO: fields should be changed accordingly
+
     let settlementTx = {
       MerchantId: MerchantId,
       CustomerId: CustomerId,
@@ -597,8 +597,43 @@ class PYMTUtilsCC extends Contract {
       messageType: messageType
     };
 
+    let { requestSettlementX500TxFN } = await pymtutils.hlfconstants();
+
     let strObj = JSON.stringify(settlementTx);
-    console.log("Inside requestX500Tx, Requested Object String is: ", strObj);
+    console.log(" strObj = ", strObj);
+    var iCCName;
+    iCCName = "MC_" + PYMTTX_MERCHANT_CC_SUFFIX;
+    console.log(" PYTMutilscc.js iCCName : ", iCCName);
+    // TODO: replace mid, mname, cid, lrf with the required fields as per the chaincode.
+    const chaincodeResponse = await ctx.stub.invokeChaincode(
+      iCCName,
+      [
+        requestSettlementX500TxFN,
+        MerchantId,
+        MerchantName,
+        CustomerId,
+        LoanReferenceNumber,
+        strObj,
+      ],
+      // SAChannelName
+      channelName
+    );
+
+    console.log(" chaincodeResponse ", chaincodeResponse);
+
+    var ccPayload = await checkInvokeCCResponse(chaincodeResponse);
+
+    // var txIn = await this.getTxObject(ctx, key);
+    let { TXSTATUS_REQUESTED, TXSTATUS_REJECTED } =
+      await pymtutils.hlfconstants();
+    console.log("PYTMutilscc.js ccPayload ", ccPayload);
+
+    if (ccPayload == "true") {
+      console.log("PYTMutilscc.js ccPayload ", ccPayload);
+      settlementTx.TxStatus = TXSTATUS_REQUESTED;
+    } else {
+      settlementTx.TxStatus = TXSTATUS_REJECTED;
+    }
 
     // === Save transaction to state ===
 
@@ -609,11 +644,16 @@ class PYMTUtilsCC extends Contract {
       console.log(err);
       throw err;
     }
+
+    // console.log("before the putste in utilscc");
+    // await ctx.stub.putState(key, Buffer.from(JSON.stringify(settlementTx)));
+    // console.log("after the putstae in utilscc")
     const txBuffer = Buffer.from(JSON.stringify(settlementTx));
-    console.log("Inside requestX500Tx, buffer is : ", txBuffer);
+    // ctx.stub.setEvent("E-TxRequested", txBuffer);
+    console.log("tx buffer : ", txBuffer);
     var hlfevent = new HLFEVENT();
     let { MERCHANT_RTX500_EVENT } = await hlfevent.hlfevents();
-
+    // /**
     try {
       await this.emitEvent(
         ctx,
@@ -628,143 +668,12 @@ class PYMTUtilsCC extends Contract {
       console.log(err);
       throw err;
     }
-    console.log("End of requestX500Tx");
+    console.log("The END");
+    // return JSON.stringify(settlementTx);
+    // */
   }
 
-  // // x100 message
-  // async confirmTx(
-  //   ctx,
-  //   MerchantId,
-  //   CustomerId,
-  //   LoanReferenceNumber,
-  //   MerchantName,
-  // ) {
-  //   // acl
 
-  //   var OrgMSPId = ctx.clientIdentity.getMSPID();
-  //   var pymtutils = new PYMTUtils(ctx);
-  //   var OrgMSPID = await pymtutils.getOrgMSPId(ctx);
-  //   var channelName = await pymtutils.getChannelIdentity(ctx, "Org1");
-  //   console.log("channel name : ", channelName);
-
-  //   try {
-  //     // TODO: change the parameters as per the requirement by changing mid, cid, lrf.
-  //     await pymtutils.checkNull(MerchantId, CustomerId, LoanReferenceNumber);
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw err;
-  //   }
-  //   // TODO: remove hardcoded Org1MSP
-  //   const accessValid = true;//await pymtutils.validateOrganization(ctx, "Org1MSP");
-  //   // TODO: change the message as per the requirement by changing mid, cid, lrf.
-  //   if (!accessValid) {
-  //     throw new Error(
-  //       "This transaction already exists for merchantId : " +
-  //       MerchantId +
-  //       " customerId :" +
-  //       CustomerId +
-  //       "LoanReferenceNumber :" +
-  //       LoanReferenceNumber
-  //     );
-  //   }
-  //   console.log("access valid : ", accessValid);
-
-  //   console.log("before the key in utilscc");
-  //   // TODO: change the key as per the requirement by changing mid, cid, lrf.
-
-  //   let key = await pymtutils.makeTxKey(
-  //     OrgMSPID,
-  //     MerchantId,
-  //     CustomerId,
-  //     LoanReferenceNumber,
-  //     "x100",
-  //   );
-  //   console.log("after the key in utilscc");
-
-  //   let settlementTx = {
-  //     MerchantId: MerchantId,
-  //     CustomerId: CustomerId,
-  //     LoanReferenceNumber: LoanReferenceNumber,
-  //     MerchantName: MerchantName
-  //   };
-
-  //   let { confirmSettlementTxFN } = await pymtutils.hlfconstants();
-
-  //   let strObj = JSON.stringify(settlementTx);
-  //   console.log(" strObj = ", strObj);
-  //   var iCCName = CONFIRM_CC_SUFFIX;
-  //   console.log(" PYTMutilscc.js iCCName : ", iCCName);
-  //   // TODO: replace mid, mname, cid, lrf with the required fields as per the chaincode.
-  //   const chaincodeResponse = await ctx.stub.invokeChaincode(
-  //     iCCName,
-  //     [
-  //       confirmSettlementTxFN,
-  //       MerchantId,
-  //       MerchantName,
-  //       CustomerId,
-  //       LoanReferenceNumber,
-  //       strObj,
-  //     ],
-  //     // SAChannelName
-  //     channelName
-  //   );
-
-  //   console.log(" chaincodeResponse ", chaincodeResponse);
-
-  //   var ccPayload = await checkInvokeCCResponse(chaincodeResponse);
-
-  //   // var txIn = await this.getTxObject(ctx, key);
-  //   let { TXSTATUS_CONFIRMED, TXSTATUS_NON_CONFIRMED } =
-  //     await pymtutils.hlfconstants();
-  //   console.log("PYTMutilscc.js ccPayload ", ccPayload);
-
-  //   if (ccPayload == "true") {
-  //     console.log("PYTMutilscc.js ccPayload ", ccPayload);
-  //     settlementTx.TxStatus = TXSTATUS_CONFIRMED;
-  //   } else {
-  //     settlementTx.TxStatus = TXSTATUS_NON_CONFIRMED;
-  //   }
-
-  //   // === Save transaction to state ===
-
-  //   console.log("------saving Txstate------");
-  //   try {
-  //     await this.saveTxState(ctx, key, settlementTx);
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw err;
-  //   }
-
-  //   // console.log("before the putste in utilscc");
-  //   // await ctx.stub.putState(key, Buffer.from(JSON.stringify(settlementTx)));
-  //   // console.log("after the putstae in utilscc")
-  //   const txBuffer = Buffer.from(JSON.stringify(settlementTx));
-  //   // ctx.stub.setEvent("E-TxRequested", txBuffer);
-  //   console.log("tx buffer : ", txBuffer);
-  //   var hlfevent = new HLFEVENT();
-  //   let { MERCHANT_RT_EVENT } = await hlfevent.hlfevents();
-  //   // /**
-  //   try {
-  //     await this.emitEvent(
-  //       ctx,
-  //       MERCHANT_RT_EVENT,
-  //       MERCHANT_RT_EVENT.eventID,
-  //       key,
-  //       settlementTx,
-  //       OrgMSPId,
-  //       channelName
-  //     );
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw err;
-  //   }
-  //   console.log("The END");
-  //   // return JSON.stringify(settlementTx);
-  //   // */
-  // }
-
-  // TODO add submit request fields.
-  // x110
   async submitTx(
     ctx,
     MerchantId,
