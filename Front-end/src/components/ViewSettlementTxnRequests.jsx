@@ -84,19 +84,19 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
               <thead>
                 <tr>
                   <th>No</th>
-                  <th colSpan={3}>Txn Summary (Hyperledger)</th>
+                  <th colSpan={2}>Txn Summary (Hyperledger)</th>
                   <th colSpan={4}>Txn Submission Details</th>
-                  <th colSpan={1}>Txn Verification Summary</th>
+                  <th colSpan={2}>Txn Verification Summary</th>
                 </tr>
                 <tr>
                   <th></th>
                   <th>Txn Date</th>
                   <th>Txn ID</th>
-                  <th>Status</th>
                   <th>Merchant Details</th>
                   <th>Merchant Name</th>
                   <th>Customer Details</th>
                   <th>Txn Reference Number</th>
+                  <th>Status</th>
                   <th>Account Txn</th>
                 </tr>
               </thead>
@@ -108,11 +108,12 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                     <td>{x500Msg.Record.txTimestamp}</td>
                     {/* <td>{20 / 10 / 2019}</td> */}
                     <td>{x500Msg.Record.txID}</td>
-                    <td>{x500Msg.Record.TxStatus}</td>
                     <td>{x500Msg.Record.MerchantId}</td>
                     <td>{x500Msg.Record.MerchantName}</td>
                     <td>{x500Msg.Record.CustomerId}</td>
                     <td>{x500Msg.Record.LoanReferenceNumber}</td>
+                    <td>{x500Msg.Record.TxStatus}</td>
+
                     <td>
                       {getButtonOrStatus(
                         x500Msg.Record.TxStatus,

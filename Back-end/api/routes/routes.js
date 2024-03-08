@@ -91,6 +91,34 @@ module.exports = function (app) {
 
   //   .post(merchantController.savePvAODMetaData);
 
+
+
+  // app
+
+  //   .route("/api/v1/verifyBalanceTx")
+
+  //   .post(merchantController.verifyBalanceTxUtils);
+
+  // app
+
+  //   .route("/api/v1/verifyAuthorizeTx")
+
+  //   .post(merchantController.verifyAuthorizeTxUtils);
+
+  // app
+
+  //   .route("/api/v1/verifyClearTx")
+
+  //   .post(merchantController.verifyClearTxUtils);
+
+  app
+
+    .route("/api/v1/verifyConfirmTx")
+
+    .post(merchantController.verifyConfirmTxUtils);
+
+
+
   app
 
     .route("/api/v1/verifySubmitTx")
@@ -99,27 +127,9 @@ module.exports = function (app) {
 
   app
 
-    .route("/api/v1/verifyBalanceTx")
+    .route("/api/v1/verifyAccountTx")
 
-    .post(merchantController.verifyBalanceTxUtils);
-
-  app
-
-    .route("/api/v1/verifyAuthorizeTx")
-
-    .post(merchantController.verifyAuthorizeTxUtils);
-
-  app
-
-    .route("/api/v1/verifyClearTx")
-
-    .post(merchantController.verifyClearTxUtils);
-
-  app
-
-    .route("/api/v1/verifyConfirmTx")
-
-    .post(merchantController.verifyConfirmTxUtils);
+    .post(merchantController.verifyAccountTxUtils);
 
   // app
 

@@ -1,0 +1,2 @@
+MerchantId,CustomerId,LoanReferenceNumber,MerchantName,primaryAccountNumber,processingCode,transactionAmount,networkInternationalId,cardAcceptorTerminalIdentification,cardAcceptorIdentificationCode,transactionCurrencyCode,transactionLifecycleId,batchNumber,totalNumberOfTransactions,messageType,systemsTraceAuditNumber
+M001,C001,LR001,Apple,3,4,5,6,7,8,9,10,11,12,x500,STANXYZ123,STANXYZ456

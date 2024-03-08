@@ -4,6 +4,15 @@ import { Button, Spinner, Table } from "react-bootstrap";
 import LoaderButton from "./LoaderButton";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
+const apiInfo = {
+  TxRequested: "verifyConfirmTx",
+  TxConfirmed: "verifySubmitTx",
+  TxSubmitted: "verifyAccountTx",
+};
+
+const requiredStatuses = ["TxConfirmed", "TxSubmitted", "TxAccounted"];
+const rejectedStatuses = ["TxNonConfirmed", "TxNotSubmitted", "TxNotAccounted"];
+
 const ViewAuthorizationTxnRequests = ({ roleId }) => {
   const [loading, setLoading] = useState(true);
   const [x100Msgs, setX100Msgs] = useState([]);
@@ -13,20 +22,18 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
     msgType,
     merchantId,
     customerId,
-    loanReferenceNumber
+    loanReferenceNumber,
+    apiPath
   ) => {
     try {
       setErrorMsg("");
-      const response = await axios.post(
-        `${apiBaseUrl}/api/v1/verifyConfirmTx`,
-        {
-          roleId,
-          msgType,
-          merchantId,
-          customerId,
-          loanReferenceNumber,
-        }
-      );
+      const response = await axios.post(`${apiBaseUrl}/api/v1/${apiPath}`, {
+        roleId,
+        msgType,
+        merchantId,
+        customerId,
+        loanReferenceNumber,
+      });
 
       if (response.data.success === true) {
         const { TxStatus, Key } = response.data.x100Message;
@@ -84,20 +91,20 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
               <thead>
                 <tr>
                   <th>No</th>
-                  <th colSpan={3}>Txn Summary (Hyperledger)</th>
+                  <th colSpan={2}>Txn Summary (Hyperledger)</th>
                   <th colSpan={5}>Txn Submission Details</th>
-                  <th colSpan={1}>Txn Verification Summary</th>
+                  <th colSpan={2}>Txn Verification Summary</th>
                 </tr>
                 <tr>
                   <th></th>
                   <th>Txn Date</th>
                   <th>Txn ID</th>
-                  <th>Status</th>
                   <th>Merchant Details</th>
                   <th>Merchant Name</th>
                   <th>Customer Details</th>
                   <th>Txn Reference Number</th>
                   <th>Systems trace audit number</th>
+                  <th>Status</th>
                   <th>Request Txn</th>
                 </tr>
               </thead>
@@ -109,23 +116,25 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
                     <td>{x100Msg.Record.txTimestamp}</td>
                     {/* <td>{20 / 10 / 2019}</td> */}
                     <td>{x100Msg.Record.txID}</td>
-                    <td>{x100Msg.Record.TxStatus}</td>
                     <td>{x100Msg.Record.MerchantId}</td>
                     <td>{x100Msg.Record.MerchantName}</td>
                     <td>{x100Msg.Record.CustomerId}</td>
                     <td>{x100Msg.Record.LoanReferenceNumber}</td>
                     <td>{x100Msg.Record.systemsTraceAuditNumber}</td>
+                    <td>{x100Msg.Record.TxStatus}</td>
+
                     <td>
                       {getButtonOrStatus(
                         x100Msg.Record.TxStatus,
-                        ["TxConfirmed", "TxAccounted"],
-                        ["TxNonConfirmed"],
+                        requiredStatuses,
+                        rejectedStatuses,
                         () =>
                           handleTxnRequest(
                             "x100",
                             x100Msg.Record.MerchantId,
                             x100Msg.Record.CustomerId,
-                            x100Msg.Record.LoanReferenceNumber
+                            x100Msg.Record.LoanReferenceNumber,
+                            apiInfo[x100Msg.Record.TxStatus]
                           )
                       )}
                     </td>
@@ -154,7 +163,10 @@ const getButtonOrStatus = (
   rejectedStatuses,
   handlerFunc
 ) => {
-  if (requiredStatuses.includes(status) || rejectedStatuses.includes(status)) {
+  if (
+    status === requiredStatuses[requiredStatuses.length - 1] ||
+    rejectedStatuses.includes(status)
+  ) {
     return <>{status}</>;
   } else {
     return <LoaderButton handlerFunc={handlerFunc} />;

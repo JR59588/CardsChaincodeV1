@@ -209,6 +209,15 @@ exports.processISO8583CSVWithType = async function (req, res) {
         const results = [];
         const responses = [];
 
+        const orgsDataStr = fs.readFileSync(
+          path.resolve(__dirname, "..", "orgsAdded.json")
+        );
+        console.log("Orgs data str is : ", orgsDataStr);
+        const orgsData = JSON.parse(orgsDataStr);
+        console.log("Orgs data is : ", orgsData);
+        orgs = orgsData.orgs.map(orgData => orgData.orgId);
+        console.log("Orgs are: ", orgs);
+
         fs.createReadStream(req.file.path)
           .pipe(csv())
           .on("data", (data) => results.push(data))
@@ -219,25 +228,17 @@ exports.processISO8583CSVWithType = async function (req, res) {
             let endorsers = [];
             switch (req.body.fileType) {
               case "settlementRequest":
-                invokedFunc = "accountTx";
-                orgs = ["AAD"];
-                endorsers = ["ACDMSP", "AODMSP"]
+                invokedFunc = "requestX500Tx";
+                // orgs = ["AAD"];
+                // endorsers = ["ACDMSP", "AODMSP"]
                 break;
               case "authorizationRequest":
-                invokedFunc = "requestTx";
-                const orgsDataStr = fs.readFileSync(
-                  path.resolve(__dirname, "..", "orgsAdded.json")
-                );
-                console.log("Orgs data str is : ", orgsDataStr);
-                const orgsData = JSON.parse(orgsDataStr);
-                console.log("Orgs data is : ", orgsData);
-                orgs = orgsData.orgs.map(orgData => orgData.orgId);
-                console.log("Orgs are: ", orgs);
+                invokedFunc = "requestX100Tx";
                 break;
               case "authorizationResponse":
-                invokedFunc = "submitTx";
-                orgs = ["ACD"];
-                endorsers = ["AADMSP", "AODMSP"]
+                invokedFunc = "requestX110Tx";
+                // orgs = ["ACD"];
+                // endorsers = ["AADMSP", "AODMSP"]
                 break;
               default:
                 throw new Error(
