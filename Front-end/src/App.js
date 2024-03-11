@@ -25,6 +25,7 @@ import OnboardFormik from "./components/Onboarding/OnboardFormik";
 import ViewAuthorizationTxnRequests from "./components/ViewAuthorizationTxnRequests";
 import ViewAuthorizationTxnResponses from "./components/ViewAuthorizationTxnResponses";
 import ViewSettlementTxnRequests from "./components/ViewSettlementTxnRequests";
+import ShowOnboarding from "./components/Onboarding/ShowOnboarding";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 const apiIP = process.env.REACT_APP_API_IP;
 const socketEndpointUrl = `${apiBaseUrl}`;
@@ -147,6 +148,12 @@ function App() {
           path="/View-Onboarding-Static"
           element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}
         />
+
+        <Route
+          path="/show-onboarding"
+          element={<ShowOnboarding roleId={roleId} IP={IP} />}
+        />
+
         <Route path="/About" element={<About />} />
         <Route
           path="/isoformik"

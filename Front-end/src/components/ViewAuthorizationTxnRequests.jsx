@@ -165,8 +165,10 @@ const getButtonOrStatus = (
 ) => {
   if (
     status === requiredStatuses[requiredStatuses.length - 1] ||
-    rejectedStatuses.includes(status)
+    status === requiredStatuses[requiredStatuses.length - 2]
   ) {
+    return "-";
+  } else if (rejectedStatuses.includes(status)) {
     return <>{status}</>;
   } else {
     return <LoaderButton handlerFunc={handlerFunc} />;
