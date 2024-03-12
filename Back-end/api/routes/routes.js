@@ -55,11 +55,17 @@ module.exports = function (app) {
     .get(viewTxcontroller.retrievePvAADMetaData); //merchant App
 
 
+  // app
+
+  //   .route("/api/v1/lookUpMerchantMetaData/:merchantID/:roleId")
+
+  //   .get(viewTxcontroller.lookUpMerchantMetaData);
+
   app
 
-    .route("/api/v1/lookUpMerchantMetaData/:merchantID/:roleId")
+    .route("/api/v1/merchantDetails/:merchantID/:roleId")
 
-    .get(viewTxcontroller.lookUpMerchantMetaData);
+    .get(viewTxcontroller.getMerchantDetails);
 
   app
 

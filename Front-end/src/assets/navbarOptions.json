@@ -16,7 +16,7 @@
             {
                 "name": "View Onboarded Merchant",
                 "id": "22",
-                "url": "/View-Onboarding-Static"
+                "url": "/show-onboarding"
             }
         ]
     },
