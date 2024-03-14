@@ -234,6 +234,7 @@ class PYMTUtilsCC extends Contract {
     additionalData,
     batchNumber,
     messageType,
+    executionMode,
   ) {
     // acl
 
@@ -301,6 +302,7 @@ class PYMTUtilsCC extends Contract {
       additionalData: additionalData,
       batchNumber: batchNumber,
       messageType: messageType,
+      executionMode: executionMode,
     };
 
     let { requestSettlementTxFN } = await pymtutils.hlfconstants();
@@ -358,17 +360,17 @@ class PYMTUtilsCC extends Contract {
     // ctx.stub.setEvent("E-TxRequested", txBuffer);
     console.log("tx buffer : ", txBuffer);
     var hlfevent = new HLFEVENT();
-    let { MERCHANT_RT_EVENT } = await hlfevent.hlfevents();
+    let { MERCHANT_RTX100_EVENT } = await hlfevent.hlfevents();
     // /**
     try {
       await this.emitEvent(
         ctx,
-        MERCHANT_RT_EVENT,
-        MERCHANT_RT_EVENT.eventID,
+        MERCHANT_RTX100_EVENT,
+        MERCHANT_RTX100_EVENT.eventID,
         key,
         settlementTx,
         OrgMSPId,
-        channelName
+        channelName,
       );
     } catch (err) {
       console.log(err);
@@ -1069,6 +1071,7 @@ class PYMTUtilsCC extends Contract {
       emittingOrgType: "NA",
       evTxId: "99999",
       key: keyIn,
+      executionMode: txIn.executionMode,
     };
     const eventPayload = JSON.stringify(evtPayload);
 

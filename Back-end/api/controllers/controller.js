@@ -104,7 +104,7 @@ const uploadWithType = multer({
   },
 }).single("file");
 
-const getArgsArray = (msg, type) => {
+const getArgsArray = (msg, type, executionMode) => {
   try {
     if (type == "authorizationRequest") {
       return [
@@ -129,6 +129,7 @@ const getArgsArray = (msg, type) => {
         msg.additionalData,
         msg.batchNumber,
         msg.messageType,
+        executionMode,
       ];
     } else if (type == "authorizationResponse") {
       return [
@@ -155,6 +156,7 @@ const getArgsArray = (msg, type) => {
         msg.approverCode,
         msg.authorizationId,
         msg.messageType,
+        executionMode
       ];
     } else if (type == "settlementRequest") {
       return [
@@ -174,6 +176,7 @@ const getArgsArray = (msg, type) => {
         msg.batchNumber,
         msg.totalNumberOfTransactions,
         msg.messageType,
+        executionMode
       ];
     }
   } catch (error) {
@@ -266,7 +269,7 @@ exports.processISO8583CSVWithType = async function (req, res) {
                       "channel1",
                       "PYMTUtilsCC",
                       invokedFunc,
-                      getArgsArray(results[i], req.body.fileType),
+                      getArgsArray(results[i], req.body.fileType, req.body.executionMode),
                       endorsers
                     );
                 if (error) {

@@ -21,19 +21,19 @@ const io = socketIo(server, {
 const channelName = 'channel1';
 
 const org1MSP = 'Org1MSP';
-const Org1UserId = 'appOrg1User31';
+const Org1UserId = 'appOrg1User33';
 
 const orgPSPMSP = 'PSPMSP';
-const OrgPSPUserId = 'appOrgPSPUser31';
+const OrgPSPUserId = 'appOrgPSPUser33';
 
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser31';
+const OrgACDUserId = 'appOrgACDUser33';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser31';
+const OrgAADUserId = 'appOrgAADUser33';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser31';
+const OrgAODUserId = 'appOrgAODUser33';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';
@@ -86,6 +86,7 @@ let contractPYMTUTILSCCOrg1, contractSubmitSettlementTxCCOrgPSP, contractSubmitS
 	contractClearSettlementTxCCOrgAAD,
 	contractSubmitSettlementTxCCOrgAAD,
 	contractSubmitSettlementTxCCOrgAOD,
+	contractConfirmSettlementTxCCOrgAOD,
 	contractConfirmSettlementTxCCOrgAAD,
 	contractConfirmSettlementTxCCOrgACD,
 	contractAccountSettlementTxCCOrgACD,
@@ -119,6 +120,7 @@ const initialize = async (callback) => {
 
 		contractSubmitSettlementTxCCOrgAAD = network1OrgAAD.getContract("SubmitSettlementTxCC");
 		contractSubmitSettlementTxCCOrgAOD = network1OrgAOD.getContract("SubmitSettlementTxCC");
+		contractConfirmSettlementTxCCOrgAOD = network1OrgAOD.getContract("ConfirmSettlementTxCC");
 		contractConfirmSettlementTxCCOrgAAD = network1OrgAAD.getContract("ConfirmSettlementTxCC");
 		contractConfirmSettlementTxCCOrgACD = network1OrgACD.getContract("ConfirmSettlementTxCC");
 		contractAccountSettlementTxCCOrgACD = network1OrgACD.getContract("AccountSettlementTxCC");
@@ -164,8 +166,22 @@ const startServer = () => {
 							await transaction.submit(...splitKey);
 							console.log(`${GREEN}<-- Submit SubmitSettlementTxCC submitSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
 						}
+
+						if (event.eventName == 'EMT-RT-X100' && stateObj.executionMode == "auto") {
+							console.log(`${GREEN}--> Submit ConfirmSettlementTxCC Transaction confirmSettlementTx, ${stateObj.key}`);
+							transaction = contractConfirmSettlementTxCCOrgAOD.createTransaction('confirmSettlementTx');
+							const splitKey = [...stateObj.key.split("-")];
+							// if (stateObj.executionMode == "manual") {
+							// 	console.log("manual mode");
+							// 	socket.emit('status-change', { status: 'requested', data: splitKey });
+
+							// }
+							console.log("Emitted status-change for requested - ", splitKey);
+							await transaction.submit(...splitKey);
+							console.log(`${GREEN}<-- Confirm ConfirmSettlementTxCC confirmSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
+						}
 					} catch (error) {
-						console.log(`${RED}<-- Submit Failed: SubmitSettlementTxCC verifyAndChangeStatus - ${createError}${RESET}`);
+						console.log(`${RED}<-- Submit Failed: ConfirmSettlementTxCC verifyAndChangeStatus - ${createError}${RESET}`);
 					}
 				};
 				// now start the client side event service and register the listener
@@ -206,6 +222,24 @@ const startServer = () => {
 					console.log(`${GREEN}<-- Contract Event Received: ${event.eventName} - ${stateObj} - ${JSON.stringify(stateObj)}${RESET}`);
 					console.log(`*** Event: ${event.eventName}`);
 					try {
+						// if (event.eventName == 'EAADAOD-AT') {
+						// 	console.log(`${GREEN}--> Submit BalanceSettlementTxCC Transaction balanceSettlementTx, ${stateObj.key}`);
+						// 	transaction = contractBalanceSettlementTxCCOrgAAD.createTransaction('balanceSettlementTx');
+						// 	const splitKey = [...stateObj.key.split("-")];
+						// 	if (stateObj.executionMode == "manual") {
+						// 		console.log("manual mode");
+						// 		socket.emit('status-change', {
+						// 			status: 'TxAuthorized', data: splitKey,
+						// 			verifications: [{ org: 'AAD', attribute: 'Transaction Amount' },
+						// 			{ org: 'AOD', attribute: 'System Trace Audit Number' }],
+						// 			message: 'AAD has Verified attribute: Transaction Amount & AOD has verified attribute: System Trace Audit Number'
+						// 		}
+						// 		);
+						// 	}
+						// 	console.log("Emitted status-change for TxAuthorized - ", { status: 'TxAuthorized', data: splitKey });
+						// 	await transaction.submit(...splitKey);
+						// 	console.log(`${GREEN}<-- Submit BalanceSettlementTxCC balanceSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
+						// }
 						if (event.eventName == 'EAADAOD-AT') {
 							console.log(`${GREEN}--> Submit BalanceSettlementTxCC Transaction balanceSettlementTx, ${stateObj.key}`);
 							transaction = contractBalanceSettlementTxCCOrgAAD.createTransaction('balanceSettlementTx');
@@ -224,6 +258,7 @@ const startServer = () => {
 							await transaction.submit(...splitKey);
 							console.log(`${GREEN}<-- Submit BalanceSettlementTxCC balanceSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
 						}
+
 					} catch (error) {
 						console.log(`${RED}<-- Balance Failed: BalanceSettlementTxCC verifyAndChangeStatus - ${createError}${RESET}`);
 					}

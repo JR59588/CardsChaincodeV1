@@ -8,7 +8,7 @@ const Settlement = (props) => {
   return (
     <div>
       <Tabs
-        defaultActiveKey="form"
+        defaultActiveKey="file"
         id="settlement-tabs"
         className="mb-3"
         fill
