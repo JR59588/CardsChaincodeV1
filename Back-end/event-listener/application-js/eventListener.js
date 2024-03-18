@@ -13,7 +13,7 @@ const socketIo = require('socket.io');
 const io = socketIo(server, {
 
 	cors: {
-		origins: ["http://localhost:3000", "http://172.16.10.22:3000"],
+		origins: ["http://localhost:3000", "http://3.108.70.234:3000", "http://172.16.10.22:3000"],
 
 	}
 });
@@ -21,19 +21,19 @@ const io = socketIo(server, {
 const channelName = 'channel1';
 
 const org1MSP = 'Org1MSP';
-const Org1UserId = 'appOrg1User45';
+const Org1UserId = 'appOrg1User46';
 
 const orgPSPMSP = 'PSPMSP';
-const OrgPSPUserId = 'appOrgPSPUser45';
+const OrgPSPUserId = 'appOrgPSPUser46';
 
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser45';
+const OrgACDUserId = 'appOrgACDUser46';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser45';
+const OrgAADUserId = 'appOrgAADUser46';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser45';
+const OrgAODUserId = 'appOrgAODUser46';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';

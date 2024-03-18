@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Table } from "react-bootstrap";
+import { Button, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const ViewAuthorizationTxnResponses = ({ roleId }) => {
@@ -74,8 +74,32 @@ const ViewAuthorizationTxnResponses = ({ roleId }) => {
                     <td>{idx + 1}</td>
                     <td>{x110Msg.Record.txTimestamp}</td>
                     {/* <td>{20 / 10 / 2019}</td> */}
-                    <td>{x110Msg.Record.txID}</td>
-                    <td>{x110Msg.Record.TxStatus}</td>
+                    <td>
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="tooltip">{x110Msg.Record.txID}</Tooltip>
+                        }
+                      >
+                        <div>{`${x110Msg.Record.txID.slice(
+                          0,
+                          3
+                        )}...${x110Msg.Record.txID.slice(-4)}`}</div>
+                      </OverlayTrigger>
+
+                      {/* <OverlayTrigger
+                        placement="bottom"
+                        overlay={() => (
+                          <Tooltip id="tooltip">{x110Msg.Record.txID}</Tooltip>
+                        )}
+                      >
+                        Hover me
+                      </OverlayTrigger> */}
+                    </td>
+                    <td>
+                      {x110Msg.Record.approverCode === 1
+                        ? "Approved"
+                        : "Not approved"}
+                    </td>
                     <td>{x110Msg.Record.MerchantId}</td>
                     <td>{x110Msg.Record.MerchantName}</td>
                     <td>{x110Msg.Record.CustomerId}</td>
