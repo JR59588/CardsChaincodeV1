@@ -21,19 +21,19 @@ const io = socketIo(server, {
 const channelName = 'channel1';
 
 const org1MSP = 'Org1MSP';
-const Org1UserId = 'appOrg1User33';
+const Org1UserId = 'appOrg1User45';
 
 const orgPSPMSP = 'PSPMSP';
-const OrgPSPUserId = 'appOrgPSPUser33';
+const OrgPSPUserId = 'appOrgPSPUser45';
 
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser33';
+const OrgACDUserId = 'appOrgACDUser45';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser33';
+const OrgAADUserId = 'appOrgAADUser45';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser33';
+const OrgAODUserId = 'appOrgAODUser45';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';

@@ -117,6 +117,7 @@ class PYMTUtilsCC extends Contract {
     console.log("after the key in utilscc");
 
     //TODO this will be invoke by initiate settlmentTX of merchantTxCC
+    // log
     console.log(
       "Logic to invoke initiateSettlemetTx of merchantCC to be completed"
     );
@@ -407,6 +408,7 @@ class PYMTUtilsCC extends Contract {
     approverCode,
     authorizationId,
     messageType,
+    executionMode,
   ) {
     // acl
 

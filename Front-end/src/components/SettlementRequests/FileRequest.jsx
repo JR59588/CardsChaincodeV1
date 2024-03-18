@@ -12,6 +12,13 @@ const FileRequest = (props) => {
 
   const { roleId } = props;
 
+  const initialValues = {
+    file: null,
+    roleId,
+    executionMode: "auto",
+    fileType: "",
+  };
+
   const [show, setShow] = useState(false);
 
   const [popupData, setPopupData] = useState({ header: "", content: "" });
@@ -59,14 +66,12 @@ const FileRequest = (props) => {
         <div className="row justify-content-center">
           <div className="col col-md-6 p-5 form-section border border-1 rounded">
             <Formik
-              initialValues={{
-                file: null,
-                roleId,
-                executionMode: "auto",
-                fileType: "",
-              }}
+              initialValues={initialValues}
               validationSchema={ISO8583Schema}
-              onSubmit={async (values, { setSubmitting, setFieldError }) => {
+              onSubmit={async (
+                values,
+                { setSubmitting, setFieldError, resetForm }
+              ) => {
                 console.log("Inside onsubmit", values);
                 if (values.file == null) {
                   setFieldError("file", "Required");
@@ -122,6 +127,7 @@ const FileRequest = (props) => {
                         </Table>
                       ),
                     });
+                    resetForm(initialValues);
                   } catch (error) {
                     console.log(error);
                     setShow(true);
@@ -152,6 +158,7 @@ const FileRequest = (props) => {
                 isSubmitting,
                 setFieldValue,
                 getFieldMeta,
+                resetForm,
               }) => (
                 <Form onSubmit={handleSubmit}>
                   <Form.Group controlId="file" className="mb-3">
