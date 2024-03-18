@@ -41,7 +41,7 @@ const ViewAuthorizationTxnResponses = ({ roleId }) => {
   }, []);
 
   return (
-    <>
+    <div style={{ minHeight: "520px" }}>
       {loading || !roleId ? (
         <Loading />
       ) : (
@@ -82,7 +82,7 @@ const ViewAuthorizationTxnResponses = ({ roleId }) => {
                       >
                         <div>{`${x110Msg.Record.txID.slice(
                           0,
-                          3
+                          4
                         )}...${x110Msg.Record.txID.slice(-4)}`}</div>
                       </OverlayTrigger>
 
@@ -112,7 +112,7 @@ const ViewAuthorizationTxnResponses = ({ roleId }) => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

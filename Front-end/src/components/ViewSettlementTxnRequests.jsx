@@ -1,6 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Button, Spinner, Table } from "react-bootstrap";
+import {
+  Button,
+  OverlayTrigger,
+  Spinner,
+  Table,
+  Tooltip,
+} from "react-bootstrap";
 import LoaderButton from "./LoaderButton";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -73,7 +79,7 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
   }, []);
 
   return (
-    <>
+    <div style={{ minHeight: "520px" }}>
       {loading || !roleId ? (
         <Loading />
       ) : (
@@ -107,7 +113,18 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                     <td>{idx + 1}</td>
                     <td>{x500Msg.Record.txTimestamp}</td>
                     {/* <td>{20 / 10 / 2019}</td> */}
-                    <td>{x500Msg.Record.txID}</td>
+                    <td>
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="tooltip">{x500Msg.Record.txID}</Tooltip>
+                        }
+                      >
+                        <div>{`${x500Msg.Record.txID.slice(
+                          0,
+                          4
+                        )}...${x500Msg.Record.txID.slice(-4)}`}</div>
+                      </OverlayTrigger>
+                    </td>
                     <td>{x500Msg.Record.MerchantId}</td>
                     <td>{x500Msg.Record.MerchantName}</td>
                     <td>{x500Msg.Record.CustomerId}</td>
@@ -135,7 +152,7 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
