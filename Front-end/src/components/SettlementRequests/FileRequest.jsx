@@ -127,7 +127,7 @@ const FileRequest = (props) => {
                         </Table>
                       ),
                     });
-                    resetForm(initialValues);
+                    // resetForm(initialValues);
                   } catch (error) {
                     console.log(error);
                     setShow(true);
