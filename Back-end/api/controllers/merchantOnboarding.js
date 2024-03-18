@@ -1047,7 +1047,7 @@ exports.verifySubmitTxUtils = async function (req, res) {
     })
   }
 
-  const { error, submitTxResult } = await evaluateTransactionWithEndorsingOrganizations(roleId, channelName, "SubmitSettlementTxCC", "submitSettlementTx", [msgType, merchantId, customerId, loanReferenceNumber], ["AADMSP", "AODMSP"]);
+  const { error, submitTxResult } = await evaluateTransactionWithEndorsingOrganizations(roleId, channelName, "SubmitSettlementTxCC", "submitSettlementTx", ["x500", merchantId, customerId, loanReferenceNumber], ["AADMSP", "AODMSP"]);
   console.log("Error in submit tx: ", error);
   console.log("Result in submit tx: ", submitTxResult);
   if (error) {
