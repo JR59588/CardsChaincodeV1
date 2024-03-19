@@ -1,12 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Modal,
-  OverlayTrigger,
-  Table,
-  Tooltip,
-} from "react-bootstrap";
+import { Button, Modal, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
 import LoaderButton from "./LoaderButton";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -19,7 +13,7 @@ const apiInfo = {
 const requiredStatuses = ["TxConfirmed", "TxSubmitted", "TxAccounted"];
 const rejectedStatuses = ["TxNonConfirmed", "TxNotSubmitted", "TxNotAccounted"];
 
-const ViewSettlementAuthRequests = ({ roleId }) => {
+const ViewSettlementAuthRequests = ({ roleId, systemsTraceAuditNumbers }) => {
   const [loading, setLoading] = useState(true);
   const [x100Msgs, setX100Msgs] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
@@ -32,52 +26,6 @@ const ViewSettlementAuthRequests = ({ roleId }) => {
 
   const handleClose = () => setShow(false);
 
-  const handleTxnRequest = async (
-    msgType,
-    merchantId,
-    customerId,
-    loanReferenceNumber,
-    apiPath
-  ) => {
-    try {
-      setErrorMsg("");
-      const response = await axios.post(`${apiBaseUrl}/api/v1/${apiPath}`, {
-        roleId,
-        msgType,
-        merchantId,
-        customerId,
-        loanReferenceNumber,
-      });
-
-      if (response.data.success === true) {
-        const { TxStatus, Key } = response.data.x100Message;
-
-        setX100Msgs((x100Messages) => {
-          return x100Messages.map((x100Message) => {
-            if (x100Message.Key === Key) {
-              x100Message.Record.TxStatus = TxStatus;
-            }
-            return x100Message;
-          });
-        });
-        setShow(true);
-        setPopupData({
-          header: "Success",
-          content: <div>The request was successful</div>,
-        });
-      }
-    } catch (error) {
-      console.log("Error submitting confirm tx: ", error);
-      setErrorMsg("Error fetching data");
-      setShow(true);
-      setPopupData({
-        header: "Failure",
-        content: <div>The request has failed</div>,
-        reason: error.response.data.message || "",
-      });
-    }
-  };
-
   useEffect(() => {
     const fetchX100Msgs = async () => {
       try {
@@ -89,7 +37,11 @@ const ViewSettlementAuthRequests = ({ roleId }) => {
         console.log("allmsgresponse", allMsgResponse);
         const allMsgs = allMsgResponse.data.response;
         const x100Msgs = allMsgs.filter(
-          (msg) => msg.Record.messageType === "x100"
+          (msg) =>
+            msg.Record.messageType === "x100" &&
+            systemsTraceAuditNumbers.includes(
+              msg.Record.systemsTraceAuditNumber
+            )
         );
         setX100Msgs(x100Msgs);
         setLoading(false);
@@ -105,31 +57,11 @@ const ViewSettlementAuthRequests = ({ roleId }) => {
   }, []);
 
   return (
-    <div >
+    <div>
       {loading || !roleId ? (
         <Loading />
       ) : (
         <>
-          <Modal
-            show={show}
-            onHide={handleClose}
-            backdrop="static"
-            keyboard={false}
-            centered
-          >
-            <Modal.Header closeButton>
-              <Modal.Title>{popupData.header}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <div>{popupData.content}</div>
-              {popupData.reason && <div>Reason: {popupData.reason} </div>}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
           <div className="mt-3">
             {/* <h5 className="text-center mb-3">Authorization requests (X100)</h5> */}
             <div style={{ overflow: "auto" }}>
