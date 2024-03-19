@@ -6,14 +6,20 @@ import {
   Spinner,
   Table,
   Tooltip,
+  Modal
 } from "react-bootstrap";
 import LoaderButton from "./LoaderButton";
+import ViewSettlementAuthRequests from "./ViewSettlementAuthRequests";
+// import ViewAuthorizationTxnRequests from "./ViewAuthorizationTxnRequests";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const ViewSettlementTxnRequests = ({ roleId }) => {
   const [loading, setLoading] = useState(true);
   const [x500Msgs, setX500Msgs] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const handleClose = () => setShowModal(false);
+  const handleShow = () => setShowModal(true);
 
   const handleTxnRequest = async (
     msgType,
@@ -102,6 +108,7 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                   <th>Merchant Name</th>
                   <th>Customer Details</th>
                   <th>Txn Reference Number</th>
+                  <th>X100 Authorization requests</th>
                   <th>Status</th>
                   <th>Account Txn</th>
                 </tr>
@@ -129,6 +136,11 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                     <td>{x500Msg.Record.MerchantName}</td>
                     <td>{x500Msg.Record.CustomerId}</td>
                     <td>{x500Msg.Record.LoanReferenceNumber}</td>
+                    <td>
+                      <Button variant="primary" onClick={handleShow}>
+                        View X100 msgs
+                      </Button>
+                    </td>
                     <td>{x500Msg.Record.TxStatus}</td>
 
                     <td>
@@ -149,6 +161,19 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                 ))}
               </tbody>
             </Table>
+            <Modal show={showModal} onHide={handleClose} fullscreen >
+              <Modal.Header closeButton>
+                <Modal.Title>x100 Authorization Requests</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <ViewSettlementAuthRequests roleId={roleId}/>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                  Close
+                </Button>
+              </Modal.Footer>
+            </Modal>
           </div>
         </div>
       )}
