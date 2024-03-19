@@ -4,49 +4,42 @@
         "ccpPath": "ccpPathOrg1",
         "walletOrg": "walletorg1",
         "clientMSPId": "Org1MSP",
-        "userWallet": "appUSER29ForOrg1",
+        "userWallet": "appUSER30ForOrg1",
         "admin": "admin"
     },
     "Org2": {
         "connectionPath": "./connection-org2.json",
         "walletOrg": "walletorg2",
         "clientMSPId": "Org2MSP",
-        "userWallet": "appUSER29ForOrg2",
+        "userWallet": "appUSER30ForOrg2",
         "admin": "admin"
     },
     "ACD": {
         "connectionPath": "./connection-ACD.json",
         "walletOrg": "wallet3ACD",
         "clientMSPId": "ACDMSP",
-        "userWallet": "appUSER29ForACD",
+        "userWallet": "appUSER30ForACD",
         "admin": "admin"
     },
     "AOD": {
         "connectionPath": "./connection-AOD.json",
         "walletOrg": "wallet4AOD",
         "clientMSPId": "AODMSP",
-        "userWallet": "appUSER29ForAOD",
+        "userWallet": "appUSER30ForAOD",
         "admin": "admin"
     },
     "AAD": {
         "connectionPath": "./connection-AAD.json",
         "walletOrg": "wallet5AAD",
         "clientMSPId": "AADMSP",
-        "userWallet": "appUSER29ForAAD",
+        "userWallet": "appUSER30ForAAD",
         "admin": "admin"
     },
     "PSP": {
         "connectionPath": "./connection-PSP.json",
         "walletOrg": "wallet5PSP",
         "clientMSPId": "PSPMSP",
-        "userWallet": "appUSER29ForPSP",
-        "admin": "admin"
-    },
-    "TataSteel101": {
-        "connectionPath": "./connection-TataSteel101.json",
-        "walletOrg": "walletTataSteel101",
-        "clientMSPId": "TataSteel101MSP",
-        "userWallet": "appUserForTataSteel101",
+        "userWallet": "appUSER30ForPSP",
         "admin": "admin"
     }
 }
