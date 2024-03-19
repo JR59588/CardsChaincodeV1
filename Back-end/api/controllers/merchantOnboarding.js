@@ -1058,14 +1058,15 @@ exports.verifySubmitTxUtils = async function (req, res) {
     });
   } else {
     console.log(`verify submit tx result: ${submitTxResult}`);
-    const key = "x100-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
+    const key = "x500-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
     console.log("key is: ", key);
     const { error, result } = await evaluateTransaction(roleId, channelName, "PYMTUtilsCC", "readState", [key]);
-    // const 
+    console.log("Result in submit is: ", result, result.toString(), JSON.parse(result.toString()));
+
     res.status(200).json({
       success: true,
       message: `Successfully invoked submit tx verification`,
-      x100Message: { Key: key, ...JSON.parse(result.toString()) },
+      x500Message: { Key: key, ...JSON.parse(result.toString()) },
     });
   }
 }

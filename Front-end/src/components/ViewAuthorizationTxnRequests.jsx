@@ -17,8 +17,18 @@ const apiInfo = {
   TxSubmitted: "verifyAccountTx",
 };
 
-const requiredStatuses = ["TxConfirmed", "TxSubmitted", "TxAccounted"];
-const rejectedStatuses = ["TxNonConfirmed", "TxNotSubmitted", "TxNotAccounted"];
+const requiredStatuses = [
+  "TxRequested",
+  "TxConfirmed",
+  "TxSubmitted",
+  "TxAccounted",
+];
+const rejectedStatuses = [
+  "TxNonRequested",
+  "TxNonConfirmed",
+  "TxNotSubmitted",
+  "TxNotAccounted",
+];
 
 const ViewAuthorizationTxnRequests = ({ roleId }) => {
   const [loading, setLoading] = useState(true);
@@ -224,15 +234,10 @@ const getButtonOrStatus = (
   rejectedStatuses,
   handlerFunc
 ) => {
-  if (
-    status === requiredStatuses[requiredStatuses.length - 1] ||
-    status === requiredStatuses[requiredStatuses.length - 2]
-  ) {
-    return "-";
-  } else if (rejectedStatuses.includes(status)) {
-    return <>{status}</>;
-  } else {
+  if (requiredStatuses[0] === status) {
     return <LoaderButton handlerFunc={handlerFunc} />;
+  } else {
+    return "-";
   }
 };
 

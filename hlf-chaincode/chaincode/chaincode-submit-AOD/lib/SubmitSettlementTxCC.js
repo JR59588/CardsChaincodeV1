@@ -40,7 +40,7 @@ class SubmitSettlementTxCC extends Contract {
       const channelName = await pymtutils.getChannelIdentity(ctx);
 
       let key500 = messageType + "-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
-      console.log(" confirmTx.js:key", key);
+      console.log(" confirmTx.js:key", key500);
 
       var txObj500 = await pymtutils.readTxStatus(ctx, key500, channelName);
 
@@ -114,9 +114,9 @@ class SubmitSettlementTxCC extends Contract {
           console.log("txobj2", txobj2);
         }
       }
-      txObj500.TxStatus = 'TxSubmitted';
-      let txobj500Updated = await pymtutils.writeTxStatus(ctx, key500, channelName, txObj500);
-      return txObj500;
+      x500Msg.TxStatus = 'TxSubmitted';
+      let x500MsgUpdated = await pymtutils.writeTxStatus(ctx, key500, channelName, x500Msg);
+      return x500Msg;
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error), error);
       throw Error(error);

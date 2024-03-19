@@ -1,0 +1,2 @@
+MerchantId,CustomerId,LoanReferenceNumber,MerchantName,primaryAccountNumber,processingCode,transactionAmount,transmissionDateAndTime,systemsTraceAuditNumber,expirationDate,merchantCategoryCode,pointOfServiceEntryMode,acquiringInstitutionIdentificationCode,retrievalReferenceNumber,cardAcceptorTerminalIdentification,cardAcceptorIdentificationCode,cardAcceptorNameAndLocation,currencyCode,additionalData,batchNumber,approverCode,authorizationId,messageType
+M001,C008,LR008,Apple,2,3,4,5,STANGHI456,7,8,9,10,11,12,13,14,15,16,17,1,19,x110
