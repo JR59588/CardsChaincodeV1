@@ -105,7 +105,7 @@ const ViewSettlementAuthRequests = ({ roleId }) => {
   }, []);
 
   return (
-    <div style={{ minHeight: "520px" }}>
+    <div >
       {loading || !roleId ? (
         <Loading />
       ) : (

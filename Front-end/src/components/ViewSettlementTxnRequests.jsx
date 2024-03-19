@@ -161,7 +161,7 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                 ))}
               </tbody>
             </Table>
-            <Modal show={showModal} onHide={handleClose} fullscreen >
+            <Modal show={showModal} onHide={handleClose} size="lg" centered >
               <Modal.Header closeButton>
                 <Modal.Title>x100 Authorization Requests</Modal.Title>
               </Modal.Header>
