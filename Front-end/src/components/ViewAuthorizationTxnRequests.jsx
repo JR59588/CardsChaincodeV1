@@ -68,8 +68,8 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
         });
       }
     } catch (error) {
-      console.log("Error submitting confirm tx: ", error);
-      setErrorMsg("Error fetching data");
+      console.log("Error submitting the transaction: ", error);
+      setErrorMsg("Error submitting the transaction");
       setShow(true);
       setPopupData({
         header: "Failure",

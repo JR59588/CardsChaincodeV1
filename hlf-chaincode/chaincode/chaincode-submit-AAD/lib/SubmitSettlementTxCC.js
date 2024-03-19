@@ -42,9 +42,9 @@ class SubmitSettlementTxCC extends Contract {
       let key = messageType + "-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
       console.log(" confirmTx.js:key", key);
 
-      var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
+      var txObj500 = await pymtutils.readTxStatus(ctx, key, channelName);
 
-      const x500Msg = JSON.parse(txObj);
+      const x500Msg = JSON.parse(txObj500);
 
       let currentTxReadState = x500Msg;
       console.log("printing the currentTxReadState :", currentTxReadState);
@@ -87,13 +87,6 @@ class SubmitSettlementTxCC extends Contract {
           x100Verified = false;
         }
 
-        //const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === stan);
-
-        // let x110Verified = true;
-        // const x110Msg = x110Msgs[0];
-        // if (x110Msg.Record.TxStatus !== 'TxSubmitted') {
-        //     x110Verified = false;
-        // }
 
         if (x100Verified) {
           statuses.push('TxSubmitted')
@@ -108,14 +101,6 @@ class SubmitSettlementTxCC extends Contract {
           var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
           console.log("txobj2", txobj2);
 
-
-          // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
-          // console.log(" x100 key::", key);
-          // txObj = x110Msg.Record
-          // txObj.TxStatus = 'TxSubmitted'
-          // var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
-          // console.log("txobj2", txobj2);
-
         } else {
           statuses.push('TxNotSubmitted')
           console.log("Result after verifying all x100 messages with stan ", stan, 'TxNotSubmitted');
@@ -128,15 +113,12 @@ class SubmitSettlementTxCC extends Contract {
           var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
           console.log("txobj2", txobj2);
 
-
-          // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
-          // console.log(" x100 key::", key);
-          // txObj = x110Msg.Record
-          // txObj.TxStatus = 'TxNotSubmitted'
-          // var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
-          // console.log("txobj2", txobj2);
         }
       }
+
+      txObj500.TxStatus = 'TxSubmitted';
+      let txobj500Updated = await pymtutils.writeTxStatus(ctx, key500, channelName, txObj500);
+      return txObj500;
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error), error);
       throw Error(error);

@@ -537,7 +537,7 @@ class PYMTUtilsCC extends Contract {
     batchNumber,
     totalNumberOfTransactions,
     messageType,
-    executinMode
+    executionMode
   ) {
     // acl
 
