@@ -96,9 +96,9 @@ const ViewAuthorizationTxnResponses = ({ roleId }) => {
                       </OverlayTrigger> */}
                     </td>
                     <td>
-                      {x110Msg.Record.approverCode === 1
-                        ? "Approved"
-                        : "Not approved"}
+                      {x110Msg.Record.approverCode === 0
+                        ? "Not approved"
+                        : "Approved"}
                     </td>
                     <td>{x110Msg.Record.MerchantId}</td>
                     <td>{x110Msg.Record.MerchantName}</td>
