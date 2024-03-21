@@ -104,29 +104,50 @@ const uploadWithType = multer({
   },
 }).single("file");
 
+const getParsedData = (iso8583Message) => {
+  var iso = new ISO8583(iso8583Message, 1);
+  var data = iso.parseDataElement();
+  const dataObj = data.reduce(
+    (obj, item) => ({
+      ...obj,
+      [item.fieldName]: item.fieldValue,
+    }),
+    {}
+  );
+  console.log("Inside get parsed data: ", dataObj);
+  return dataObj;
+}
+
+
 const getArgsArray = (msg, type, executionMode) => {
+
   try {
+
+    console.log("iso 8583 message is: ", msg.iso8583Message);
+
+    const isoData = getParsedData(msg.iso8583Message);
+
     if (type == "authorizationRequest") {
       return [
         msg.MerchantId,
         msg.CustomerId,
         msg.LoanReferenceNumber,
         msg.MerchantName,
-        msg.primaryAccountNumber,
-        msg.processingCode,
-        msg.transactionAmount,
-        msg.transmissionDateAndTime,
-        msg.systemsTraceAuditNumber,
-        msg.expirationDate,
-        msg.merchantCategoryCode,
-        msg.pointOfServiceEntryMode,
-        msg.acquiringInstitutionIdentificationCode,
-        msg.retrievalReferenceNumber,
-        msg.cardAcceptorTerminalIdentification,
-        msg.cardAcceptorIdentificationCode,
-        msg.cardAcceptorNameAndLocation,
-        msg.currencyCode,
-        msg.additionalData,
+        isoData.primaryAccountNumber,
+        isoData.processingCode,
+        isoData.transactionAmount,
+        isoData.transmissionDateAndTime,
+        isoData.systemsTraceAuditNumber,
+        isoData.expirationDate,
+        isoData.merchantCategoryCode,
+        isoData.pointOfServiceEntryMode,
+        isoData.acquiringInstitutionIdentificationCode,
+        isoData.retrievalReferenceNumber,
+        isoData.cardAcceptorTerminalIdentification,
+        isoData.cardAcceptorIdentificationCode,
+        isoData.cardAcceptorNameAndLocation,
+        isoData.currencyCode,
+        isoData.additionalDataISO,
         msg.batchNumber,
         msg.messageType,
         executionMode,
@@ -137,24 +158,24 @@ const getArgsArray = (msg, type, executionMode) => {
         msg.CustomerId,
         msg.LoanReferenceNumber,
         msg.MerchantName,
-        msg.primaryAccountNumber,
-        msg.processingCode,
-        msg.transactionAmount,
-        msg.transmissionDateAndTime,
-        msg.systemsTraceAuditNumber,
-        msg.expirationDate,
-        msg.merchantCategoryCode,
-        msg.pointOfServiceEntryMode,
-        msg.acquiringInstitutionIdentificationCode,
-        msg.retrievalReferenceNumber,
-        msg.cardAcceptorTerminalIdentification,
-        msg.cardAcceptorIdentificationCode,
-        msg.cardAcceptorNameAndLocation,
-        msg.currencyCode,
-        msg.additionalData,
+        isoData.primaryAccountNumber,
+        isoData.processingCode,
+        isoData.transactionAmount,
+        isoData.transmissionDateAndTime,
+        isoData.systemsTraceAuditNumber,
+        isoData.expirationDate,
+        isoData.merchantCategoryCode,
+        isoData.pointOfServiceEntryMode,
+        isoData.acquiringInstitutionIdentificationCode,
+        isoData.retrievalReferenceNumber,
+        isoData.cardAcceptorTerminalIdentification,
+        isoData.cardAcceptorIdentificationCode,
+        isoData.cardAcceptorNameAndLocation,
+        isoData.currencyCode,
+        isoData.additionalDataISO,
         msg.batchNumber,
         msg.approverCode,
-        msg.authorizationId,
+        isoData.authorizationIdentificationResponse,
         msg.messageType,
         executionMode
       ];
