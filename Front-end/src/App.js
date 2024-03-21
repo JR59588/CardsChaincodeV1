@@ -66,110 +66,117 @@ function App() {
   };
 
   return (
-    <div>
-      <Header roleId={roleId} setRoleId={setRoleId} orgOptions={orgOptions} />
-      <NotificationContainer />
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route
-          path="/Merchant"
-          element={
-            <Merchant
-              roleId={roleId}
-              IP={IP}
-              getRoleFromFile={getRoleFromFile}
-            />
-          }
-        />
-        <Route
-          path="/settlement-request"
-          element={<Settlement roleId={roleId} />}
-        />
-        <Route
-          path="/Aggregator"
-          element={
-            // <Onboard
-            //   roleId={roleId}
-            //   IP={IP}
-            //   fetchOrganizationData={fetchOrganizationData}
-            // />
-            <OnboardFormik
-              roleId={roleId}
-              IP={IP}
-              fetchOrganizationData={fetchOrganizationData}
-            />
-          }
-        />
-        <Route
-          path="/OnboardFormik"
-          element={
-            <OnboardFormik
-              roleId={roleId}
-              IP={IP}
-              fetchOrganizationData={fetchOrganizationData}
-            />
-          }
-        />
-        <Route
-          path="/Onboard"
-          element={
-            <Onboard
-              roleId={roleId}
-              IP={IP}
-              fetchOrganizationData={fetchOrganizationData}
-            />
-          }
-        />
-        <Route
-          path="/FileComponent"
-          element={<FileComponent roleId={roleId} IP={IP} />}
-        />
-        <Route
-          path="/ViewTx"
-          element={<ViewTx roleId={roleId} IP={IP} socket={socket} />}
-        />
-        <Route
-          path="/ViewAuthorizationTxnRequests"
-          element={<ViewAuthorizationTxnRequests roleId={roleId} IP={IP} socket={socket} />}
-        />
-        <Route
-          path="/ViewAuthorizationTxnResponses"
-          element={<ViewAuthorizationTxnResponses roleId={roleId} IP={IP} socket={socket} />}
-        />
-        <Route
-          path="/ViewSettlementTxnRequests"
-          element={<ViewSettlementTxnRequests roleId={roleId} IP={IP} socket={socket} />}
-        />
-        {/* <Route
+    <div className="position-relative" sytle={{ marginBottom: "100px" }}>
+      <div style={{ position: "fixed", top: "0px", width: "100%", zIndex: "100" }}>
+        <Header roleId={roleId} setRoleId={setRoleId} orgOptions={orgOptions} />
+      </div>
+      <div style={{ marginTop: "80px", marginBottom: "80px" }}>
+        <NotificationContainer />
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route
+            path="/Merchant"
+            element={
+              <Merchant
+                roleId={roleId}
+                IP={IP}
+                getRoleFromFile={getRoleFromFile}
+              />
+            }
+          />
+          <Route
+            path="/settlement-request"
+            element={<Settlement roleId={roleId} />}
+          />
+          <Route
+            path="/Aggregator"
+            element={
+              // <Onboard
+              //   roleId={roleId}
+              //   IP={IP}
+              //   fetchOrganizationData={fetchOrganizationData}
+              // />
+              <OnboardFormik
+                roleId={roleId}
+                IP={IP}
+                fetchOrganizationData={fetchOrganizationData}
+              />
+            }
+          />
+          <Route
+            path="/OnboardFormik"
+            element={
+              <OnboardFormik
+                roleId={roleId}
+                IP={IP}
+                fetchOrganizationData={fetchOrganizationData}
+              />
+            }
+          />
+          <Route
+            path="/Onboard"
+            element={
+              <Onboard
+                roleId={roleId}
+                IP={IP}
+                fetchOrganizationData={fetchOrganizationData}
+              />
+            }
+          />
+          <Route
+            path="/FileComponent"
+            element={<FileComponent roleId={roleId} IP={IP} />}
+          />
+          <Route
+            path="/ViewTx"
+            element={<ViewTx roleId={roleId} IP={IP} socket={socket} />}
+          />
+          <Route
+            path="/ViewAuthorizationTxnRequests"
+            element={<ViewAuthorizationTxnRequests roleId={roleId} IP={IP} socket={socket} />}
+          />
+          <Route
+            path="/ViewAuthorizationTxnResponses"
+            element={<ViewAuthorizationTxnResponses roleId={roleId} IP={IP} socket={socket} />}
+          />
+          <Route
+            path="/ViewSettlementTxnRequests"
+            element={<ViewSettlementTxnRequests roleId={roleId} IP={IP} socket={socket} />}
+          />
+          {/* <Route
           path="/ViewSettlementRequests"
           element={<ViewSettlementRequests roleId={roleId} IP={IP} socket={socket} />}
         /> */}
-        <Route
-          path="/View-Onboarding-Static"
-          element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}
-        />
+          <Route
+            path="/View-Onboarding-Static"
+            element={<NewViewOnboardingStatic roleId={roleId} IP={IP} />}
+          />
 
-        <Route
-          path="/show-onboarding"
-          element={<ShowOnboarding roleId={roleId} IP={IP} />}
-        />
+          <Route
+            path="/show-onboarding"
+            element={<ShowOnboarding roleId={roleId} IP={IP} />}
+          />
 
-        <Route path="/About" element={<About />} />
-        <Route
-          path="/isoformik"
-          element={<ISO8583FormikComponent roleId={roleId} />}
-        />
-        <Route
-          path="/isofileformik"
-          element={<ISO8583FileFormikComponent roleId={roleId} />}
-        />
-        <Route
-          path="/DashboardSummary"
-          element={<DashboardSummary roleId={roleId} />}
-        />
-        <Route path="*" element={<h1>Not found....</h1>} />
-      </Routes>
-      <Footer />
+          <Route path="/About" element={<About />} />
+          <Route
+            path="/isoformik"
+            element={<ISO8583FormikComponent roleId={roleId} />}
+          />
+          <Route
+            path="/isofileformik"
+            element={<ISO8583FileFormikComponent roleId={roleId} />}
+          />
+          <Route
+            path="/DashboardSummary"
+            element={<DashboardSummary roleId={roleId} />}
+          />
+          <Route path="*" element={<h1>Not found....</h1>} />
+        </Routes>
+      </div>
+
+      <div style={{ position: "fixed", bottom: "0px", width: "100%" }}>
+        <Footer />
+      </div>
     </div>
   );
 }
