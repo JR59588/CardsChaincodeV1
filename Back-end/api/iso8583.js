@@ -23,7 +23,7 @@ function ISO8583(message, additionLength) {
 		"21": ["n", 3, "forwardingInstitutionCountryCode", false, false],
 		"22": ["n", 3, "pointOfServiceEntryMode", false, false],
 		"23": ["n", 3, "applicationPanNumber", false, false],
-		"24": ["n", 3, "functionCode(ISO 8583:1993)/networkInternationalIdentifier (NII)", false, false],
+		"24": ["n", 3, "networkInternationalId", false, false],
 		"25": ["n", 2, "pointOfServiceConditionCode", false, false],
 		"26": ["n", 2, "pointOfServiceCaptureCode", false, false],
 		"27": ["n", 1, "authorizingIdentificationResponseLength", false, false],
