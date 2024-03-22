@@ -69,9 +69,12 @@ class SubmitSettlementTxCC extends Contract {
       const prevTxnsStr = await pymtutils.readAllPrevTxns(ctx, channelName); //read prev txns using channel name
 
       const prevTxns = JSON.parse(prevTxnsStr);
-      let stan = currentTxReadState.systemsTraceAuditNumber;
+      let stan = currentTxReadState.additionalDataISO;
       let stans = stan.split(',')
       let statuses = []
+      let totalTransactionAmount = currentTxReadState.amountNetSettlement;
+      let x100TransactionAmountTotal = 0;
+
       for (let iii = 0; iii < stans.length; iii++) {
         stan = stans[iii]
         console.log("Stan is: ", stan);
@@ -100,6 +103,7 @@ class SubmitSettlementTxCC extends Contract {
           txObj.TxStatus = 'TxSubmitted'
           var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
           console.log("txobj2", txobj2);
+          x100TransactionAmountTotal += x100Msg.Record.transactionAmount;
 
         } else {
           statuses.push('TxNotSubmitted')
@@ -114,8 +118,15 @@ class SubmitSettlementTxCC extends Contract {
           console.log("txobj2", txobj2);
         }
       }
-      x500Msg.TxStatus = 'TxSubmitted';
-      let x500MsgUpdated = await pymtutils.writeTxStatus(ctx, key500, channelName, x500Msg);
+      if (!(x100TransactionAmountTotal == totalTransactionAmount)) {
+        x500Msg.TxStatus = 'TxNotSubmitted';
+        let x500MsgUpdated = await pymtutils.writeTxStatus(ctx, key500, channelName, x500Msg);
+        console.log("The settlement amount is not equal to total transaction amount of x100's");
+      } else {
+        x500Msg.TxStatus = 'TxSubmitted';
+        let x500MsgUpdated = await pymtutils.writeTxStatus(ctx, key500, channelName, x500Msg);
+        console.log("The settlement amount is equal to total transaction amount of x100's");
+      }
       return x500Msg;
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error), error);

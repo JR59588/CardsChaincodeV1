@@ -96,7 +96,7 @@ function ISO8583(message, additionLength) {
 		"94": ["an", 7, "serviceIndicator", false, false],
 		"95": ["an", 42, "replacementAmounts", false, false],
 		"96": ["an", 8, "messageSecurityCode", false, false],
-		"97": ["n", 16, "amount, netSettlement", false, true],
+		"97": ["n", 16, "amountNetSettlement", false, true],
 		"98": ["ans", 25, "payee", false, false],
 		"99": ["n", 11, "settlementInstitutionIdentificationCode", true, false],
 		"100": ["n", 11, "receivingInstitutionIdentificationCode", true, false],
