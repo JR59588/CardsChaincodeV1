@@ -69,63 +69,90 @@ class SubmitSettlementTxCC extends Contract {
       const prevTxnsStr = await pymtutils.readAllPrevTxns(ctx, channelName); //read prev txns using channel name
 
       const prevTxns = JSON.parse(prevTxnsStr);
-      let stan = currentTxReadState.additionalDataISO;
-      let stans = stan.split(',')
-      let statuses = []
-      let totalTransactionAmount = currentTxReadState.amountNetSettlement;
+      let batchNumber = currentTxReadState.batchNumber;
+
+      // let stan = currentTxReadState.additionalDataISO;
+      // let stans = stan.split(',')
+      // let statuses = []
+      let totalTransactionAmount = parseInt(currentTxReadState.amountNetSettlement);
       let x100TransactionAmountTotal = 0;
 
-      for (let iii = 0; iii < stans.length; iii++) {
-        stan = stans[iii]
-        console.log("Stan is: ", stan);
-        console.log("Previous transactions are:", prevTxns);
 
-        const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
+      const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.batchNumber === batchNumber);
 
-        console.log("Filtered x100 messages are: ", x100Msgs);
-
+      for (let i = 0; i < x100Msgs.length; i++) {
+        const x100Msg = x100Msgs[i];
         let x100Verified = true;
-        const x100Msg = x100Msgs[0]; //if no x100Msg raise error
+
         if (x100Msg.Record.TxStatus !== 'TxConfirmed') {
           x100Verified = false;
         }
 
         if (x100Verified) {
-          statuses.push('TxSubmitted')
-          console.log("Result after verifying all x100 messages with stan ", stan, 'TxSubmitted');
-
-          x100Msg.TxStatus = 'TxSubmitted';
-          // x110Msg.TxStatus = 'TxSubmitted';
-          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
-
-          console.log(" x100 key::", key);
-          let txObj = x100Msg.Record
-          txObj.TxStatus = 'TxSubmitted'
-          var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
-          console.log("txobj2", txobj2);
-          x100TransactionAmountTotal += x100Msg.Record.transactionAmount;
-
+          x100Msg.Record.TxStatus = 'TxSubmitted';
+          x100TransactionAmountTotal += parseInt(x100Msg.Record.transactionAmount);
+          console.log(`Submit Chaincode AOD: x100 message ${x100Msg.Key} is verified and status is changed to ${x100Msg.Record.TxStatus}`)
+          await pymtutils.writeTxStatus(ctx, x100Msg.Key, channelName, x100Msg.Record);
         } else {
-          statuses.push('TxNotSubmitted')
-          console.log("Result after verifying all x100 messages with stan ", stan, 'TxNotSubmitted');
-
-          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
-
-          console.log(" x100 key::", key);
-          let txObj = x100Msg.Record
-          txObj.TxStatus = 'TxNotSubmitted'
-          var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
-          console.log("txobj2", txobj2);
+          x100Msg.Record.TxStatus = 'TxNotSubmitted';
+          await pymtutils.writeTxStatus(ctx, x100Msg.Key, channelName, x100Msg.Record);
+          console.log(`Submit Chaincode AOD: x100 message ${x100Msg.Key} is not verified and status is changed to ${x100Msg.Record.TxStatus}`)
         }
+
+
       }
+
+      // for (let iii = 0; iii < stans.length; iii++) {
+      //   stan = stans[iii]
+      //   console.log("Stan is: ", stan);
+      //   console.log("Previous transactions are:", prevTxns);
+
+      //   const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
+
+      //   console.log("Filtered x100 messages are: ", x100Msgs);
+
+      //   let x100Verified = true;
+      //   const x100Msg = x100Msgs[0]; //if no x100Msg raise error
+      //   if (x100Msg.Record.TxStatus !== 'TxConfirmed') {
+      //     x100Verified = false;
+      //   }
+
+      //   if (x100Verified) {
+      //     statuses.push('TxSubmitted')
+      //     console.log("Result after verifying all x100 messages with stan ", stan, 'TxSubmitted');
+
+      //     x100Msg.TxStatus = 'TxSubmitted';
+      //     // x110Msg.TxStatus = 'TxSubmitted';
+      //     let key = x100Msg.Record.messageType + "-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
+
+      //     console.log(" x100 key::", key);
+      //     let txObj = x100Msg.Record
+      //     txObj.TxStatus = 'TxSubmitted'
+      //     var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+      //     console.log("txobj2", txobj2);
+      //     x100TransactionAmountTotal += x100Msg.Record.transactionAmount;
+
+      //   } else {
+      //     statuses.push('TxNotSubmitted')
+      //     console.log("Result after verifying all x100 messages with stan ", stan, 'TxNotSubmitted');
+
+      //     let key = x100Msg.Record.messageType + "-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
+
+      //     console.log(" x100 key::", key);
+      //     let txObj = x100Msg.Record
+      //     txObj.TxStatus = 'TxNotSubmitted'
+      //     var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
+      //     console.log("txobj2", txobj2);
+      //   }
+      // }
       if (!(x100TransactionAmountTotal == totalTransactionAmount)) {
         x500Msg.TxStatus = 'TxNotSubmitted';
         let x500MsgUpdated = await pymtutils.writeTxStatus(ctx, key500, channelName, x500Msg);
-        console.log("The settlement amount is not equal to total transaction amount of x100's");
+        console.log("Submit Chaincode AOD: The settlement amount is not equal to total transaction amount of x100's");
       } else {
         x500Msg.TxStatus = 'TxSubmitted';
         let x500MsgUpdated = await pymtutils.writeTxStatus(ctx, key500, channelName, x500Msg);
-        console.log("The settlement amount is equal to total transaction amount of x100's");
+        console.log("Submit Chaincode AOD: The settlement amount is equal to total transaction amount of x100's");
       }
       return x500Msg;
     } catch (error) {
