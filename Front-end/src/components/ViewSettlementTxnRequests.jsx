@@ -38,12 +38,21 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
   const handleClose = () => setShow(false);
 
   const [showModal, setShowModal] = useState(false);
+  const [showMerchantDetails, setShowMerchantDetails] = useState(false);
+  const [showTransactionDetails, setShowTransactionDetails] = useState(false);
   const handleCloseModal = () => setShowModal(false);
+  const handleCloseMerchantDetails = () => setShowMerchantDetails(false);
+  const handleCloseTransactionDetails = () => setShowTransactionDetails(false);
   const handleShow = (systemsTraceAuditNumbers) => {
     // setSystemsTraceAuditNumbers(systemsTraceAuditNumbers);
     setShowModal(true);
   };
-
+  const handleShowMerchantDetails = () => {
+    setShowMerchantDetails(true);
+  }
+  const handleShowTransactionDetails = () => {
+    setShowTransactionDetails(true);
+  }
   const handleTxnRequest = async (
     msgType,
     merchantId,
@@ -100,9 +109,15 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
         );
         console.log("allmsgresponse", allMsgResponse);
         const allMsgs = allMsgResponse.data.response;
-        const x500Msgs = allMsgs.filter(
+        let x500Msgs = allMsgs.filter(
           (msg) => msg.Record.messageType === "x500"
         );
+
+        // Sorting the messages by timestamp in descending order
+        x500Msgs = x500Msgs.sort((a, b) => {
+          return new Date(b.Record.timestamp) - new Date(a.Record.timestamp);
+        });
+
         setX500Msgs(x500Msgs);
         setLoading(false);
       } catch (error) {
@@ -115,6 +130,7 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
 
     fetchX500Msgs();
   }, []);
+
 
   return (
     <div style={{ minHeight: "520px" }}>
@@ -149,21 +165,24 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                 <thead>
                   <tr>
                     <th>No</th>
-                    <th colSpan={2}>Txn Summary (Hyperledger)</th>
-                    <th colSpan={4}>Txn Submission Details</th>
-                    <th colSpan={2}>Txn Verification Summary</th>
+                    <th colSpan={4}>Settlement Txn Summary (Hyperledger)</th>
+                    <th colSpan={4}>Settlement Submission Details</th>
+                    <th colSpan={4}>Settlement Txn Verification Summary</th>
                   </tr>
                   <tr>
                     <th></th>
-                    <th>Txn Date</th>
-                    <th>Txn ID</th>
+                    <th>Settlement Txn Date</th>
+                    <th>Settlement Txn ID</th>
+                    <th>Settlement transaction status</th>
+                    <th>Settlement transaction amount</th>
                     <th>Merchant Details</th>
-                    <th>Merchant Name</th>
-                    <th>Customer Details</th>
-                    <th>Txn Reference Number</th>
+                    <th>Transaction Details</th>
+                    <th>Batch ID</th>
+                    
                     <th>X100 Authorization requests</th>
-                    <th>Status</th>
-                    <th>Account Txn</th>
+                    <th>Confirm Settlement Txn</th>
+                    <th>Submit Settelement Txn</th>
+                    <th>Account Settlement Txn</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -187,10 +206,20 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                           )}...${x500Msg.Record.txID.slice(-4)}`}</div>
                         </OverlayTrigger>
                       </td>
-                      <td>{x500Msg.Record.MerchantId}</td>
-                      <td>{x500Msg.Record.MerchantName}</td>
-                      <td>{x500Msg.Record.CustomerId}</td>
+                      <td>{x500Msg.Record.TxStatus}</td>
+                      <td></td>
+                      <td>{x500Msg.Record.MerchantName}
+                        <br />
+                        <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={handleShowMerchantDetails}>
+                          View More
+                        </span></td>
+                      <td>{x500Msg.Record.CustomerId}
+                        <br />
+                        <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={handleShowTransactionDetails}>
+                          View More
+                        </span></td>
                       <td>{x500Msg.Record.LoanReferenceNumber}</td>
+                      
                       <td>
                         <Button
                           variant="primary"
@@ -204,7 +233,7 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                           View X100 msgs
                         </Button>
                       </td>
-                      <td>{x500Msg.Record.TxStatus}</td>
+
 
                       <td>
                         {getButtonOrStatus(
@@ -221,6 +250,7 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                             )
                         )}
                       </td>
+                      <td></td>
                     </tr>
                   ))}
                 </tbody>
@@ -242,6 +272,99 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                 </Modal.Body>
                 <Modal.Footer>
                   <Button variant="secondary" onClick={handleCloseModal}>
+                    Close
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+              <Modal
+                show={showMerchantDetails}
+                onHide={handleCloseMerchantDetails}
+                size="lg"
+                centered
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Merchant Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                <div className="mt-3">
+                    
+                    <div style={{ overflow: "auto" }}>
+                      <Table bordered hover>
+                        <thead>
+
+                          <tr>
+
+                            <th>Merchant Name</th>
+                            <th>Merchant ID</th>
+                            <th>Negotiated MDR</th>
+                            <th>POS ID</th>
+
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            </tr>
+
+
+
+                        </tbody>
+                      </Table>
+                    </div>
+                  </div>
+
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={handleCloseMerchantDetails}>
+                    Close
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+              <Modal
+                show={showTransactionDetails}
+                onHide={handleCloseTransactionDetails}
+                size="lg"
+                centered
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Transaction Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <div className="mt-3">
+                    
+                    <div style={{ overflow: "auto" }}>
+                      <Table bordered hover>
+                        <thead>
+
+                          <tr>
+
+                            <th>Transaction STAN</th>
+                            <th>Transaction Date</th>
+                            <th>Transaction Status</th>
+                            <th>Transaction Amount</th>
+
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th></th>
+                        
+                            <th></th>
+                            <th></th>
+                            </tr>
+
+
+
+                        </tbody>
+                      </Table>
+                    </div>
+                  </div>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={handleCloseTransactionDetails}>
                     Close
                   </Button>
                 </Modal.Footer>
