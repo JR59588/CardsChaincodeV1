@@ -3,7 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { NotificationManager } from "react-notifications";
 import Chart from "chart.js/auto";
 import "./Merchant.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 import Modal from "react-bootstrap/Modal";
+import { Button, Dropdown, DropdownButton, DropdownItemText } from "react-bootstrap";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 const dateFunc = (timestamp) => {
   let datetime = new Date(Date.parse(timestamp)); //new Date(actualTime * 1000);
@@ -14,6 +18,7 @@ const timeFunc = (timestamp) => {
   let datetime = new Date(Date.parse(timestamp)); //new Date(actualTime * 1000);
   return datetime.toLocaleTimeString();
 };
+
 
 const ChartComponent = (props) => {
   const chartRef = useRef(null);
@@ -63,12 +68,44 @@ const ChartComponent = (props) => {
   return (
     <div className="d-flex justify-content-center col-md-6 p-2">
       <div style={{ width: "300px" }}>
+
         <canvas ref={chartRef} />
       </div>
     </div>
   );
 };
+const TransactionAmountTableComponent = (props) => {
 
+  return (
+    <div className="d-flex table-responsive-md mt-3 col-md-6">
+      <table className="table table-sm table-striped table-hover table-bordered">
+        <thead>
+          <tr>
+            <th colSpan={2}>Settlement Amount Summary</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Total Settlement  Amount Requested </td>
+
+            <td>
+           
+                {props.transactionsToday}
+              
+            </td>
+          </tr>
+          <tr>
+            <td>Total Amount Settled</td>
+            <td>{props.pendingTransactionsToday}</td>
+          </tr>
+        
+        </tbody>
+      </table>
+     
+    </div>
+    
+  );
+};
 const StatsTableComponent = (props) => {
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
   const toggleTransactionPopup = () => {
@@ -84,7 +121,7 @@ const StatsTableComponent = (props) => {
         </thead>
         <tbody>
           <tr>
-            <td>Number of Settlement Requests Today</td>
+            <td>Number of Settlement Requests </td>
 
             <td>
               <button
@@ -97,11 +134,11 @@ const StatsTableComponent = (props) => {
             </td>
           </tr>
           <tr>
-            <td>Number of Pending Settlement Requests Today</td>
+            <td>Number of  Settlement Requests in Process</td>
             <td>{props.pendingTransactionsToday}</td>
           </tr>
           <tr>
-            <td>Number of Rejected Settlement Requests Today</td>
+            <td>Number of Settlement Requests rejected</td>
             <td>{props.rejectedTransactionsToday}</td>
           </tr>
         </tbody>
@@ -119,8 +156,10 @@ const StatsTableComponent = (props) => {
         </Modal.Body>
       </Modal>
     </div>
+    
   );
 };
+
 
 const TransactionStatsComponent = ({
   transactionStatsData,
@@ -146,7 +185,24 @@ const TransactionStatsComponent = ({
           StatusData.TxBalanced || 0,
           StatusData.TxCleared || 0,
         ]}
-        labels={["Requested", "Submitted", "Authorized", "Balanced", "Cleared"]}
+        labels={["In process", "Completed",  "Rejected"]}
+      />
+       <TransactionAmountTableComponent
+        transactionsToday={TransactionsComponent.transactionAmount} 
+        pendingTransactionsToday={transactionStatsData.pendingTransactionsToday}
+       
+        
+       
+      />
+      <ChartComponent
+        data={[
+          StatusData.TxRequested || 0,
+          StatusData.TxSubmitted || 0,
+          StatusData.TxAuthorized || 0,
+          StatusData.TxBalanced || 0,
+          StatusData.TxCleared || 0,
+        ]}
+        labels={["In process", "Completed",  "Rejected"]}
       />
     </>
   );
@@ -166,8 +222,8 @@ const TransactionsComponent = ({ transactions }) => {
             </th>
             <th className="fontSize">S/R Txn ID</th>
             <th className="fontSize">Merchant ID</th>
-            <th className="fontSize">Customer ID</th>
-            <th className="fontSize">Loan Ref Number</th>
+            <th className="fontSize">STAN</th>
+
             <th className="fontSize">S/R Txn Amount</th>
             <th className="fontSize">S/R Txn Status</th>
           </tr>
@@ -188,8 +244,8 @@ const TransactionsComponent = ({ transactions }) => {
                     item.Record.txID.substr(item.Record.txID.length - 5)}
                 </td>
                 <td>{item.Record.MerchantId}</td>
-                <td>{item.Record.CustomerId}</td>
-                <td>{item.Record.LoanReferenceNumber}</td>
+                <td></td>
+
                 <td>{item.Record.transactionAmount}</td>
                 <td>{item.Record.TxStatus}</td>
               </tr>
@@ -226,6 +282,17 @@ const DashboardSummary = ({ roleId }) => {
 
     fetchTransactionStats();
   }, []);
+  const [dateFilter, setDateFilter] = useState({ startDate: null, endDate: null });
+  const [transactionStatus, setTransactionStatus] = useState('');
+const [merchant, setMerchant] = useState('');
+
+const handleFilterClick = () => {
+  console.log('Filter button clicked');
+  console.log('Transaction Status:', transactionStatus);
+  console.log('Merchant:', merchant);
+};
+
+
 
   if (loading) {
     return <div>Loading transaction data...</div>;
@@ -238,7 +305,56 @@ const DashboardSummary = ({ roleId }) => {
           className="row"
           style={{ background: "rgb(235, 234, 242)", minHeight: "400px" }}
         >
-          <h5 className="text-center">Settlement Requests Stats</h5>
+          <h5 className="text-center">Transaction Summary</h5>
+          <br/> <br/> 
+          {/* <div className="date-filter" style={{ display: 'flex', alignItems: 'center' }}> */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '90%' }}>
+            <h4>Date:</h4>
+            &nbsp;&nbsp;
+          
+  
+            
+           
+<DatePicker
+      selected={dateFilter.startDate}
+      onChange={date => setDateFilter({ ...dateFilter, startDate: date })}
+      selectsStart
+      startDate={dateFilter.startDate}
+      endDate={dateFilter.endDate}
+      dateFormat="dd/MM/yyyy"
+      placeholderText="DD/MM/YYYY"
+    />
+    &nbsp;&nbsp;
+    <DatePicker
+      selected={dateFilter.endDate}
+      onChange={date => setDateFilter({ ...dateFilter, endDate: date })}
+      selectsEnd
+      startDate={dateFilter.startDate}
+      endDate={dateFilter.endDate}
+      minDate={dateFilter.startDate}
+      dateFormat="dd/MM/yyyy"
+      placeholderText="DD/MM/YYYY"
+    />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <DropdownButton id="dropdown-basic-button" title={transactionStatus || "Transaction Status"}>
+      <Dropdown.Item onClick={() => setTransactionStatus('Completed')}>Completed</Dropdown.Item>
+      <Dropdown.Item onClick={() => setTransactionStatus('In-process')}>In-process</Dropdown.Item>
+      <Dropdown.Item onClick={() => setTransactionStatus('Rejected')}>Rejected</Dropdown.Item>
+    </DropdownButton>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <DropdownButton id="dropdown-basic-button" title={merchant || "Merchant Name"}>
+      <Dropdown.Item onClick={() => setMerchant('Merchant 1')}>Merchant 1</Dropdown.Item>
+      <Dropdown.Item onClick={() => setMerchant('Merchant 2')}>Merchant 2</Dropdown.Item>
+      <Dropdown.Item onClick={() => setMerchant('Merchant 3')}>Merchant 3</Dropdown.Item>
+    </DropdownButton>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <Button onClick={handleFilterClick} style={{ width: '150px',height:'40px' }}>Filter</Button>
+          </div>
+          <br /> <br/>
+
+
+
+
           <TransactionStatsComponent
             transactionStatsData={transactionStatsData}
           />
