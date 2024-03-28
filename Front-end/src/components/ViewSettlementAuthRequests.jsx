@@ -13,7 +13,7 @@ const apiInfo = {
 const requiredStatuses = ["TxConfirmed", "TxSubmitted", "TxAccounted"];
 const rejectedStatuses = ["TxNonConfirmed", "TxNotSubmitted", "TxNotAccounted"];
 
-const ViewSettlementAuthRequests = ({ roleId, systemsTraceAuditNumbers }) => {
+const ViewSettlementAuthRequests = ({ roleId, batchNumber }) => {
   const [loading, setLoading] = useState(true);
   const [x100Msgs, setX100Msgs] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
@@ -39,9 +39,7 @@ const ViewSettlementAuthRequests = ({ roleId, systemsTraceAuditNumbers }) => {
         const x100Msgs = allMsgs.filter(
           (msg) =>
             msg.Record.messageType === "x100" &&
-            systemsTraceAuditNumbers.includes(
-              msg.Record.systemsTraceAuditNumber
-            )
+            msg.Record.batchNumber === batchNumber
         );
         setX100Msgs(x100Msgs);
         setLoading(false);

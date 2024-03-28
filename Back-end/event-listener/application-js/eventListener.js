@@ -21,19 +21,19 @@ const io = socketIo(server, {
 const channelName = 'channel1';
 
 const org1MSP = 'Org1MSP';
-const Org1UserId = 'appOrg1User52';
+const Org1UserId = 'appOrg1User47';
 
 const orgPSPMSP = 'PSPMSP';
-const OrgPSPUserId = 'appOrgPSPUser52';
+const OrgPSPUserId = 'appOrgPSPUser47';
 
 const orgACDMSP = 'ACDMSP';
-const OrgACDUserId = 'appOrgACDUser52';
+const OrgACDUserId = 'appOrgACDUser47';
 
 const orgAADMSP = 'AADMSP';
-const OrgAADUserId = 'appOrgAADUser52';
+const OrgAADUserId = 'appOrgAADUser47';
 
 const orgAODMSP = 'AODMSP';
-const OrgAODUserId = 'appOrgAODUser52';
+const OrgAODUserId = 'appOrgAODUser47';
 
 const RED = '\x1b[31m\n';
 const GREEN = '\x1b[32m\n';
@@ -167,19 +167,19 @@ const startServer = () => {
 							console.log(`${GREEN}<-- Submit SubmitSettlementTxCC submitSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
 						}
 
-						if (event.eventName == 'EMT-RT-X100' && stateObj.executionMode == "auto") {
-							console.log(`${GREEN}--> Submit ConfirmSettlementTxCC Transaction confirmSettlementTx, ${stateObj.key}`);
-							transaction = contractConfirmSettlementTxCCOrgAOD.createTransaction('confirmSettlementTx');
-							const splitKey = [...stateObj.key.split("-")];
-							// if (stateObj.executionMode == "manual") {
-							// 	console.log("manual mode");
-							// 	socket.emit('status-change', { status: 'requested', data: splitKey });
+						// if (event.eventName == 'EMT-RT-X100' && stateObj.executionMode == "auto") {
+						// 	console.log(`${GREEN}--> Submit ConfirmSettlementTxCC Transaction confirmSettlementTx, ${stateObj.key}`);
+						// 	transaction = contractConfirmSettlementTxCCOrgAOD.createTransaction('confirmSettlementTx');
+						// 	const splitKey = [...stateObj.key.split("-")];
+						// 	// if (stateObj.executionMode == "manual") {
+						// 	// 	console.log("manual mode");
+						// 	// 	socket.emit('status-change', { status: 'requested', data: splitKey });
 
-							// }
-							console.log("Emitted status-change for requested - ", splitKey);
-							await transaction.submit(...splitKey);
-							console.log(`${GREEN}<-- Confirm ConfirmSettlementTxCC confirmSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
-						}
+						// 	// }
+						// 	console.log("Emitted status-change for requested - ", splitKey);
+						// 	await transaction.submit(...splitKey);
+						// 	console.log(`${GREEN}<-- Confirm ConfirmSettlementTxCC confirmSettlementTx Result: committed, for ${stateObj.key}${RESET}`);
+						// }
 					} catch (error) {
 						console.log(`${RED}<-- Submit Failed: ConfirmSettlementTxCC verifyAndChangeStatus - ${createError}${RESET}`);
 					}

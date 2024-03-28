@@ -14,18 +14,22 @@ import ViewSettlementAuthRequests from "./ViewSettlementAuthRequests";
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
 const apiInfo = {
-  TxRequested: "verifySubmitTx",
+  TxRequested: "verifyConfirmTx",
+  TxConfirmed: "verifySubmitTx",
   TxSubmitted: "verifyAccountTx",
 };
 
-const requiredStatuses = ["TxSubmitted", "TxAccounted"];
-const rejectedStatuses = ["TxNotSubmitted", "TxNotAccounted"];
+const requiredStatuses = ["TxConfirmed", "TxSubmitted", "TxAccounted"];
+const rejectedStatuses = ["TxNonConfirmed", "TxNotSubmitted", "TxNotAccounted"];
 
 const ViewSettlementTxnRequests = ({ roleId }) => {
   const [loading, setLoading] = useState(true);
   const [x500Msgs, setX500Msgs] = useState([]);
+  const [mdr, setMdr] = useState(null);
   const [systemsTraceAuditNumbers, setSystemsTraceAuditNumbers] =
     useState(null);
+  const [batchNumber, setBatchNumber] = useState(null);
+
   const [errorMsg, setErrorMsg] = useState("");
 
   const [show, setShow] = useState(false);
@@ -49,10 +53,10 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
   };
   const handleShowMerchantDetails = () => {
     setShowMerchantDetails(true);
-  }
+  };
   const handleShowTransactionDetails = () => {
     setShowTransactionDetails(true);
-  }
+  };
   const handleTxnRequest = async (
     msgType,
     merchantId,
@@ -107,7 +111,13 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
         const allMsgResponse = await axios.get(
           `${apiBaseUrl}/api/v1/GetTxByRange/${roleId}`
         );
+
+        // const mdrResponse = await axios.get(
+        //   `${apiBaseUrl}/api/v1/retrievePvAADAODMetaData/${merchantId}/AOD`
+        // );
+
         console.log("allmsgresponse", allMsgResponse);
+        // console.log("mdrresponse", mdrResponse);
         const allMsgs = allMsgResponse.data.response;
         let x500Msgs = allMsgs.filter(
           (msg) => msg.Record.messageType === "x500"
@@ -130,7 +140,6 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
 
     fetchX500Msgs();
   }, []);
-
 
   return (
     <div style={{ minHeight: "520px" }}>
@@ -175,10 +184,11 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                     <th>Settlement Txn ID</th>
                     <th>Settlement transaction status</th>
                     <th>Settlement transaction amount</th>
+                    <th>Net transaction amount</th>
                     <th>Merchant Details</th>
                     <th>Transaction Details</th>
                     <th>Batch ID</th>
-                    
+
                     <th>X100 Authorization requests</th>
                     <th>Confirm Settlement Txn</th>
                     <th>Submit Settelement Txn</th>
@@ -207,26 +217,44 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                         </OverlayTrigger>
                       </td>
                       <td>{x500Msg.Record.TxStatus}</td>
-                      <td></td>
-                      <td>{x500Msg.Record.MerchantName}
+                      <td>{parseInt(x500Msg.Record.amountNetSettlement)}</td>
+                      <td>{parseInt(x500Msg.Record.amountNetSettlement)}</td>
+                      <td>
+                        {x500Msg.Record.MerchantName}
                         <br />
-                        <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={handleShowMerchantDetails}>
+                        <span
+                          style={{
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                          }}
+                          onClick={handleShowMerchantDetails}
+                        >
                           View More
-                        </span></td>
-                      <td>{x500Msg.Record.CustomerId}
+                        </span>
+                      </td>
+                      <td>
+                        {x500Msg.Record.CustomerId}
                         <br />
-                        <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={handleShowTransactionDetails}>
+                        <span
+                          style={{
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                          }}
+                          onClick={handleShowTransactionDetails}
+                        >
                           View More
-                        </span></td>
+                        </span>
+                      </td>
                       <td>{x500Msg.Record.LoanReferenceNumber}</td>
-                      
+
                       <td>
                         <Button
                           variant="primary"
                           onClick={() => {
-                            setSystemsTraceAuditNumbers(
-                              x500Msg.Record.systemsTraceAuditNumber.split(",")
-                            );
+                            // setSystemsTraceAuditNumbers(
+                            //   x500Msg.Record.systemsTraceAuditNumber.split(",")
+                            // );
+                            setBatchNumber(x500Msg.Record.batchNumber);
                             handleShow();
                           }}
                         >
@@ -234,10 +262,54 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                         </Button>
                       </td>
 
+                      <td>
+                        {getButtonOrStatus(
+                          x500Msg.Record.TxStatus,
+                          0,
+                          requiredStatuses,
+                          rejectedStatuses,
+                          () =>
+                            handleTxnRequest(
+                              "x500",
+                              x500Msg.Record.MerchantId,
+                              x500Msg.Record.CustomerId,
+                              x500Msg.Record.LoanReferenceNumber,
+                              apiInfo[x500Msg.Record.TxStatus]
+                            )
+                        )}
+                        {/* {x500Msg.Record.TxStatus === "TxRequested" ? (
+                          <LoaderButton handlerFunc={() =>
+                            handleTxnRequest(
+                              "x500",
+                              x500Msg.Record.MerchantId,
+                              x500Msg.Record.CustomerId,
+                              x500Msg.Record.LoanReferenceNumber,
+                              apiInfo[x500Msg.Record.TxStatus]
+                            )} />
+                        ) : x500Msg.Record.TxStatus === "TxConfirmed" ? <>Confirmed</> : x500Msg.Record.TxStatus === "TxNonConfirmed" ? <>Not Confirmed</> : < */}
+                      </td>
 
                       <td>
                         {getButtonOrStatus(
                           x500Msg.Record.TxStatus,
+                          1,
+                          requiredStatuses,
+                          rejectedStatuses,
+                          () =>
+                            handleTxnRequest(
+                              "x500",
+                              x500Msg.Record.MerchantId,
+                              x500Msg.Record.CustomerId,
+                              x500Msg.Record.LoanReferenceNumber,
+                              apiInfo[x500Msg.Record.TxStatus]
+                            )
+                        )}
+                      </td>
+
+                      <td>
+                        {getButtonOrStatus(
+                          x500Msg.Record.TxStatus,
+                          2,
                           requiredStatuses,
                           rejectedStatuses,
                           () =>
@@ -267,7 +339,7 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                 <Modal.Body>
                   <ViewSettlementAuthRequests
                     roleId={roleId}
-                    systemsTraceAuditNumbers={systemsTraceAuditNumbers}
+                    batchNumber={batchNumber}
                   />
                 </Modal.Body>
                 <Modal.Footer>
@@ -286,19 +358,15 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                   <Modal.Title>Merchant Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                <div className="mt-3">
-                    
+                  <div className="mt-3">
                     <div style={{ overflow: "auto" }}>
                       <Table bordered hover>
                         <thead>
-
                           <tr>
-
                             <th>Merchant Name</th>
                             <th>Merchant ID</th>
                             <th>Negotiated MDR</th>
                             <th>POS ID</th>
-
                           </tr>
                         </thead>
                         <tbody>
@@ -307,18 +375,17 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                             <th></th>
                             <th></th>
                             <th></th>
-                            </tr>
-
-
-
+                          </tr>
                         </tbody>
                       </Table>
                     </div>
                   </div>
-
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button variant="secondary" onClick={handleCloseMerchantDetails}>
+                  <Button
+                    variant="secondary"
+                    onClick={handleCloseMerchantDetails}
+                  >
                     Close
                   </Button>
                 </Modal.Footer>
@@ -334,37 +401,33 @@ const ViewSettlementTxnRequests = ({ roleId }) => {
                 </Modal.Header>
                 <Modal.Body>
                   <div className="mt-3">
-                    
                     <div style={{ overflow: "auto" }}>
                       <Table bordered hover>
                         <thead>
-
                           <tr>
-
                             <th>Transaction STAN</th>
                             <th>Transaction Date</th>
                             <th>Transaction Status</th>
                             <th>Transaction Amount</th>
-
                           </tr>
                         </thead>
                         <tbody>
                           <tr>
                             <th></th>
-                        
+
                             <th></th>
                             <th></th>
-                            </tr>
-
-
-
+                          </tr>
                         </tbody>
                       </Table>
                     </div>
                   </div>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button variant="secondary" onClick={handleCloseTransactionDetails}>
+                  <Button
+                    variant="secondary"
+                    onClick={handleCloseTransactionDetails}
+                  >
                     Close
                   </Button>
                 </Modal.Footer>
@@ -400,17 +463,24 @@ const Loading = () => {
 
 const getButtonOrStatus = (
   status,
+  currentRequiredStatus,
   requiredStatuses,
   rejectedStatuses,
   handlerFunc
 ) => {
-  if (status === requiredStatuses[requiredStatuses.length - 1]) {
-    return "-";
-  } else if (rejectedStatuses.includes(status)) {
-    return <>{status}</>;
-  } else {
+  const statusIndex = requiredStatuses.findIndex((st) => st === status);
+  if (currentRequiredStatus === statusIndex + 1) {
     return <LoaderButton handlerFunc={handlerFunc} />;
   }
+  if (
+    (statusIndex <= currentRequiredStatus &&
+      requiredStatuses.includes(status)) ||
+    rejectedStatuses.includes(status)
+  ) {
+    return <>{status}</>;
+  }
+
+  return <>{"-"}</>;
 };
 
 export default ViewSettlementTxnRequests;

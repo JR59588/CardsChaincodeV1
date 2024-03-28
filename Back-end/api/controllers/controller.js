@@ -174,7 +174,7 @@ const getArgsArray = (msg, type, executionMode) => {
         isoData.currencyCode,
         isoData.additionalDataISO,
         msg.batchNumber,
-        msg.approverCode,
+        isoData.responseCode,
         isoData.authorizationIdentificationResponse,
         msg.messageType,
         executionMode

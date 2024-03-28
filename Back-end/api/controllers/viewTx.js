@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 const { Wallets, Gateway } = require("fabric-network");
 const fs = require("fs");
 const path = require("path");
-const { parseJSONFile } = require("./utils");
+const { parseJSONFile, evaluateTransactionWithEndorsingOrganizations } = require("./utils");
 const channelName = "channel1";
 const contractName = "onboardingMerchantC";
 const UNAUTHORIZED = "Not Authorized";
@@ -102,10 +102,29 @@ exports.GetTxByRange = async function (req, res) {
       startKey,
       endKey
     );
-    console.log(
-      `Transaction has been evaluated, result is: ${result.toString()}`
-    );
-    res.status(200).json({ response: JSON.parse(result.toString()) });
+
+    const pdcContract = network.getContract("onboardingMerchantC");
+
+
+    const allMessages = JSON.parse(result.toString());
+    console.log("all messages parsed: ", allMessages)
+
+    allMessages.map(async (message) => {
+      if (message.Record.messageType === 'x500') {
+
+        const merchantDetails = await evaluateTransactionWithEndorsingOrganizations("AAD", "channel1", "onboardingMerchantC", "retrievePvAADAODMetaData", [message.Record.cardAcceptorIdentificationCode], ['AADMSP', 'AODMSP'])
+        // const merchantDetails = await pdcContract.evaluateTransaction("retrievePvAADAODMetaData");
+        console.log("Fetched merchant details from pdc: ", merchantDetails);
+        message.Record.negotiatedMDR = merchantDetails.txcNegotiatedMDR || 10;
+      }
+
+      return message;
+    });
+
+    // console.log(
+    //   `Transaction has been evaluated, result is: ${result.toString()}`
+    // );
+    res.status(200).json({ response: allMessages });
 
     // Disconnect from the gateway.
     await gateway.disconnect();

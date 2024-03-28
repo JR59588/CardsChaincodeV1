@@ -38,10 +38,10 @@ class ConfirmSettlementTxCC extends Contract {
       } = await pymtutils.hlfconstants();
       //TODO : change the function of the utils.js for channel name.(replace:getChannelIdentity )
       const channelName = await pymtutils.getChannelIdentity(ctx);
-      let key = messageType + "-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
-      console.log(" confirmTx.js:key", key);
+      let x500Key = messageType + "-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
+      console.log(" confirmTx.js:x500Key", x500Key);
 
-      var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
+      var txObj = await pymtutils.readTxStatus(ctx, x500Key, channelName);
 
       console.log(JSON.stringify(txObj) + "tx value");
 
@@ -52,38 +52,66 @@ class ConfirmSettlementTxCC extends Contract {
 
       //@to-do verify chaincode has data for key
       if (currentTxReadState.length == 0) {
-        throw new Error(`Invalid Key : ${key} not found `);
+        throw new Error(`Invalid X500 Key : ${x500Key} not found `);
       }
 
       //@to-do verify chaincode tx state is initiated only.
       if (!(currentTxReadState.TxStatus == TXSTATUS_REQUESTED)) {
-        throw new Error(`Invalid Transaction state  for key  : ${key}`);
+        throw new Error(`Invalid Transaction state  for x500Key  : ${x500Key}`);
       }
 
       const prevTxns = JSON.parse(prevTxnsStr);
-      const x100_stan = currentTxReadState.systemsTraceAuditNumber;
-      const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === x100_stan);
 
-      if (x110Msgs.length == 0) {
-        throw new Error(`No x110 messages found corresponding to x100 message with given Systems trace audit number ${currentTxReadState.systemsTraceAuditNumber}`);
+      const x500_batchNumber = currentTxReadState.batchNumber;
+
+      const x100Msgs = prevTxns.filter(txn => txn.Record.messageType === 'x100' && txn.Record.batchNumber === x500_batchNumber);
+
+      let allConfirmed = true;
+
+      for (let i = 0; i < x100Msgs.length; i++) {
+        const x100Msg = x100Msgs[i];
+        console.log("X100 message is: ", x100Msg);
+
+        const x100_stan = x100Msg.Record.systemsTraceAuditNumber;
+
+        // finding x110 message
+        const x110Msg = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === x100_stan)[0];
+        // console.log("ConfirmTxCC AAD: X110 message read: ", x110Msg);
+
+        // if (!x110Msg) {
+        //   throw new Error(`No x110 messages found corresponding to x100 message with given Systems trace audit number ${currentTxReadState.systemsTraceAuditNumber}`);
+        // }
+
+        const isConfirmed = await this.confirmTxByACD(
+          ctx,
+          x100Msg.Record,
+          x110Msg
+        );
+
+        let state;
+        if (isConfirmed) {
+          state = TXSTATUS_CONFIRMED;
+        } else {
+          state = TXSTATUS_NON_CONFIRMED;
+          allConfirmed = false;
+        }
+        // putState the state to utilsCC
+        x100Msg.Record.TxStatus = state;
+        const x100Key = "x100-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
+
+        const txObj = await pymtutils.writeTxStatus(ctx, x100Key, channelName, x100Msg.Record);
+        console.log("ConfirmTxCC AAD: After saving x100 message", txObj);
       }
-
-      const isConfirmed = await this.confirmTxByACD(
-        ctx,
-        currentTxReadState,
-        x110Msgs[0]
-      );
-
-      var state;
-      if (isConfirmed) {
-        state = TXSTATUS_CONFIRMED;
+      // saving x500 status finally
+      if (allConfirmed) {
+        currentTxReadState.TxStatus = TXSTATUS_CONFIRMED;
+        const txObj = await pymtutils.writeTxStatus(ctx, x500Key, channelName, currentTxReadState);
+        console.log("ConfirmTxCC AAD: After saving x500 message", txObj);
       } else {
-        state = TXSTATUS_NON_CONFIRMED;
+        currentTxReadState.TxStatus = TXSTATUS_NON_CONFIRMED;
+        const txObj = await pymtutils.writeTxStatus(ctx, x500Key, channelName, currentTxReadState);
+        console.log("ConfirmTxCC AAD: After saving x500 message", txObj);
       }
-      // putState the state to utilsCC
-      currentTxReadState.TxStatus = state;
-      var txObj = await pymtutils.writeTxStatus(ctx, key, channelName, currentTxReadState);
-      console.log("txObj", txObj);
 
       var OrgMSPId = await ctx.clientIdentity.getMSPID();
       var hlfevent = new HLFEVENT();
@@ -93,7 +121,7 @@ class ConfirmSettlementTxCC extends Contract {
           ctx,
           AAD_ACD_CT_EVENT,
           AAD_ACD_CT_EVENT.eventID,
-          key,
+          x500Key,
           OrgMSPId,
           channelName
         );
@@ -101,6 +129,7 @@ class ConfirmSettlementTxCC extends Contract {
         console.log(err);
         throw err;
       }
+      return currentTxReadState;
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error));
       throw Error(error);
@@ -111,8 +140,14 @@ class ConfirmSettlementTxCC extends Contract {
     var isConfirmed = true;
     // TODO : check the validations and change accordingly (discussion with nishanth)
 
-    if (x110Msg.Record.approverCode === 0) { // not approved.
-      isConfirmed = false
+    if (!x110Msg) {
+      return false;
+    }
+
+    // console.log("x100Msg: ", x110Msg, "x110Msg record: ", x110Msg.Record);
+
+    if (x110Msg.Record.approverCode === "00") { // not approved.
+      return false;
     }
 
     const hasTxprocessingCode = "processingCode" in txIn;

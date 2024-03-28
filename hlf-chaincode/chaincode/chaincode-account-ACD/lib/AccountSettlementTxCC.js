@@ -32,17 +32,18 @@ class AccountSettlementTxCC extends Contract {
       let {
         // TODO : update the utils.js file (hlfconstants)  
         TXSTATUS_SUBMITTED,
-        TXSTATUS_CONFIRMED,
+        TXSTATUS_ACCOUNTED,
+        TXSTATUS_NON_ACCOUNTED,
         TXSTATUS_NOT_SUBMITTED
 
       } = await pymtutils.hlfconstants();
       //TODO : change the function of the utils.js for channel name.(replace:getChannelIdentity )
       const channelName = await pymtutils.getChannelIdentity(ctx);
 
-      let key500 = messageType + "-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
-      console.log(" confirmTx.js:key", key500);
+      let x500Key = messageType + "-" + merchantId + "-" + customerId + "-" + loanReferenceNumber;
+      console.log("ACD: AccountTxCC key:", x500Key);
 
-      var txObj500 = await pymtutils.readTxStatus(ctx, key500, channelName);
+      var txObj500 = await pymtutils.readTxStatus(ctx, x500Key, channelName);
 
       const x500Msg = JSON.parse(txObj500);
 
@@ -55,92 +56,68 @@ class AccountSettlementTxCC extends Contract {
         throw new Error(`Invalid Key : ${x500Msg} not found `);
       }
 
-      let isAccounted = false;
-      isAccounted = await this.accountTxByACD(
-        ctx,
-        currentTxReadState
-      );
+      // let isAccounted = false;
+      // isAccounted = await this.accountTxByACD(
+      //   ctx,
+      //   currentTxReadState
+      // );
 
       // checking if isaccounted is false
-      if (isAccounted == false) {
-        throw new Error(`Invalid Key : ${x500Msg} not valid error thrown by ACD `);
-      }
+      // if (isAccounted == false) {
+      //   throw new Error(`Invalid Key : ${x500Msg} not valid error thrown by ACD `);
+      // }
       // var txObj = await pymtutils.readTxStatus(ctx, key, channelName);
       // console.log(JSON.stringify(txObj) + "tx value");
       const prevTxnsStr = await pymtutils.readAllPrevTxns(ctx, channelName); //read prev txns using channel name
 
       const prevTxns = JSON.parse(prevTxnsStr);
-      let stan = currentTxReadState.systemsTraceAuditNumber;
-      let stans = stan.split(',')
-      let statuses = []
-      for (let iii = 0; iii < stans.length; iii++) {
-        stan = stans[iii]
-        console.log("Stan is: ", stan);
-        console.log("Previous transactions are:", prevTxns);
 
-        const x100Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x100" && prevTxn.Record.systemsTraceAuditNumber === stan);
+      const x500_batchNumber = currentTxReadState.batchNumber;
 
-        console.log("Filtered x100 messages are: ", x100Msgs);
+      const x100Msgs = prevTxns.filter(txn => txn.Record.messageType === 'x100' && txn.Record.batchNumber === x500_batchNumber);
 
-        let x100Verified = true;
-        const x100Msg = x100Msgs[0]; //if no x100Msg raise error
-        if (x100Msg.Record.TxStatus !== 'TxSubmitted') {
-          x100Verified = false;
-        }
+      let allAccounted = true;
 
-        //const x110Msgs = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === stan);
-
-        // let x110Verified = true;
-        // const x110Msg = x110Msgs[0];
-        // if (x110Msg.Record.TxStatus !== 'TxSubmitted') {
-        //     x110Verified = false;
+      for (let i = 0; i < x100Msgs.length; i++) {
+        const x100Msg = x100Msgs[i];
+        console.log("X100 message is: ", x100Msg);
+        // const x100_stan = x100Msg.Record.systemsTraceAuditNumber;
+        // finding x110 message
+        // const x110Msg = prevTxns.filter((prevTxn) => prevTxn.Record.messageType === "x110" && prevTxn.Record.systemsTraceAuditNumber === x100_stan)[0];
+        // console.log("AccountTxCC AAD: X110 message read: ", x110Msg);
+        // if (!x110Msg) {
+        //   throw new Error(`No x110 messages found corresponding to x100 message with given Systems trace audit number ${currentTxReadState.systemsTraceAuditNumber}`);
         // }
 
-        if (x100Verified) {
-          statuses.push('TxAccounted')
-          console.log("Result after verifying all x100 messages with stan ", stan, 'TxAccounted');
+        const isAccounted = await this.accountTxByACD(
+          ctx,
+          x100Msg.Record,
+        );
 
-          x100Msg.TxStatus = 'TxAccounted';
-          // x110Msg.TxStatus = 'TxAccounted';
-          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
-          console.log(" x100 key::", key);
-          let txObj = x100Msg.Record
-          txObj.TxStatus = 'TxAccounted'
-          var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
-          console.log("txobj2", txobj2);
-
-
-          // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
-          // console.log(" x100 key::", key);
-          // txObj = x110Msg.Record
-          // txObj.TxStatus = 'TxSubmitted'
-          // var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
-          // console.log("txobj2", txobj2);
-
+        let state;
+        if (isAccounted) {
+          state = TXSTATUS_ACCOUNTED;
         } else {
-          statuses.push('TxNotAccounted')
-          console.log("Result after verifying all x100 messages with stan ", stan, 'TxNotAccounted');
-
-          let key = x100Msg.Record.messageType + "-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
-
-          console.log(" x100 key::", key);
-          let txObj = x100Msg.Record
-          txObj.TxStatus = 'TxNotAccounted'
-          var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
-          console.log("txobj2", txobj2);
-
-
-          // key = x110Msg.Record.messageType + "-" +  x110Msg.Record.merchantId + "-" +  x110Msg.Record.customerId + "-" +  x110Msg.Record.loanReferenceNumber;
-          // console.log(" x100 key::", key);
-          // txObj = x110Msg.Record
-          // txObj.TxStatus = 'TxNotAccounted'
-          // var txobj2 = await pymtutils.writeTxStatus(ctx, key, channelName, txObj);
-          // console.log("txobj2", txobj2);
+          state = TXSTATUS_NON_ACCOUNTED;
+          allAccounted = false;
         }
+        // putState the state to utilsCC
+        x100Msg.Record.TxStatus = state;
+        const x100Key = "x100-" + x100Msg.Record.MerchantId + "-" + x100Msg.Record.CustomerId + "-" + x100Msg.Record.LoanReferenceNumber;
+
+        const txObj = await pymtutils.writeTxStatus(ctx, x100Key, channelName, x100Msg.Record);
+        console.log("AccountTxCC AAD: After saving x100 message", txObj);
       }
-      x500Msg.TxStatus = 'TxAccounted';
-      let x500MsgUpdated = await pymtutils.writeTxStatus(ctx, key500, channelName, x500Msg);
-      return x500Msg;
+      // saving x500 status finally
+      if (allAccounted) {
+        currentTxReadState.TxStatus = TXSTATUS_ACCOUNTED;
+        const txObj = await pymtutils.writeTxStatus(ctx, x500Key, channelName, currentTxReadState);
+        console.log("AccountTxCC ACD: After saving x500 message", txObj);
+      } else {
+        currentTxReadState.TxStatus = TXSTATUS_NON_ACCOUNTED;
+        const txObj = await pymtutils.writeTxStatus(ctx, x500Key, channelName, currentTxReadState);
+        console.log("AccountTxCC ACD: After saving x500 message", txObj);
+      }
     } catch (error) {
       console.log("Error inside submit Tx :", JSON.stringify(error), error);
       throw Error(error);
@@ -149,23 +126,7 @@ class AccountSettlementTxCC extends Contract {
 
 
   async accountTxByACD(ctx, txIn) {
-    var isAccounted = true;
-    // TODO : check the validations and change accordingly (discussion with nishanth)
-    const hasTxnetworkInternationalId = "networkInternationalId" in txIn;
-    if (hasTxnetworkInternationalId) {
-      if (txIn.networkInternationalId === "" || txIn.networkInternationalId.length == 0) {
-        isAccounted = false;
-        console.log(
-          "Validation by ACD... networkInternationalId not valid: ",
-          isAccounted
-        );
-        return isAccounted;
-      }
-    } else {
-      return false;
-    }
-
-    return isAccounted;
+    return txIn.TxStatus === 'TxSubmitted';
   }
 
   async emitEvent(ctx, eventType, eventID, keyIn, txIn, MSPId, chName) {

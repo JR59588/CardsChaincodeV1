@@ -162,7 +162,7 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
                     <th>Txn Reference Number</th>
                     <th>Systems trace audit number</th>
                     <th>Status</th>
-                    <th>Request Txn</th>
+                    {/* <th>Request Txn</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -193,7 +193,7 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
                       <td>{x100Msg.Record.systemsTraceAuditNumber}</td>
                       <td>{x100Msg.Record.TxStatus}</td>
 
-                      <td>
+                      {/* <td>
                         {getButtonOrStatus(
                           x100Msg.Record.TxStatus,
                           requiredStatuses,
@@ -207,7 +207,7 @@ const ViewAuthorizationTxnRequests = ({ roleId }) => {
                               apiInfo[x100Msg.Record.TxStatus]
                             )
                         )}
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>
