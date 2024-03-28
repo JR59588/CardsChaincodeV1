@@ -257,7 +257,7 @@ const TransactionsComponent = ({ transactions }) => {
   );
 };
 
-const DashboardSummary = ({ roleId }) => {
+const DashboardSummary = ({ roleId,orgOptions }) => {
   const [loading, setLoading] = useState(true);
   const [transactionStatsData, setTransactionStatsData] = useState(null);
 
@@ -287,7 +287,7 @@ const DashboardSummary = ({ roleId }) => {
 const [merchant, setMerchant] = useState('');
 
 const handleFilterClick = () => {
-  console.log('Filter button clicked');
+  console.log('date button clicked');
   console.log('Transaction Status:', transactionStatus);
   console.log('Merchant:', merchant);
 };
@@ -336,16 +336,19 @@ const handleFilterClick = () => {
       placeholderText="DD/MM/YYYY"
     />
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <DropdownButton id="dropdown-basic-button" title={transactionStatus || "Transaction Status"}>
-      <Dropdown.Item onClick={() => setTransactionStatus('Completed')}>Completed</Dropdown.Item>
-      <Dropdown.Item onClick={() => setTransactionStatus('In-process')}>In-process</Dropdown.Item>
-      <Dropdown.Item onClick={() => setTransactionStatus('Rejected')}>Rejected</Dropdown.Item>
+    <DropdownButton id="dropdown-button-dark-example1" variant="secondary" title={transactionStatus || "Transaction Status"}>
+      <Dropdown.Item onClick={() => setTransactionStatus('completed')}>Completed</Dropdown.Item>
+      <Dropdown.Item onClick={() => setTransactionStatus('inProcess')}>In-process</Dropdown.Item>
+      <Dropdown.Item onClick={() => setTransactionStatus('rejected')}>Rejected</Dropdown.Item>
     </DropdownButton>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <DropdownButton id="dropdown-basic-button" title={merchant || "Merchant Name"}>
-      <Dropdown.Item onClick={() => setMerchant('Merchant 1')}>Merchant 1</Dropdown.Item>
-      <Dropdown.Item onClick={() => setMerchant('Merchant 2')}>Merchant 2</Dropdown.Item>
-      <Dropdown.Item onClick={() => setMerchant('Merchant 3')}>Merchant 3</Dropdown.Item>
+    <DropdownButton id="dropdown-button-dark-example1" variant="secondary" title={merchant || "Merchant Name"}>
+      {
+        orgOptions.map(org => {
+          return <Dropdown.Item onClick = {() => setMerchant(org.orgId)}>{org.orgName}</Dropdown.Item>
+        })
+      }
+ 
     </DropdownButton>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <Button onClick={handleFilterClick} style={{ width: '150px',height:'40px' }}>Filter</Button>

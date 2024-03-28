@@ -168,7 +168,7 @@ function App() {
           />
           <Route
             path="/DashboardSummary"
-            element={<DashboardSummary roleId={roleId} />}
+            element={<DashboardSummary roleId={roleId} orgOptions={orgOptions} />}
           />
           <Route path="*" element={<h1>Not found....</h1>} />
         </Routes>
